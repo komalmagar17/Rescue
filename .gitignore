@@ -16,3 +16,8 @@ __pycache__/
 # Environment / credentials
 .env
 .env.*
+
+# Internal dev & technical architecture documentation
+README_DEV.md
+README_INTERNAL.md
+README.local.md
