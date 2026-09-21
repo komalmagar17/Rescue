@@ -1,0 +1,179 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: >
+  Emergency Passport System - Serverless backend providing rapid emergency medical
+  profiles and nearby hospital routing for tourists and first responders.
+
+Globals:
+  Function:
+    Timeout: 10
+    MemorySize: 256
+    Runtime: python3.12
+    LoggingConfig:
+      LogFormat: JSON
+
+Parameters:
+  TouristProfilesTableName:
+    Type: String
+    Default: TouristProfiles
+    Description: Name of the DynamoDB table storing tourist emergency medical profiles.
+  HospitalsTableName:
+    Type: String
+    Default: Hospitals
+    Description: Name of the DynamoDB table storing verified hospital directory and capacity info.
+
+Resources:
+  # ============================================================================
+  # DynamoDB Tables (On-Demand / Pay-Per-Request Billing)
+  # ============================================================================
+  TouristProfilesTable:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      TableName: !Ref TouristProfilesTableName
+      BillingMode: PAY_PER_REQUEST
+      AttributeDefinitions:
+        - AttributeName: TouristID
+          AttributeType: S
+      KeySchema:
+        - AttributeName: TouristID
+          KeyType: HASH
+      PointInTimeRecoverySpecification:
+        PointInTimeRecoveryEnabled: true
+      SSESpecification:
+        SSEEnabled: true
+      Tags:
+        - Key: Project
+          Value: EmergencyPassport
+        - Key: Environment
+          Value: Dev
+
+  HospitalsTable:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      TableName: !Ref HospitalsTableName
+      BillingMode: PAY_PER_REQUEST
+      AttributeDefinitions:
+        - AttributeName: HospitalID
+          AttributeType: S
+      KeySchema:
+        - AttributeName: HospitalID
+          KeyType: HASH
+      PointInTimeRecoverySpecification:
+        PointInTimeRecoveryEnabled: true
+      SSESpecification:
+        SSEEnabled: true
+      Tags:
+        - Key: Project
+          Value: EmergencyPassport
+        - Key: Environment
+          Value: Dev
+
+  # ============================================================================
+  # API Gateway HTTP API
+  # ============================================================================
+  EmergencyHttpApi:
+    Type: AWS::Serverless::HttpApi
+    Properties:
+      Description: HTTP API for Emergency Passport access and first responder lookup
+      CorsConfiguration:
+        AllowMethods:
+          - GET
+          - POST
+          - OPTIONS
+        AllowHeaders:
+          - Content-Type
+          - Authorization
+          - X-Amz-Date
+          - X-Api-Key
+          - X-Amz-Security-Token
+        AllowOrigins:
+          - "*"
+
+  # ============================================================================
+  # Lambda Functions (Least Privilege Access)
+  # ============================================================================
+  EmergencyHandlerFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: EmergencyHandler
+      CodeUri: src/emergency_handler/
+      Handler: app.lambda_handler
+      Description: Placeholder entrypoint for emergency passport triage and lookup
+      Environment:
+        Variables:
+          TOURIST_PROFILES_TABLE: !Ref TouristProfilesTable
+          HOSPITALS_TABLE: !Ref HospitalsTable
+      # Least privilege IAM permissions: scoped strictly to CRUD on the two DynamoDB tables
+      Policies:
+        - DynamoDBCrudPolicy:
+            TableName: !Ref TouristProfilesTable
+        - DynamoDBCrudPolicy:
+            TableName: !Ref HospitalsTable
+        - Statement:
+            - Effect: Allow
+              Action:
+                - bedrock:InvokeModel
+              Resource: "*"
+      Events:
+        HealthCheck:
+          Type: HttpApi
+          Properties:
+            ApiId: !Ref EmergencyHttpApi
+            Path: /health
+            Method: GET
+        EmergencyGet:
+          Type: HttpApi
+          Properties:
+            ApiId: !Ref EmergencyHttpApi
+            Path: /emergency
+            Method: GET
+        EmergencyPost:
+          Type: HttpApi
+          Properties:
+            ApiId: !Ref EmergencyHttpApi
+            Path: /emergency
+            Method: POST
+        TouristLookup:
+          Type: HttpApi
+          Properties:
+            ApiId: !Ref EmergencyHttpApi
+            Path: /tourists/{tourist_id}
+            Method: GET
+        HospitalsList:
+          Type: HttpApi
+          Properties:
+            ApiId: !Ref EmergencyHttpApi
+            Path: /hospitals
+            Method: GET
+      Tags:
+        Project: EmergencyPassport
+
+# ============================================================================
+# Stack Outputs
+# ============================================================================
+Outputs:
+  HttpApiEndpoint:
+    Description: Base HTTP API endpoint URL for Emergency Passport service
+    Value: !Sub "https://${EmergencyHttpApi}.execute-api.${AWS::Region}.amazonaws.com"
+    Export:
+      Name: EmergencyPassportHttpApiEndpoint
+
+  EmergencyHandlerFunctionArn:
+    Description: Lambda Function ARN for EmergencyHandler
+    Value: !GetAtt EmergencyHandlerFunction.Arn
+
+  TouristProfilesTableName:
+    Description: DynamoDB Table Name for Tourist Profiles
+    Value: !Ref TouristProfilesTable
+
+  TouristProfilesTableArn:
+    Description: DynamoDB Table ARN for Tourist Profiles
+    Value: !GetAtt TouristProfilesTable.Arn
+
+  HospitalsTableName:
+    Description: DynamoDB Table Name for Hospitals Directory
+    Value: !Ref HospitalsTable
+
+  HospitalsTableArn:
+    Description: DynamoDB Table ARN for Hospitals Directory
+    Value: !GetAtt HospitalsTable.Arn

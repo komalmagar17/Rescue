@@ -1,0 +1,32 @@
+{
+  "version": "2.0",
+  "routeKey": "POST /emergency",
+  "rawPath": "/emergency",
+  "rawQueryString": "",
+  "headers": {
+    "accept": "*/*",
+    "content-type": "application/json",
+    "host": "localhost:3000",
+    "user-agent": "curl/8.0.1"
+  },
+  "requestContext": {
+    "accountId": "123456789012",
+    "apiId": "emergency-api",
+    "domainName": "localhost:3000",
+    "domainPrefix": "localhost",
+    "http": {
+      "method": "POST",
+      "path": "/emergency",
+      "protocol": "HTTP/1.1",
+      "sourceIp": "127.0.0.1",
+      "userAgent": "curl/8.0.1"
+    },
+    "requestId": "test-req-001",
+    "routeKey": "POST /emergency",
+    "stage": "$default",
+    "time": "20/Sep/2026:11:15:00 +0000",
+    "timeEpoch": 1790000000000
+  },
+  "body": "{\"tourist_id\": \"T-1001\", \"latitude\": 40.7128, \"longitude\": -74.0060}",
+  "isBase64Encoded": false
+}

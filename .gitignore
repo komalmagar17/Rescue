@@ -1,0 +1,18 @@
+# AWS SAM build directory
+.aws-sam/
+
+# Python virtual environment
+.venv/
+env/
+venv/
+ENV/
+
+# Python cache files
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+
+# Environment / credentials
+.env
+.env.*
