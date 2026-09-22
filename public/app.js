@@ -1092,13 +1092,112 @@ function initStitchCommandDock() {
 }
 
 // -----------------------------------------------------------------------------
+// 10.C Luxury Interactive Cursor & Spring Trailing Engine
+// -----------------------------------------------------------------------------
+class LuxuryCursorEngine {
+  constructor() {
+    this.dot = document.getElementById('cursorDot');
+    this.ring = document.getElementById('cursorRing');
+    this.trail = document.getElementById('cursorTrail');
+    if (!this.dot || !this.ring) return;
+
+    if (window.matchMedia('(hover: none) and (pointer: coarse)').matches) return;
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+
+    this.mouse = { x: -100, y: -100 };
+    this.ringPos = { x: -100, y: -100 };
+    this.isHovering = false;
+    this.isClicking = false;
+    this.isVisible = false;
+    this.lerpFactor = 0.22;
+
+    this._bindEvents();
+    this._renderLoop();
+  }
+
+  _bindEvents() {
+    window.addEventListener('pointermove', (e) => {
+      this.mouse.x = e.clientX;
+      this.mouse.y = e.clientY;
+
+      if (!this.isVisible) {
+        this.isVisible = true;
+        this.dot.style.opacity = '1';
+        this.ring.style.opacity = '1';
+      }
+
+      const target = e.target.closest(
+        'a, button, input, select, textarea, .btn, .custom-dropdown-btn, .custom-dropdown-item, .stitch-role-tab, .stitch-action-btn, .stitch-dock-link, .stitch-smart-chip, .stitch-card, .relationship-contact-card, .editorial-hospital-card, [data-interactive], [role="button"]'
+      );
+
+      if (target && !this.isHovering) {
+        this.isHovering = true;
+        document.body.classList.add('cursor-hovering');
+      } else if (!target && this.isHovering) {
+        this.isHovering = false;
+        document.body.classList.remove('cursor-hovering');
+      }
+    }, { passive: true });
+
+    window.addEventListener('pointerdown', (e) => {
+      this.isClicking = true;
+      document.body.classList.add('cursor-clicking');
+      this._triggerRipple(e.clientX, e.clientY);
+    });
+
+    window.addEventListener('pointerup', () => {
+      this.isClicking = false;
+      document.body.classList.remove('cursor-clicking');
+    });
+
+    document.documentElement.addEventListener('mouseleave', () => {
+      this.isVisible = false;
+      this.dot.style.opacity = '0';
+      this.ring.style.opacity = '0';
+    });
+
+    document.documentElement.addEventListener('mouseenter', () => {
+      this.isVisible = true;
+      this.dot.style.opacity = '1';
+      this.ring.style.opacity = '1';
+    });
+  }
+
+  _triggerRipple(x, y) {
+    if (!this.trail) return;
+    this.trail.style.setProperty('--trail-x', `${x}px`);
+    this.trail.style.setProperty('--trail-y', `${y}px`);
+    this.trail.classList.remove('is-rippling');
+    void this.trail.offsetWidth;
+    this.trail.classList.add('is-rippling');
+  }
+
+  _renderLoop() {
+    this.ringPos.x += (this.mouse.x - this.ringPos.x) * this.lerpFactor;
+    this.ringPos.y += (this.mouse.y - this.ringPos.y) * this.lerpFactor;
+
+    if (this.isVisible) {
+      this.dot.style.transform = `translate3d(${this.mouse.x}px, ${this.mouse.y}px, 0)`;
+      this.ring.style.transform = `translate3d(${this.ringPos.x}px, ${this.ringPos.y}px, 0)`;
+    }
+
+    requestAnimationFrame(() => this._renderLoop());
+  }
+}
+
+function initLuxuryCursor() {
+  new LuxuryCursorEngine();
+}
+
+// -----------------------------------------------------------------------------
 // 11. Bootstrap Application
 // -----------------------------------------------------------------------------
 async function initApp() {
-  // 1. Initialize Ambient Canvas & Parallax
+  // 1. Initialize Ambient Canvas, Parallax & Interactive Cursor
   new AmbientCanvasEngine('ambientCanvas');
   initStitchParallax();
   initStitchCommandDock();
+  initLuxuryCursor();
 
   // 2. Apply theme & language
   applyCurrentTheme();
