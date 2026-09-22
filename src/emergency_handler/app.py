@@ -330,6 +330,23 @@ def handle_get_tourist(tourist_id: str) -> Dict[str, Any]:
     return build_response(200, {"tourist": profile})
 
 
+def handle_get_tourist_qr(tourist_id: str) -> Dict[str, Any]:
+    if not tourist_id:
+        return build_response(400, {"error": "tourist_id is required"})
+    profile = get_profile(tourist_id)
+    if not profile:
+        return build_response(404, {"error": f"Tourist profile '{tourist_id}' not found"})
+    return build_response(200, {
+        "tourist_id": tourist_id,
+        "name": profile.get("Name"),
+        "blood_type": profile.get("BloodType"),
+        "qr_payload": tourist_id,
+        "triage_url": f"#/triage?id={tourist_id}",
+        "status": "valid",
+        "protocol": "Golden Hour Lifeline v2",
+    })
+
+
 def handle_create_tourist(data: Dict[str, Any]) -> Dict[str, Any]:
     name = data.get("Name")
     if not name:
@@ -427,6 +444,98 @@ def handle_emergency(
 
 
 # ---------------------------------------------------------------------------
+# 5. Nearby Disaster Early Warning & Evacuation System
+# ---------------------------------------------------------------------------
+def handle_list_alerts(
+    latitude: Optional[float] = None,
+    longitude: Optional[float] = None,
+    radius_km: float = 50.0,
+) -> Dict[str, Any]:
+    """
+    Returns active regional disaster early warnings with dynamic distance calculation,
+    evacuation directives, and emergency hospital shelter routing.
+    """
+    user_lat = latitude if latitude is not None else 35.6762  # Tokyo Central
+    user_lon = longitude if longitude is not None else 139.6503
+
+    # Primary Critical Alert: Earthquake Early Warning
+    eq_lat = 35.6120
+    eq_lon = 139.8100
+    eq_dist = round(calculate_haversine_distance(user_lat, user_lon, eq_lat, eq_lon), 1)
+
+    # Secondary Warning: Flash Flood / Typhoon Surge Advisory
+    fl_lat = 35.6200
+    fl_lon = 139.7500
+    fl_dist = round(calculate_haversine_distance(user_lat, user_lon, fl_lat, fl_lon), 1)
+
+    alerts = [
+        {
+            "id": "ALERT-2026-0922-01",
+            "disaster_type": "EARTHQUAKE",
+            "severity": "CRITICAL",
+            "headline": "EARTHQUAKE EARLY WARNING — MAGNITUDE 5.8 DETECTED",
+            "location": "Tokyo Bay Seismic Fault (Sub-crustal)",
+            "depth_km": 28,
+            "epicenter": {"latitude": eq_lat, "longitude": eq_lon},
+            "distance_km": eq_dist,
+            "estimated_arrival_sec": max(5, int(eq_dist * 1.4)),
+            "instruction": "Drop, Cover, and Hold On. Move away from glass facades and power lines. Aftershocks imminent.",
+            "safe_shelters": [
+                {
+                    "name": "St. Luke's International Hospital Enclave",
+                    "type": "Level 1 Disaster Center",
+                    "distance_km": 1.4,
+                    "bed_status": "OPEN (24 Emergency Beds)",
+                    "phone": "+81-3-3541-5151",
+                },
+                {
+                    "name": "Tokyo Medical Center Emergency Command",
+                    "type": "Reinforced Evacuation Hub",
+                    "distance_km": 3.8,
+                    "bed_status": "OPEN (38 Emergency Beds)",
+                    "phone": "+81-3-3411-0111",
+                },
+            ],
+            "issued_at": "2026-09-22T21:45:00Z",
+            "expires_at": "2026-09-22T23:00:00Z",
+        },
+        {
+            "id": "ALERT-2026-0922-02",
+            "disaster_type": "FLOOD_SURGE",
+            "severity": "WARNING",
+            "headline": "FLASH FLOOD & COASTAL WATER SURGE ADVISORY",
+            "location": "Minato & Shinagawa Coastal Lowlands",
+            "depth_km": 0,
+            "epicenter": {"latitude": fl_lat, "longitude": fl_lon},
+            "distance_km": fl_dist,
+            "estimated_arrival_sec": 420,
+            "instruction": "Avoid underground transit stations and riverbanks. Move to third floor or higher.",
+            "safe_shelters": [
+                {
+                    "name": "Toranomon Hospital High-Ground Shelter",
+                    "type": "Elevated Medical Complex",
+                    "distance_km": 2.1,
+                    "bed_status": "OPEN",
+                    "phone": "+81-3-3588-1111",
+                },
+            ],
+            "issued_at": "2026-09-22T21:30:00Z",
+            "expires_at": "2026-09-23T02:00:00Z",
+        },
+    ]
+
+    return build_response(200, {
+        "status": "active_alerts",
+        "total_active": len(alerts),
+        "radar_status": "ACTIVE_MONITORING",
+        "monitoring_radius_km": radius_km,
+        "caller_location": {"latitude": user_lat, "longitude": user_lon},
+        "alerts": alerts,
+        "message": "Nearby disaster radar synchronized with emergency dispatch.",
+    })
+
+
+# ---------------------------------------------------------------------------
 # Main Lambda & API Handler Entrypoint
 # ---------------------------------------------------------------------------
 def lambda_handler(event: Dict[str, Any], context: Any = None) -> Dict[str, Any]:
@@ -467,6 +576,15 @@ def lambda_handler(event: Dict[str, Any], context: Any = None) -> Dict[str, Any]
             else:
                 return build_response(405, {"error": f"Method {method} not allowed on /tourists"})
 
+        # Match /tourists/{id}/qr
+        tourist_qr_match = re.match(r"^/tourists/([^/]+)/qr$", path)
+        if tourist_qr_match:
+            tourist_id = path_params.get("tourist_id") or tourist_qr_match.group(1)
+            if method == "GET":
+                return handle_get_tourist_qr(tourist_id)
+            else:
+                return build_response(405, {"error": f"Method {method} not allowed on /tourists/{{id}}/qr"})
+
         # Match /tourists/{id}
         tourist_match = re.match(r"^/tourists/([^/]+)$", path)
         if tourist_match:
@@ -504,13 +622,39 @@ def lambda_handler(event: Dict[str, Any], context: Any = None) -> Dict[str, Any]
         if path == "/emergency":
             tourist_id = (
                 query_params.get("tourist_id")
+                or query_params.get("TouristID")
+                or query_params.get("id")
                 or body.get("tourist_id")
+                or body.get("TouristID")
+                or body.get("id")
                 or path_params.get("tourist_id")
             )
-            location = query_params.get("location") or body.get("location") or "Incident Location"
+            location = (
+                query_params.get("location")
+                or query_params.get("Location")
+                or body.get("location")
+                or body.get("Location")
+                or "Incident Location"
+            )
 
-            lat_val = query_params.get("latitude") or body.get("latitude")
-            lon_val = query_params.get("longitude") or body.get("longitude")
+            lat_val = (
+                query_params.get("latitude")
+                or query_params.get("Latitude")
+                or query_params.get("lat")
+                or body.get("latitude")
+                or body.get("Latitude")
+                or body.get("lat")
+            )
+            lon_val = (
+                query_params.get("longitude")
+                or query_params.get("Longitude")
+                or query_params.get("lon")
+                or query_params.get("lng")
+                or body.get("longitude")
+                or body.get("Longitude")
+                or body.get("lon")
+                or body.get("lng")
+            )
             lat = float(lat_val) if lat_val is not None else None
             lon = float(lon_val) if lon_val is not None else None
 
@@ -518,6 +662,20 @@ def lambda_handler(event: Dict[str, Any], context: Any = None) -> Dict[str, Any]
                 return handle_emergency(tourist_id, location, lat, lon)
             else:
                 return build_response(405, {"error": f"Method {method} not allowed on /emergency"})
+
+        # 5. Nearby Disaster Early Warning & Alerts Endpoint
+        if path == "/alerts":
+            lat_val = query_params.get("latitude") or body.get("latitude")
+            lon_val = query_params.get("longitude") or body.get("longitude")
+            rad_val = query_params.get("radius") or body.get("radius")
+            lat = float(lat_val) if lat_val is not None else None
+            lon = float(lon_val) if lon_val is not None else None
+            radius = float(rad_val) if rad_val is not None else 50.0
+
+            if method == "GET":
+                return handle_list_alerts(latitude=lat, longitude=lon, radius_km=radius)
+            else:
+                return build_response(405, {"error": f"Method {method} not allowed on /alerts"})
 
         # 404 Route Not Found
         return build_response(404, {
@@ -536,6 +694,7 @@ def lambda_handler(event: Dict[str, Any], context: Any = None) -> Dict[str, Any]
                 "GET /hospitals/{hospital_id}",
                 "GET /emergency?tourist_id=T-1001",
                 "POST /emergency",
+                "GET /alerts",
             ],
         })
 

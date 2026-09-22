@@ -145,37 +145,166 @@ def main():
     if not check_aws_credentials():
         sys.exit(1)
 
-    # 1. Check for SAM CLI or fallback
+def deploy_via_boto3(stack_name: str, region: str):
+    """
+    Automated native Python deployment using Boto3.
+    Requires zero external CLI tools (no sam or aws binary needed).
+    Packages Lambda, creates deployment bucket, deploys SAM/CloudFormation stack.
+    """
+    import io
+    import time
+    import zipfile
+    import boto3
+    from botocore.exceptions import ClientError
+
+    print("\n[*] Initializing native AWS Boto3 Serverless Deployment Engine...")
+    sts = boto3.client("sts", region_name=region)
+    cfn = boto3.client("cloudformation", region_name=region)
+    s3 = boto3.client("s3", region_name=region)
+
+    account_id = sts.get_caller_identity()["Account"]
+    deploy_bucket = f"ep-deploy-{account_id}-{region}"
+    print(f"  • AWS Account: {account_id}")
+    print(f"  • Target Region: {region}")
+    print(f"  • Artifact Bucket: {deploy_bucket}")
+
+    # 1. Ensure deployment bucket exists
+    try:
+        if region == "us-east-1":
+            s3.create_bucket(Bucket=deploy_bucket)
+        else:
+            s3.create_bucket(
+                Bucket=deploy_bucket,
+                CreateBucketConfiguration={"LocationConstraint": region},
+            )
+        print(f"  • Created deployment bucket: {deploy_bucket}")
+    except ClientError as e:
+        if e.response["Error"]["Code"] not in ("BucketAlreadyOwnedByYou", "BucketAlreadyExists"):
+            print(f"  • Bucket notice: {e}")
+
+    # 2. Package Lambda code into zip
+    print("  • Packaging Lambda functions from src/emergency_handler/...")
+    lambda_src = REPO_ROOT / "src" / "emergency_handler"
+    zip_buf = io.BytesIO()
+    with zipfile.ZipFile(zip_buf, "w", zipfile.ZIP_DEFLATED) as zf:
+        for root, _, files in os.walk(lambda_src):
+            for f in files:
+                if f.endswith((".pyc", ".pyo")) or "__pycache__" in root:
+                    continue
+                full_p = Path(root) / f
+                arcname = full_p.relative_to(lambda_src).as_posix()
+                zf.write(full_p, arcname)
+
+    zip_bytes = zip_buf.getvalue()
+    zip_key = f"lambda-packages/emergency-handler-{int(time.time())}.zip"
+    s3.put_object(Bucket=deploy_bucket, Key=zip_key, Body=zip_bytes)
+    print(f"  • Uploaded Lambda package: s3://{deploy_bucket}/{zip_key} ({len(zip_bytes)} bytes)")
+
+    # 3. Read template and substitute CodeUri
+    with open(REPO_ROOT / "template.yaml", "r", encoding="utf-8") as f:
+        template_body = f.read()
+
+    template_body = template_body.replace(
+        "CodeUri: src/emergency_handler/",
+        f"CodeUri: s3://{deploy_bucket}/{zip_key}",
+    )
+
+    # 4. Check if stack already exists
+    stack_exists = False
+    try:
+        stacks = cfn.describe_stacks(StackName=stack_name)["Stacks"]
+        if stacks and stacks[0]["StackStatus"] not in ("DELETE_COMPLETE", "ROLLBACK_COMPLETE"):
+            stack_exists = True
+    except ClientError:
+        stack_exists = False
+
+    change_set_name = f"deploy-{int(time.time())}"
+    change_set_type = "UPDATE" if stack_exists else "CREATE"
+    print(f"\n[*] Creating CloudFormation Change Set ({change_set_type}) for '{stack_name}'...")
+
+    cfn.create_change_set(
+        StackName=stack_name,
+        ChangeSetName=change_set_name,
+        TemplateBody=template_body,
+        Capabilities=["CAPABILITY_IAM", "CAPABILITY_AUTO_EXPAND"],
+        ChangeSetType=change_set_type,
+    )
+
+    # Wait for change set creation
+    print("  • Analyzing AWS resource graph and security policies...")
+    for _ in range(60):
+        time.sleep(3)
+        cs = cfn.describe_change_set(StackName=stack_name, ChangeSetName=change_set_name)
+        status = cs["Status"]
+        if status in ("CREATE_COMPLETE", "FAILED"):
+            break
+
+    if cs["Status"] == "FAILED":
+        reason = cs.get("StatusReason", "Unknown reason")
+        if "didn't contain changes" in reason or "No updates are to be performed" in reason:
+            print("  • Stack infrastructure is already up to date.")
+            return
+        else:
+            raise RuntimeError(f"Change set failed: {reason}")
+
+    print("  • Change set verified. Executing CloudFormation deployment...")
+    cfn.execute_change_set(StackName=stack_name, ChangeSetName=change_set_name)
+
+    # Wait for stack to reach steady state
+    print("  • Provisioning DynamoDB tables, Bedrock IAM, CloudFront, and HTTP APIs...")
+    while True:
+        time.sleep(6)
+        stack = cfn.describe_stacks(StackName=stack_name)["Stacks"][0]
+        cur_status = stack["StackStatus"]
+        print(f"    Status: {cur_status}...")
+        if cur_status in ("CREATE_COMPLETE", "UPDATE_COMPLETE"):
+            print("✅ CloudFormation Serverless Stack successfully deployed!")
+            break
+        elif "FAILED" in cur_status or "ROLLBACK" in cur_status:
+            raise RuntimeError(f"Stack deployment failed with status: {cur_status}")
+
+
+def main():
+    parser = argparse.ArgumentParser(description="Deploy Emergency Passport to AWS with HTTPS")
+    parser.add_argument("--stack-name", default="emergency-passport", help="CloudFormation stack name")
+    parser.add_argument("--region", default="us-east-1", help="AWS region (default: us-east-1)")
+    parser.add_argument("--skip-build", action="store_true", help="Skip sam build")
+    args = parser.parse_args()
+
+    print("=" * 65)
+    print(" 🚑 EMERGENCY PASSPORT — AWS PRODUCTION HTTPS DEPLOYMENT 🌍")
+    print("=" * 65)
+    print(f"  Stack Name: {args.stack_name}")
+    print(f"  Region:     {args.region}")
+    print("=" * 65)
+
+    if not check_aws_credentials():
+        sys.exit(1)
+
+    # Check if SAM CLI is available; if not, use automated Boto3 engine
     has_sam = subprocess.run(["which", "sam"], capture_output=True).returncode == 0
-    if not has_sam:
-        print("\n[!] AWS SAM CLI not found. Checking for AWS CLI...")
-        has_aws = subprocess.run(["which", "aws"], capture_output=True).returncode == 0
-        if not has_aws:
-            print("\n[!] Neither SAM CLI nor AWS CLI is installed.")
-            print("    Please install SAM CLI: https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/install-sam-cli.html")
-            print("    Or via Homebrew on Mac: brew install aws-sam-cli")
-            sys.exit(1)
+    if has_sam:
+        if not args.skip_build:
+            print("\n[*] Step 1: Building Serverless Application with SAM...")
+            run_command(["sam", "build"])
 
-    # 2. SAM Build
-    if not args.skip_build:
-        print("\n[*] Step 1: Building Serverless Application with SAM...")
-        run_command(["sam", "build"])
-
-    # 3. SAM Deploy
-    print("\n[*] Step 2: Deploying to AWS CloudFormation...")
-    deploy_cmd = [
-        "sam",
-        "deploy",
-        "--stack-name",
-        args.stack_name,
-        "--region",
-        args.region,
-        "--capabilities",
-        "CAPABILITY_IAM",
-        "--resolve-s3",
-        "--no-confirm-changeset",
-    ]
-    run_command(deploy_cmd)
+        print("\n[*] Step 2: Deploying to AWS CloudFormation via SAM...")
+        deploy_cmd = [
+            "sam",
+            "deploy",
+            "--stack-name",
+            args.stack_name,
+            "--region",
+            args.region,
+            "--capabilities",
+            "CAPABILITY_IAM",
+            "--resolve-s3",
+            "--no-confirm-changeset",
+        ]
+        run_command(deploy_cmd)
+    else:
+        print("\n[*] SAM CLI not present in PATH. Switching to native AWS Boto3 Serverless Engine...")
+        deploy_via_boto3(args.stack_name, args.region)
 
     # 4. Get outputs
     print("\n[*] Step 3: Fetching Stack Outputs...")

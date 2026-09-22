@@ -955,11 +955,23 @@ const Views = {
             <p style="font-size: 0.9rem; color: var(--text-secondary);">Sub-800ms identity decoding & clinical emergency field assessment.</p>
           </div>
 
-          <div style="display: flex; gap: 8px;">
-            <input type="text" id="triageSearchInput" class="editorial-input" style="width: 140px; padding: 6px 12px; font-family: var(--font-mono);" value="${defaultId}" />
+          <div style="display: flex; gap: 8px; align-items: center; flex-wrap: wrap;">
+            <button class="btn btn-sm btn-outline-medical" id="triageLaunchCameraBtn" title="Open Camera Optical Scanner">
+              <span class="btn-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" class="ui-icon"><path d="M14.5 4h-5L7 7H4a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-3l-2.5-3z"/><circle cx="12" cy="13" r="3"/></svg></span>
+              <span>Scan with Camera</span>
+            </button>
+            <input type="text" id="triageSearchInput" class="editorial-input" style="width: 140px; padding: 6px 12px; font-family: var(--font-mono);" value="${defaultId}" placeholder="T-1001" />
             <button class="btn btn-sm btn-primary" id="triageExecuteBtn">Decode</button>
           </div>
         </header>
+
+        <!-- Quick Demo Case Shortcuts -->
+        <div style="display: flex; gap: 8px; align-items: center; margin-top: 14px; font-size: 0.8rem; color: var(--text-secondary); flex-wrap: wrap;">
+          <span style="font-family: var(--font-mono); font-size: 0.72rem; letter-spacing: 0.05em; color: var(--gold);">VERIFIED DEMO CASES:</span>
+          <button class="btn btn-ghost btn-sm" onclick="fetchEmergencyTriage('T-1001')" style="padding: 3px 10px; font-size: 0.78rem; border-radius: var(--radius-pill); border: 1px solid var(--border);">Elena Rostova (O+)</button>
+          <button class="btn btn-ghost btn-sm" onclick="fetchEmergencyTriage('T-1002')" style="padding: 3px 10px; font-size: 0.78rem; border-radius: var(--radius-pill); border: 1px solid var(--border);">Kenji Sato (A-)</button>
+          <button class="btn btn-ghost btn-sm" onclick="fetchEmergencyTriage('T-1003')" style="padding: 3px 10px; font-size: 0.78rem; border-radius: var(--radius-pill); border: 1px solid var(--border);">Chloe Dupont (B+)</button>
+        </div>
 
         <!-- Active Triage Workspace Mount -->
         <div id="triageActiveDisplay">

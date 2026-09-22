@@ -623,11 +623,23 @@ function stopSiren() {
 }
 
 // -----------------------------------------------------------------------------
-// 6. Standalone Vector SVG QR Generator
+// 6. ISO-Standard Vector QR Generator (qrcode.js with Scalable SVG)
 // -----------------------------------------------------------------------------
 function generateQrSvg(text) {
-  const size = 21;
-  const hash = Array.from(text).reduce((acc, char) => (acc * 31 + char.charCodeAt(0)) % 1000000007, 7);
+  try {
+    if (typeof qrcode !== 'undefined') {
+      const qr = qrcode(0, 'M');
+      qr.addData(String(text || ''));
+      qr.make();
+      return qr.createSvgTag({ cellSize: 6, margin: 2, scalable: true });
+    }
+  } catch (err) {
+    console.warn('qrcode generator error, using vector fallback:', err);
+  }
+
+  // Standalone vector fallback with ISO finder patterns
+  const size = 25;
+  const hash = Array.from(String(text || '')).reduce((acc, char) => (acc * 31 + char.charCodeAt(0)) % 1000000007, 7);
   const grid = Array(size).fill(0).map(() => Array(size).fill(false));
 
   function drawFinder(r0, c0) {
@@ -665,6 +677,363 @@ function generateQrSvg(text) {
       ${rects.join('')}
     </svg>
   `;
+}
+
+// -----------------------------------------------------------------------------
+// 6.B Live Camera QR Optical Scanner Engine (jsQR + getUserMedia)
+// -----------------------------------------------------------------------------
+const qrScannerState = {
+  stream: null,
+  animId: null,
+  activeFacingMode: 'environment',
+  isScanning: false,
+};
+
+function playScanSuccessChime() {
+  try {
+    const AudioCtx = window.AudioContext || window.webkitAudioContext;
+    if (!AudioCtx) return;
+    const ctx = new AudioCtx();
+    const now = ctx.currentTime;
+
+    const osc1 = ctx.createOscillator();
+    const gain1 = ctx.createGain();
+    osc1.type = 'sine';
+    osc1.frequency.setValueAtTime(880, now);
+    gain1.gain.setValueAtTime(0.12, now);
+    gain1.gain.exponentialRampToValueAtTime(0.01, now + 0.12);
+    osc1.connect(gain1);
+    gain1.connect(ctx.destination);
+    osc1.start(now);
+    osc1.stop(now + 0.12);
+
+    const osc2 = ctx.createOscillator();
+    const gain2 = ctx.createGain();
+    osc2.type = 'sine';
+    osc2.frequency.setValueAtTime(1760, now + 0.09);
+    gain2.gain.setValueAtTime(0.14, now + 0.09);
+    gain2.gain.exponentialRampToValueAtTime(0.001, now + 0.28);
+    osc2.connect(gain2);
+    gain2.connect(ctx.destination);
+    osc2.start(now + 0.09);
+    osc2.stop(now + 0.28);
+  } catch (err) {
+    console.debug('Audio chime note:', err);
+  }
+}
+
+function parseTouristId(rawText) {
+  if (!rawText) return 'T-1001';
+  const str = String(rawText).trim();
+
+  // JSON payload
+  if (str.startsWith('{') && str.endsWith('}')) {
+    try {
+      const parsed = JSON.parse(str);
+      if (parsed.tourist_id) return parsed.tourist_id;
+      if (parsed.TouristID) return parsed.TouristID;
+      if (parsed.passportId) return parsed.passportId;
+      if (parsed.id) return parsed.id;
+    } catch (e) {}
+  }
+
+  // URL query parameter ?id=T-1001
+  try {
+    if (str.includes('id=')) {
+      const match = str.match(/[?&]id=([^&#]+)/);
+      if (match && match[1]) return decodeURIComponent(match[1]);
+    }
+  } catch (e) {}
+
+  // Pattern match (e.g. T-1001, T-1002)
+  const tMatch = str.match(/\b(T-\d{3,6})\b/i);
+  if (tMatch) return tMatch[1].toUpperCase();
+
+  return str.replace(/[^A-Za-z0-9_-]/g, '').slice(0, 16) || 'T-1001';
+}
+
+function handleDecodedQr(qrText) {
+  if (!qrText) return;
+  const touristId = parseTouristId(qrText);
+  playScanSuccessChime();
+  showToast(`Emergency Identity Decoded: ${touristId}`, 'emergency');
+
+  closeQrScannerModal();
+
+  if (typeof appRouter !== 'undefined') {
+    appRouter.navigate(`/triage?id=${encodeURIComponent(touristId)}`);
+  }
+
+  setTimeout(() => {
+    fetchEmergencyTriage(touristId);
+  }, 200);
+}
+
+async function startCameraStream() {
+  const video = document.getElementById('qrCameraFeed');
+  const statusText = document.getElementById('scannerStatusText');
+  if (!video) return;
+
+  qrScannerState.isScanning = true;
+  if (statusText) statusText.textContent = 'CONNECTING OPTICAL SENSOR...';
+
+  try {
+    stopCameraStream();
+
+    if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+      throw new Error('Camera device access not supported in this browser context');
+    }
+
+    const constraints = {
+      video: {
+        facingMode: { ideal: qrScannerState.activeFacingMode },
+        width: { ideal: 1280 },
+        height: { ideal: 720 },
+      },
+      audio: false,
+    };
+
+    let stream = null;
+    try {
+      stream = await navigator.mediaDevices.getUserMedia(constraints);
+    } catch (idealErr) {
+      stream = await navigator.mediaDevices.getUserMedia({ video: true, audio: false });
+    }
+
+    qrScannerState.stream = stream;
+    video.srcObject = stream;
+    video.setAttribute('playsinline', 'true');
+    await video.play();
+
+    if (statusText) statusText.textContent = 'OPTICAL SENSOR ACTIVE • AIM AT QR';
+    scanCameraFrame();
+  } catch (err) {
+    console.warn('Camera stream error:', err);
+    if (statusText) {
+      statusText.textContent = 'CAMERA UNAVAILABLE • USE FILE UPLOAD OR DEMO CASE';
+    }
+  }
+}
+
+function stopCameraStream() {
+  qrScannerState.isScanning = false;
+  if (qrScannerState.animId) {
+    cancelAnimationFrame(qrScannerState.animId);
+    qrScannerState.animId = null;
+  }
+  if (qrScannerState.stream) {
+    try {
+      qrScannerState.stream.getTracks().forEach(track => track.stop());
+    } catch (e) {}
+    qrScannerState.stream = null;
+  }
+  const video = document.getElementById('qrCameraFeed');
+  if (video) {
+    video.srcObject = null;
+  }
+}
+
+function scanCameraFrame() {
+  if (!qrScannerState.isScanning) return;
+  const video = document.getElementById('qrCameraFeed');
+  const canvas = document.getElementById('qrCanvasBuffer');
+
+  if (video && canvas && video.readyState === video.HAVE_ENOUGH_DATA) {
+    const ctx = canvas.getContext('2d', { willReadFrequently: true });
+    canvas.width = video.videoWidth || 640;
+    canvas.height = video.videoHeight || 480;
+    ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+
+    if (typeof jsQR !== 'undefined') {
+      try {
+        const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+        const code = jsQR(imageData.data, imageData.width, imageData.height, {
+          inversionAttempts: 'dontInvert',
+        });
+
+        if (code && code.data) {
+          handleDecodedQr(code.data);
+          return;
+        }
+      } catch (err) {
+        console.debug('jsQR frame error:', err);
+      }
+    }
+  }
+
+  qrScannerState.animId = requestAnimationFrame(scanCameraFrame);
+}
+
+function openQrScannerModal() {
+  const modal = document.getElementById('qrScannerModal');
+  if (!modal) return;
+  modal.classList.remove('hidden');
+  startCameraStream();
+}
+
+function closeQrScannerModal() {
+  const modal = document.getElementById('qrScannerModal');
+  if (modal) modal.classList.add('hidden');
+  stopCameraStream();
+}
+
+function switchCamera() {
+  qrScannerState.activeFacingMode =
+    qrScannerState.activeFacingMode === 'environment' ? 'user' : 'environment';
+  startCameraStream();
+}
+
+function handleQrFileUpload(event) {
+  const file = event.target.files && event.target.files[0];
+  if (!file) return;
+
+  const reader = new FileReader();
+  reader.onload = (e) => {
+    const img = new Image();
+    img.onload = () => {
+      const canvas = document.getElementById('qrCanvasBuffer') || document.createElement('canvas');
+      const ctx = canvas.getContext('2d');
+      canvas.width = img.width;
+      canvas.height = img.height;
+      ctx.drawImage(img, 0, 0);
+
+      if (typeof jsQR !== 'undefined') {
+        const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+        const code = jsQR(imageData.data, imageData.width, imageData.height, {
+          inversionAttempts: 'dontInvert',
+        });
+        if (code && code.data) {
+          handleDecodedQr(code.data);
+        } else {
+          showToast('No readable QR code found in this image. Please try a clearer picture.', 'warning');
+        }
+      } else {
+        showToast('QR decoder engine loading. Please retry.', 'info');
+      }
+    };
+    img.src = e.target.result;
+  };
+  reader.readAsDataURL(file);
+}
+
+// -----------------------------------------------------------------------------
+// 6.C Regional Disaster Early Warning & Evacuation Radar Engine
+// -----------------------------------------------------------------------------
+let activeDisasterAlerts = [];
+
+async function fetchDisasterAlerts() {
+  try {
+    const res = await fetch(`${API_BASE}/alerts`);
+    if (!res.ok) return;
+    const data = await res.json();
+    if (data && data.alerts && data.alerts.length > 0) {
+      activeDisasterAlerts = data.alerts;
+      renderDisasterBanner(data.alerts[0]);
+      updateDisasterCount(data.alerts.length);
+    }
+  } catch (err) {
+    console.debug('Alerts fetch skipped:', err);
+  }
+}
+
+function updateDisasterCount(count) {
+  const pill = document.getElementById('stitchAlertCountPill');
+  if (pill) {
+    pill.textContent = count;
+    pill.style.display = count > 0 ? 'inline-flex' : 'none';
+  }
+}
+
+function renderDisasterBanner(primaryAlert) {
+  const banner = document.getElementById('disasterAlertBanner');
+  const headlineEl = document.getElementById('disasterBannerHeadline');
+  const distanceEl = document.getElementById('disasterBannerDistance');
+  if (!banner || !primaryAlert) return;
+
+  if (headlineEl) headlineEl.textContent = primaryAlert.headline || 'REGIONAL DISASTER EARLY WARNING';
+  if (distanceEl) distanceEl.textContent = `${primaryAlert.distance_km || 14.2} KM AWAY`;
+
+  banner.classList.remove('hidden');
+}
+
+function openDisasterModal() {
+  const modal = document.getElementById('disasterModal');
+  const container = document.getElementById('disasterContentContainer');
+  if (!modal || !container) return;
+
+  if (activeDisasterAlerts.length === 0) {
+    container.innerHTML = `
+      <div style="padding: 32px; text-align: center; color: var(--text-secondary);">
+        <p>No active regional disaster early warnings in your immediate sector.</p>
+        <span class="telemetry-pill operational" style="margin-top: 12px; display: inline-flex;">ALL SECTORS SECURE</span>
+      </div>
+    `;
+  } else {
+    container.innerHTML = activeDisasterAlerts.map(alert => `
+      <div class="disaster-card ${alert.severity === 'CRITICAL' ? 'critical-border' : ''}">
+        <div class="disaster-card-header">
+          <div>
+            <div class="disaster-badge-row">
+              <span class="badge ${alert.severity === 'CRITICAL' ? 'badge-emergency' : 'badge-gold'}">
+                <span class="pulse-beacon"></span>
+                ${alert.severity} • ${alert.disaster_type}
+              </span>
+              <span class="disaster-eta-pill">ETA: ~${alert.estimated_arrival_sec} SEC</span>
+            </div>
+            <h4 class="disaster-card-title">${alert.headline}</h4>
+            <div class="disaster-meta-line">
+              <span>Location: ${alert.location}</span>
+              <span>•</span>
+              <span>Epicenter: ${alert.distance_km} km away</span>
+              ${alert.depth_km ? `<span>•</span><span>Depth: ${alert.depth_km} km</span>` : ''}
+            </div>
+          </div>
+        </div>
+
+        <div class="disaster-instruction-box">
+          <strong style="color: var(--emergency); font-size: 0.76rem; letter-spacing: 0.05em; display: block; margin-bottom: 4px;">CIVIL DEFENSE DIRECTIVE</strong>
+          <p style="margin: 0; font-size: 0.92rem; line-height: 1.5; color: var(--text-primary);">${alert.instruction}</p>
+        </div>
+
+        <div class="disaster-shelters-section">
+          <div style="font-size: 0.76rem; font-family: var(--font-mono); color: var(--gold); letter-spacing: 0.05em; margin-bottom: 8px;">
+            VERIFIED SAFE SHELTERS & EMERGENCY CLINICAL HUBS:
+          </div>
+          <div class="shelters-grid">
+            ${(alert.safe_shelters || []).map(shelter => `
+              <div class="shelter-chip">
+                <div style="display: flex; justify-content: space-between; align-items: flex-start;">
+                  <strong style="font-size: 0.88rem; color: var(--text-primary);">${shelter.name}</strong>
+                  <span style="font-family: var(--font-mono); font-size: 0.78rem; color: var(--gold);">${shelter.distance_km} km</span>
+                </div>
+                <div style="font-size: 0.76rem; color: var(--text-secondary); margin-top: 3px;">
+                  ${shelter.type} • <span style="color: var(--medical);">${shelter.bed_status}</span>
+                </div>
+                ${shelter.phone ? `<a href="tel:${shelter.phone}" class="shelter-phone-link">Call Dispatch: ${shelter.phone}</a>` : ''}
+              </div>
+            `).join('')}
+          </div>
+        </div>
+      </div>
+    `).join('');
+  }
+
+  modal.classList.remove('hidden');
+}
+
+function closeDisasterModal() {
+  const modal = document.getElementById('disasterModal');
+  if (modal) modal.classList.add('hidden');
+}
+
+// Global window exposure
+if (typeof window !== 'undefined') {
+  window.generateQrSvg = generateQrSvg;
+  window.openQrScannerModal = openQrScannerModal;
+  window.closeQrScannerModal = closeQrScannerModal;
+  window.openDisasterModal = openDisasterModal;
+  window.closeDisasterModal = closeDisasterModal;
+  window.fetchDisasterAlerts = fetchDisasterAlerts;
 }
 
 // -----------------------------------------------------------------------------
@@ -886,10 +1255,17 @@ function setupGlobalListeners() {
   }
 
   // Close modals on backdrop click or Escape
-  [langModal, themeModal].forEach(modal => {
+  const scannerModal = document.getElementById('qrScannerModal');
+  const disasterModal = document.getElementById('disasterModal');
+
+  [langModal, themeModal, scannerModal, disasterModal].forEach(modal => {
     if (modal) {
       modal.addEventListener('click', (e) => {
-        if (e.target === modal) modal.classList.add('hidden');
+        if (e.target === modal) {
+          if (modal === scannerModal) closeQrScannerModal();
+          else if (modal === disasterModal) closeDisasterModal();
+          else modal.classList.add('hidden');
+        }
       });
     }
   });
@@ -898,6 +1274,69 @@ function setupGlobalListeners() {
     if (e.key === 'Escape') {
       if (langModal) langModal.classList.add('hidden');
       if (themeModal) themeModal.classList.add('hidden');
+      if (scannerModal && !scannerModal.classList.contains('hidden')) closeQrScannerModal();
+      if (disasterModal && !disasterModal.classList.contains('hidden')) closeDisasterModal();
+    }
+  });
+
+  // Camera Scanner Modal Controls
+  const closeScannerBtn = document.getElementById('closeScannerModalBtn');
+  if (closeScannerBtn) {
+    closeScannerBtn.addEventListener('click', closeQrScannerModal);
+  }
+
+  const switchCamBtn = document.getElementById('switchCameraBtn');
+  if (switchCamBtn) {
+    switchCamBtn.addEventListener('click', switchCamera);
+  }
+
+  const qrFileInput = document.getElementById('qrFileInput');
+  if (qrFileInput) {
+    qrFileInput.addEventListener('change', handleQrFileUpload);
+  }
+
+  document.querySelectorAll('.scanner-preset-chip').forEach(chip => {
+    chip.addEventListener('click', () => {
+      if (chip.dataset.testId) handleDecodedQr(chip.dataset.testId);
+    });
+  });
+
+  // Disaster Early Warning Banner & Modal Controls
+  const openDisasterBtn = document.getElementById('openDisasterModalBtn');
+  if (openDisasterBtn) {
+    openDisasterBtn.addEventListener('click', openDisasterModal);
+  }
+
+  const dismissDisasterBtn = document.getElementById('dismissDisasterBannerBtn');
+  if (dismissDisasterBtn) {
+    dismissDisasterBtn.addEventListener('click', () => {
+      const banner = document.getElementById('disasterAlertBanner');
+      if (banner) banner.classList.add('hidden');
+    });
+  }
+
+  const closeDisasterBtn = document.getElementById('closeDisasterModalBtn');
+  if (closeDisasterBtn) {
+    closeDisasterBtn.addEventListener('click', closeDisasterModal);
+  }
+
+  // Persistent Dock Quick Action Triggers
+  const stitchCamBtn = document.getElementById('stitchCameraScanBtn');
+  if (stitchCamBtn) {
+    stitchCamBtn.addEventListener('click', openQrScannerModal);
+  }
+
+  const stitchRadarBtn = document.getElementById('stitchDisasterRadarBtn');
+  if (stitchRadarBtn) {
+    stitchRadarBtn.addEventListener('click', openDisasterModal);
+  }
+
+  // Delegated Global Click for Dynamic Triage & Paramedic HUD Camera Buttons
+  document.addEventListener('click', (e) => {
+    const launchCamera = e.target.closest('#triageLaunchCameraBtn, #hudOpenScannerBtn, [data-action="open-scanner"]');
+    if (launchCamera) {
+      e.preventDefault();
+      openQrScannerModal();
     }
   });
 }
@@ -1207,9 +1646,10 @@ async function initApp() {
   // 3. Setup global listeners
   setupGlobalListeners();
 
-  // 4. Check API health & hospital records
+  // 4. Check API health, hospital records & disaster alerts
   await checkHealth();
   await fetchHospitals();
+  await fetchDisasterAlerts();
 
   // 5. Mount current route
   if (typeof appRouter !== 'undefined') {

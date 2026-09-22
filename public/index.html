@@ -86,9 +86,22 @@
 
       <!-- Quick Action: QR Badge -->
       <a href="#/qr" class="stitch-dock-link" id="stitchQrBtn" title="Instant QR Medical Beacon">
-        <span class="link-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" class="dock-svg"><rect width="5" height="5" x="3" y="3" rx="1"/><rect width="5" height="5" x="16" y="3" rx="1"/><rect width="5" height="5" x="3" y="16" rx="1"/><path d="M21 16h-3a2 2 0 0 0-2 2v3"/><path d="M21 21v.01"/><path d="M12 7v3a2 2 0 0 1-2 2H7"/><path d="M3 12h.01"/><path d="M12 3h.01"/><path d="M12 16v.01"/><path d="M16 12h1"/><path d="M21 12v.01"/><path d="M12 21v-1"/></svg></span>
+        <span class="link-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" class="dock-svg"><rect width="5" height="5" x="3" y="3" rx="1"/><rect width="5" height="5" x="16" y="3" rx="1"/><rect width="5" height="5" x="3" y="16" rx="1"/><path d="M21 16h-3a2 2 0 0 0-2 2v3"/><path d="M21 21v.01"/><path d="M12 7v3a2 2 0 0 1-2 2H7"/><path d="M3 12h.01"/><path d="M12 3h.01"/><path d="M12 16v.01"/><path d="M16 12h1"/><path d="M21 12v.01"/><path d="M12 21v-1"/></svg></span>
         <span class="link-label">QR Card</span>
       </a>
+
+      <!-- Quick Action: Live Camera QR Scanner -->
+      <button class="stitch-dock-link" id="stitchCameraScanBtn" title="Scan Emergency QR with Camera">
+        <span class="link-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" class="dock-svg"><path d="M14.5 4h-5L7 7H4a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-3l-2.5-3z"/><circle cx="12" cy="13" r="3"/></svg></span>
+        <span class="link-label">Camera</span>
+      </button>
+
+      <!-- Quick Action: Nearby Disaster Early Warning Radar -->
+      <button class="stitch-dock-link disaster-dock-trigger" id="stitchDisasterRadarBtn" title="Nearby Disaster Early Warning Radar">
+        <span class="link-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" class="dock-svg" style="color: var(--emergency);"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg></span>
+        <span class="link-label" style="color: var(--emergency);">Alerts</span>
+        <span class="stitch-alert-count-pill" id="stitchAlertCountPill">2</span>
+      </button>
 
       <div class="stitch-dock-divider"></div>
 
@@ -194,6 +207,101 @@
     </div>
   </div>
 
+  <!-- ================================================================= -->
+  <!-- 3. LIVE WEBCAM & MOBILE CAMERA QR OPTICAL SCANNER MODAL -->
+  <!-- ================================================================= -->
+  <div class="modal-backdrop hidden" id="qrScannerModal" role="dialog" aria-modal="true" aria-label="Camera QR Scanner">
+    <div class="modal-box glass-sheet scanner-modal-box">
+      <div class="modal-header">
+        <div>
+          <span class="modal-eyebrow">FIELD TELEMETRY SCANNER</span>
+          <h3 class="modal-title">Live Emergency QR Camera</h3>
+          <p class="modal-desc">Point your device camera at any Emergency Passport QR or upload an image.</p>
+        </div>
+        <button class="modal-close-btn" id="closeScannerModalBtn" aria-label="Close scanner">&times;</button>
+      </div>
+
+      <!-- Live Video Feed Viewport with Holographic Reticle -->
+      <div class="scanner-viewport-wrap">
+        <video id="qrCameraFeed" autoplay playsinline muted></video>
+        <canvas id="qrCanvasBuffer" style="display: none;"></canvas>
+
+        <!-- Laser Reticle & Target Brackets -->
+        <div class="scanner-reticle">
+          <div class="reticle-bracket tl"></div>
+          <div class="reticle-bracket tr"></div>
+          <div class="reticle-bracket bl"></div>
+          <div class="reticle-bracket br"></div>
+          <div class="scanner-laser-line"></div>
+        </div>
+
+        <div class="scanner-status-tag" id="scannerStatusTag">
+          <span class="pulse-beacon"></span>
+          <span id="scannerStatusText">INITIALIZING OPTICAL SENSOR...</span>
+        </div>
+      </div>
+
+      <!-- Scanner Controls & File Upload Fallback -->
+      <div class="scanner-controls-row">
+        <button class="btn btn-sm btn-outline" id="switchCameraBtn" title="Switch front/back camera">
+          <span class="btn-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" class="ui-icon"><path d="M21 12a9 9 0 0 0-9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/><path d="M3 12a9 9 0 0 0 9 9 9.75 9.75 0 0 0 6.74-2.74L21 16"/><path d="M16 21h5v-5"/></svg></span>
+          <span>Flip Camera</span>
+        </button>
+
+        <label for="qrFileInput" class="btn btn-sm btn-outline" style="cursor: pointer;">
+          <span class="btn-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" class="ui-icon"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" x2="12" y1="3" y2="15"/></svg></span>
+          <span>Upload Image / File</span>
+          <input type="file" id="qrFileInput" accept="image/*" style="display: none;" />
+        </label>
+      </div>
+
+      <!-- Quick Demo Presets -->
+      <div class="scanner-presets-row">
+        <span class="presets-label">DEMO PROFILES:</span>
+        <button class="scanner-preset-chip" data-test-id="T-1001">Elena Rostova (T-1001)</button>
+        <button class="scanner-preset-chip" data-test-id="T-1002">Kenji Sato (T-1002)</button>
+        <button class="scanner-preset-chip" data-test-id="T-1003">Chloe Dupont (T-1003)</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ================================================================= -->
+  <!-- 4. PERSISTENT DISASTER EARLY WARNING RADAR BANNER -->
+  <!-- ================================================================= -->
+  <aside id="disasterAlertBanner" class="disaster-alert-banner hidden" role="alert" aria-live="assertive">
+    <div class="disaster-banner-inner">
+      <div class="disaster-headline-wrap">
+        <span class="disaster-alarm-beacon"></span>
+        <strong id="disasterBannerHeadline">EARTHQUAKE EARLY WARNING: MAGNITUDE 5.8</strong>
+        <span class="disaster-distance-pill" id="disasterBannerDistance">11.4 KM AWAY</span>
+      </div>
+      <div class="disaster-actions-wrap">
+        <button class="btn btn-sm btn-disaster" id="openDisasterModalBtn">View Evacuation Hubs</button>
+        <button class="btn-dismiss-disaster" id="dismissDisasterBannerBtn" aria-label="Dismiss">&times;</button>
+      </div>
+    </div>
+  </aside>
+
+  <!-- ================================================================= -->
+  <!-- 5. DISASTER EARLY WARNING RADAR & EVACUATION MODAL -->
+  <!-- ================================================================= -->
+  <div class="modal-backdrop hidden" id="disasterModal" role="dialog" aria-modal="true" aria-label="Disaster Evacuation Radar">
+    <div class="modal-box glass-sheet disaster-modal-box">
+      <div class="modal-header">
+        <div>
+          <span class="modal-eyebrow" style="color: var(--emergency);">CIVIL DEFENSE & DISASTER RADAR</span>
+          <h3 class="modal-title" id="disasterModalTitle">Regional Disaster Early Warning</h3>
+          <p class="modal-desc" id="disasterModalSubtitle">Live telemetry synchronized with Emergency Dispatch & Medical Centers.</p>
+        </div>
+        <button class="modal-close-btn" id="closeDisasterModalBtn" aria-label="Close modal">&times;</button>
+      </div>
+
+      <div class="disaster-content-scroll" id="disasterContentContainer">
+        <!-- Rendered dynamically by JS -->
+      </div>
+    </div>
+  </div>
+
   <!-- Modern Luxury Editorial Footer -->
   <footer class="site-footer">
     <div class="footer-container">
@@ -245,6 +353,10 @@
   <div class="custom-cursor-dot" id="cursorDot" aria-hidden="true"></div>
   <div class="custom-cursor-ring" id="cursorRing" aria-hidden="true"></div>
   <div class="custom-cursor-trail" id="cursorTrail" aria-hidden="true"></div>
+
+  <!-- Vendor Libraries: Standard QR Generator & Fast Optical Decoder -->
+  <script src="vendor/qrcode.min.js"></script>
+  <script src="vendor/jsQR.js"></script>
 
   <!-- Modular Scripts Architecture -->
   <script src="i18n.js"></script>

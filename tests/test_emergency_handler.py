@@ -131,6 +131,18 @@ class TestEmergencyHandler(unittest.TestCase):
         body = json.loads(response["body"])
         self.assertEqual(body["tourist"]["TouristID"], "T-1001")
 
+    def test_get_tourist_qr(self):
+        event = {
+            "rawPath": "/tourists/T-1001/qr",
+            "requestContext": {"http": {"method": "GET", "path": "/tourists/T-1001/qr"}},
+        }
+        response = lambda_handler(event, None)
+        self.assertEqual(response["statusCode"], 200)
+        body = json.loads(response["body"])
+        self.assertEqual(body["tourist_id"], "T-1001")
+        self.assertEqual(body["status"], "valid")
+        self.assertIn("triage_url", body)
+
     def test_get_nonexistent_tourist(self):
         event = {
             "rawPath": "/tourists/T-99999",
@@ -181,15 +193,22 @@ class TestEmergencyHandler(unittest.TestCase):
         self.assertGreater(dist, 5.0)
         self.assertLess(dist, 15.0)
 
-    def test_route_not_found(self):
+    def test_disaster_alerts(self):
         event = {
-            "rawPath": "/unknown/route",
-            "requestContext": {"http": {"method": "GET", "path": "/unknown/route"}},
+            "rawPath": "/alerts",
+            "requestContext": {"http": {"method": "GET", "path": "/alerts"}},
+            "queryStringParameters": {"latitude": "35.6812", "longitude": "139.7671"},
         }
         response = lambda_handler(event, None)
-        self.assertEqual(response["statusCode"], 404)
+        self.assertEqual(response["statusCode"], 200)
         body = json.loads(response["body"])
-        self.assertEqual(body["error"], "Route not found")
+        self.assertEqual(body["status"], "active_alerts")
+        self.assertIn("alerts", body)
+        self.assertGreaterEqual(body["total_active"], 1)
+        alert = body["alerts"][0]
+        self.assertIn("headline", alert)
+        self.assertIn("disaster_type", alert)
+        self.assertIn("safe_shelters", alert)
 
 
 if __name__ == "__main__":

@@ -122,7 +122,7 @@ class EmergencyPassportHandler(BaseHTTPRequestHandler):
     def do_GET(self):
         parsed = urllib.parse.urlparse(self.path)
         # Check if API route
-        if parsed.path.startswith(("/health", "/tourists", "/hospitals", "/emergency")):
+        if parsed.path.startswith(("/health", "/tourists", "/hospitals", "/emergency", "/alerts")):
             self._dispatch_lambda("GET")
         else:
             self._serve_static_file(parsed.path)
@@ -162,6 +162,7 @@ def run_server(port: int = 3000):
     print(f"    • Tourists API:  http://localhost:{port}/tourists")
     print(f"    • Hospitals API: http://localhost:{port}/hospitals")
     print(f"    • Emergency API: http://localhost:{port}/emergency?tourist_id=T-1001")
+    print(f"    • Disaster Alert: http://localhost:{port}/alerts")
     print("=" * 65)
     print("  Press Ctrl+C to stop the server.\n")
 

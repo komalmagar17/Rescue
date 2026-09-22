@@ -151,6 +151,12 @@ Resources:
             ApiId: !Ref EmergencyHttpApi
             Path: /tourists/{tourist_id}
             Method: GET
+        TouristQr:
+          Type: HttpApi
+          Properties:
+            ApiId: !Ref EmergencyHttpApi
+            Path: /tourists/{tourist_id}/qr
+            Method: GET
         TouristUpdate:
           Type: HttpApi
           Properties:
@@ -181,6 +187,12 @@ Resources:
             ApiId: !Ref EmergencyHttpApi
             Path: /hospitals
             Method: POST
+        AlertsList:
+          Type: HttpApi
+          Properties:
+            ApiId: !Ref EmergencyHttpApi
+            Path: /alerts
+            Method: GET
       Tags:
         Project: EmergencyPassport
 

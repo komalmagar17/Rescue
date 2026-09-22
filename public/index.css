@@ -1573,15 +1573,19 @@ p {
 /* Container & Text Boundary Protections */
 .glass-card,
 .glass-sheet,
+.stitch-card,
 .relationship-contact-card,
 .editorial-hospital-card,
 .luxury-passport-document,
 .qr-editorial-card,
-.field-briefing-sheet {
+.field-briefing-sheet,
+.disaster-card,
+.scanner-modal-box {
   box-sizing: border-box;
   overflow: hidden;
   word-break: break-word;
   overflow-wrap: break-word;
+  max-width: 100%;
 }
 
 /* ==============================================================================
@@ -3576,12 +3580,350 @@ p {
     display: none !important;
   }
 
-  .luxury-passport-document {
-    border: 2px solid #000000 !important;
-    box-shadow: none !important;
-    width: 100% !important;
-    margin: 0 auto !important;
-  }
+/* ==============================================================================
+   LIVE CAMERA QR OPTICAL SCANNER MODAL & VIEWPORT
+   ============================================================================== */
+.scanner-modal-box {
+  max-width: 540px;
+  width: 92%;
+  padding: 32px;
+}
+
+.scanner-viewport-wrap {
+  position: relative;
+  width: 100%;
+  height: 320px;
+  border-radius: var(--radius-md);
+  overflow: hidden;
+  background: #000000;
+  border: 1px solid var(--border);
+  margin: 16px 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+#qrCameraFeed {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* Holographic Optical Reticle with Corner Brackets */
+.scanner-reticle {
+  position: absolute;
+  width: 200px;
+  height: 200px;
+  border: 1px solid rgba(198, 165, 107, 0.4);
+  box-shadow: 0 0 20px rgba(198, 165, 107, 0.15), inset 0 0 20px rgba(198, 165, 107, 0.1);
+  border-radius: 12px;
+  pointer-events: none;
+}
+
+.reticle-bracket {
+  position: absolute;
+  width: 16px;
+  height: 16px;
+  border-color: var(--gold);
+  border-style: solid;
+}
+
+.reticle-bracket.tl { top: -2px; left: -2px; border-width: 3px 0 0 3px; border-top-left-radius: 6px; }
+.reticle-bracket.tr { top: -2px; right: -2px; border-width: 3px 3px 0 0; border-top-right-radius: 6px; }
+.reticle-bracket.bl { bottom: -2px; left: -2px; border-width: 0 0 3px 3px; border-bottom-left-radius: 6px; }
+.reticle-bracket.br { bottom: -2px; right: -2px; border-width: 0 3px 3px 0; border-bottom-right-radius: 6px; }
+
+/* Animated Sweeping Laser Line */
+.scanner-laser-line {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, var(--gold), #FFFFFF, var(--gold), transparent);
+  box-shadow: 0 0 12px var(--gold), 0 0 4px #FFFFFF;
+  animation: laserSweep 2.2s infinite ease-in-out;
+}
+
+@keyframes laserSweep {
+  0% { top: 0; opacity: 0.8; }
+  50% { top: 100%; opacity: 1; }
+  100% { top: 0; opacity: 0.8; }
+}
+
+.scanner-status-tag {
+  position: absolute;
+  bottom: 12px;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 4px 12px;
+  border-radius: var(--radius-pill);
+  background: rgba(18, 22, 20, 0.85);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  border: 1px solid var(--border);
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  font-weight: 600;
+  color: var(--gold);
+  letter-spacing: 0.04em;
+}
+
+.scanner-controls-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  margin-top: 14px;
+}
+
+.scanner-presets-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-top: 16px;
+  padding-top: 14px;
+  border-top: 1px solid var(--border-subtle);
+}
+
+.presets-label {
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  font-weight: 700;
+  color: var(--text-muted);
+  letter-spacing: 0.05em;
+}
+
+.scanner-preset-chip {
+  padding: 4px 10px;
+  border-radius: var(--radius-pill);
+  border: 1px solid var(--border);
+  background: var(--surface-subtle);
+  color: var(--text-secondary);
+  font-size: 0.75rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.scanner-preset-chip:hover {
+  border-color: var(--gold);
+  color: var(--gold);
+  background: var(--gold-subtle);
+  transform: translateY(-1px);
+}
+
+/* ==============================================================================
+   NEARBY DISASTER EARLY WARNING RADAR SYSTEM
+   ============================================================================== */
+.disaster-alert-banner {
+  position: fixed;
+  top: 76px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: calc(100% - 32px);
+  max-width: 960px;
+  z-index: 999;
+  border-radius: var(--radius-lg);
+  background: rgba(26, 12, 12, 0.92);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1.5px solid var(--emergency);
+  box-shadow: 0 10px 35px rgba(241, 107, 96, 0.25);
+  animation: bannerSlideIn 0.4s var(--ease-out);
+}
+
+@keyframes bannerSlideIn {
+  from { opacity: 0; transform: translate(-50%, -12px); }
+  to { opacity: 1; transform: translate(-50%, 0); }
+}
+
+.disaster-banner-inner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 20px;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.disaster-headline-wrap {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  color: #FFFFFF;
+}
+
+.disaster-alarm-beacon {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: var(--emergency);
+  box-shadow: 0 0 12px var(--emergency);
+  animation: alarmPulse 1.2s infinite ease-in-out;
+  flex-shrink: 0;
+}
+
+@keyframes alarmPulse {
+  0% { transform: scale(0.9); opacity: 0.8; box-shadow: 0 0 6px var(--emergency); }
+  50% { transform: scale(1.3); opacity: 1; box-shadow: 0 0 18px var(--emergency); }
+  100% { transform: scale(0.9); opacity: 0.8; box-shadow: 0 0 6px var(--emergency); }
+}
+
+.disaster-distance-pill {
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  font-weight: 700;
+  padding: 2px 8px;
+  border-radius: var(--radius-pill);
+  background: var(--emergency-subtle);
+  color: var(--emergency);
+  border: 1px solid var(--emergency);
+  letter-spacing: 0.05em;
+}
+
+.disaster-actions-wrap {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.btn-disaster {
+  background: var(--emergency);
+  color: #FFFFFF;
+  border: none;
+  font-weight: 700;
+  font-size: 0.82rem;
+  padding: 6px 14px;
+  border-radius: var(--radius-pill);
+  cursor: pointer;
+  box-shadow: 0 4px 14px rgba(241, 107, 96, 0.4);
+  transition: transform 0.2s ease, opacity 0.2s ease;
+}
+
+.btn-disaster:hover {
+  transform: scale(1.04);
+  opacity: 0.92;
+}
+
+.btn-dismiss-disaster {
+  background: transparent;
+  border: none;
+  color: var(--text-secondary);
+  font-size: 1.3rem;
+  cursor: pointer;
+  line-height: 1;
+  padding: 4px;
+}
+
+.btn-dismiss-disaster:hover {
+  color: #FFFFFF;
+}
+
+/* Disaster Modal Dialog */
+.disaster-modal-box {
+  max-width: 640px;
+  width: 92%;
+  padding: 32px;
+}
+
+.disaster-content-scroll {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  max-height: 480px;
+  overflow-y: auto;
+  margin-top: 18px;
+  padding-right: 4px;
+}
+
+.disaster-card {
+  padding: 22px;
+  border-radius: var(--radius-md);
+  background: var(--surface-subtle);
+  border: 1px solid var(--border);
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.disaster-card.critical {
+  border-color: var(--emergency);
+  background: rgba(241, 107, 96, 0.04);
+}
+
+.disaster-card-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.disaster-severity-badge {
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  font-weight: 800;
+  padding: 3px 8px;
+  border-radius: var(--radius-pill);
+  letter-spacing: 0.06em;
+}
+
+.disaster-severity-badge.critical {
+  background: var(--emergency);
+  color: #FFFFFF;
+}
+
+.disaster-severity-badge.warning {
+  background: var(--gold-subtle);
+  color: var(--gold);
+  border: 1px solid var(--gold-soft);
+}
+
+.disaster-dist-tag {
+  font-family: var(--font-mono);
+  font-size: 0.8rem;
+  color: var(--gold);
+}
+
+.disaster-title {
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin: 0;
+  line-height: 1.3;
+}
+
+.disaster-location {
+  font-size: 0.84rem;
+  color: var(--text-secondary);
+}
+
+.evacuation-directive-box {
+  padding: 12px 14px;
+  border-radius: var(--radius-sm);
+  background: rgba(0, 0, 0, 0.25);
+  border-left: 3px solid var(--emergency);
+}
+
+.disaster-shelter-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 12px;
+  border-radius: var(--radius-sm);
+  background: var(--surface);
+  border: 1px solid var(--border-subtle);
+}
+
+.stitch-alert-count-pill {
+  font-family: var(--font-mono);
+  font-size: 0.65rem;
+  font-weight: 800;
+  background: var(--emergency);
+  color: #FFFFFF;
+  padding: 1px 6px;
+  border-radius: var(--radius-pill);
+  margin-left: 2px;
 }
 
 /* ==============================================================================
