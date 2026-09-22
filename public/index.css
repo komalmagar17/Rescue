@@ -140,6 +140,23 @@ body {
   background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
 }
 
+/* Global Hidden & Utility Classes */
+.hidden {
+  display: none !important;
+}
+
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border-width: 0;
+}
+
 /* Typography Hierarchy */
 .editorial-display {
   font-family: var(--font-serif);
@@ -771,37 +788,117 @@ p {
   gap: 16px;
 }
 
-/* Hero Visual Composition */
-.hero-visual-stage {
-  position: relative;
-  max-width: 860px;
+/* Hero Visual Showcase — Responsive Dual Console */
+.hero-showcase-container {
+  width: 100%;
+  max-width: 1200px;
   margin: 40px auto 0 auto;
 }
 
-.stage-map-backdrop {
-  position: relative;
-  height: 420px;
-  border-radius: var(--radius-lg);
+.hero-showcase-grid {
+  display: grid;
+  grid-template-columns: 1.12fr 0.88fr;
+  gap: 28px;
+  align-items: stretch;
+}
+
+.showcase-passport-card {
+  width: 100%;
+  display: flex;
+}
+
+.showcase-passport-card .luxury-passport-document {
+  width: 100%;
+}
+
+.showcase-map-card {
+  width: 100%;
+  border-radius: var(--radius-md);
   overflow: hidden;
-  border: 1px solid var(--border);
+  display: flex;
+  flex-direction: column;
   background: var(--surface);
+  border: 1px solid var(--border);
+  box-shadow: var(--shadow-subtle);
+  min-height: 480px;
+  transition: all 0.3s var(--ease-out);
+}
+
+.showcase-map-card:hover {
+  border-color: var(--border-focus);
   box-shadow: var(--shadow-elevated);
 }
 
-.interactive-hero-map {
-  width: 100%;
-  height: 100%;
+.showcase-map-header {
+  padding: 14px 20px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 1px solid var(--border);
+  background: var(--surface-subtle);
 }
 
-.floating-passport-preview {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  width: 90%;
-  max-width: 640px;
-  z-index: 20;
-  box-shadow: 0 25px 60px -15px rgba(0, 0, 0, 0.5);
+.radar-live-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: var(--medical);
+  letter-spacing: 0.08em;
+}
+
+.radar-live-badge .pulse-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--medical);
+  animation: pulseDot 2s infinite ease-in-out;
+}
+
+.radar-coords {
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  color: var(--gold);
+}
+
+.interactive-hero-map {
+  flex: 1;
+  width: 100%;
+  min-height: 320px;
+}
+
+.showcase-map-footer {
+  padding: 14px 20px;
+  border-top: 1px solid var(--border);
+  background: var(--surface-subtle);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 16px;
+}
+
+.telemetry-item {
+  display: flex;
+  flex-direction: column;
+}
+
+.telemetry-label {
+  font-family: var(--font-mono);
+  font-size: 0.62rem;
+  color: var(--text-muted);
+  letter-spacing: 0.06em;
+}
+
+.telemetry-val {
+  font-size: 0.82rem;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.telemetry-val.text-medical {
+  color: var(--medical);
 }
 
 /* 4-Step Golden Hour Storytelling */
@@ -1517,6 +1614,15 @@ p {
   font-family: var(--font-sans) !important;
 }
 
+/* OpenStreetMap Tile Styling via Pure CSS Filters (Zero API Key, No Watermark) */
+[data-theme="dark"] .leaflet-tile-pane {
+  filter: brightness(0.62) invert(1) contrast(3.2) hue-rotate(200deg) saturate(0.25) brightness(0.72);
+}
+
+[data-theme="light"] .leaflet-tile-pane {
+  filter: sepia(18%) contrast(96%) brightness(101%);
+}
+
 .leaflet-popup-content-wrapper {
   background: var(--surface-elevated) !important;
   color: var(--text-primary) !important;
@@ -1955,6 +2061,30 @@ p {
   display: none;
 }
 
+@media (max-width: 1024px) {
+  .hero-showcase-grid {
+    grid-template-columns: 1fr;
+    gap: 24px;
+  }
+
+  .showcase-map-card {
+    min-height: 380px;
+  }
+
+  .dashboard-core-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .hospitals-split-viewport {
+    grid-template-columns: 1fr;
+    height: auto;
+  }
+
+  .story-steps-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
 @media (max-width: 768px) {
   .nav-center-links, .brand-editorial-sub {
     display: none;
@@ -2003,17 +2133,9 @@ p {
     box-shadow: 0 8px 24px var(--gold-glow);
   }
 
-  .hospitals-split-viewport {
-    grid-template-columns: 1fr;
-    height: auto;
-  }
-
-  .dashboard-core-grid {
-    grid-template-columns: 1fr;
-  }
-
   .passport-body-grid {
     grid-template-columns: 1fr;
+    gap: 20px;
   }
 
   .auth-editorial-viewport {
@@ -2027,6 +2149,32 @@ p {
   .footer-container {
     grid-template-columns: 1fr;
     gap: 32px;
+  }
+
+  .quick-action-strip {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .editorial-trust-seal {
+    flex-direction: column;
+    padding: 24px;
+    gap: 24px;
+  }
+}
+
+@media (max-width: 640px) {
+  .story-steps-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .passport-security-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 12px;
+  }
+
+  .passport-id-box {
+    text-align: left;
   }
 }
 

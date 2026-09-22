@@ -160,12 +160,10 @@ class AmbientCanvasEngine {
 }
 
 // -----------------------------------------------------------------------------
-// 2. Interactive Real Map Engine (Leaflet + CartoDB Warm/Dark Tiles)
+// 2. Interactive Real Map Engine (Leaflet + OpenStreetMap Vector)
 // -----------------------------------------------------------------------------
 function getMapTileUrl() {
-  return state.themeMode === 'light'
-    ? 'https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png'
-    : 'https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png';
+  return 'https://tile.openstreetmap.org/{z}/{x}/{y}.png';
 }
 
 function initHeroMap() {
@@ -219,6 +217,12 @@ function initHeroMap() {
   });
 
   state.leafletHeroMap = map;
+
+  setTimeout(() => {
+    if (state.leafletHeroMap) {
+      state.leafletHeroMap.invalidateSize();
+    }
+  }, 150);
 
   // Subtle ambient camera drift
   let driftAngle = 0;

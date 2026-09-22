@@ -53,30 +53,55 @@ const Views = {
           </div>
         </section>
 
-        <!-- Hero Visual Composition: Luxury Passport Floating over Interactive Map -->
-        <section class="hero-visual-stage">
-          <div class="stage-map-backdrop" id="heroMapStage">
-            <div id="heroInteractiveMap" class="interactive-hero-map"></div>
-          </div>
-          
-          <div class="floating-passport-preview">
-            ${UI.renderPassportDocument({
-              bloodGroup: 'O+',
-              allergies: ['Penicillin (Anaphylaxis)', 'Peanuts (Severe)'],
-              conditions: ['Asthma (Carry Inhaler)', 'Mild Hypertension'],
-              emergencyContacts: [
-                { name: 'Mark Rostova', relationship: 'Spouse', phone: '+1 (555) 019-2834' },
-                { name: 'Dr. Viktor Rostov', relationship: 'Father · Physician', phone: '+1 (555) 018-9921' }
-              ],
-              lastVerified: '2026-09-22'
-            }, {
-              name: 'Elena Rostova',
-              passportId: 'T-1001',
-              avatar: 'ER',
-              country: 'International Traveler',
-              language: 'English, Russian',
-              dob: '1995-04-12'
-            })}
+        <!-- Hero Visual Showcase: Integrated Dual Console (Passport + Live Trauma Radar) -->
+        <section class="hero-showcase-container">
+          <div class="hero-showcase-grid">
+            
+            <!-- Left: High-Precision Verified Medical Passport -->
+            <div class="showcase-passport-card">
+              ${UI.renderPassportDocument({
+                bloodGroup: 'O+',
+                allergies: ['Penicillin (Anaphylaxis)', 'Peanuts (Severe)'],
+                conditions: ['Asthma (Carry Inhaler)', 'Mild Hypertension'],
+                emergencyContacts: [
+                  { name: 'Mark Rostova', relationship: 'Spouse', phone: '+1 (555) 019-2834' },
+                  { name: 'Dr. Viktor Rostov', relationship: 'Father · Physician', phone: '+1 (555) 018-9921' }
+                ],
+                lastVerified: '2026-09-22'
+              }, {
+                name: 'Elena Rostova',
+                passportId: 'T-1001',
+                avatar: 'ER',
+                country: 'International Traveler',
+                language: 'English, Russian',
+                dob: '1995-04-12'
+              })}
+            </div>
+
+            <!-- Right: Interactive Live Emergency Trauma Radar Console -->
+            <div class="showcase-map-card glass-card">
+              <div class="showcase-map-header">
+                <div class="radar-live-badge">
+                  <span class="pulse-dot"></span>
+                  <span>LIVE TRAUMA RADAR</span>
+                </div>
+                <span class="radar-coords">35.6895° N, 139.6917° E</span>
+              </div>
+
+              <div id="heroInteractiveMap" class="interactive-hero-map"></div>
+
+              <div class="showcase-map-footer">
+                <div class="telemetry-item">
+                  <span class="telemetry-label">NEAREST TRAUMA CENTER</span>
+                  <span class="telemetry-val">St. Jude Emergency Center</span>
+                </div>
+                <div class="telemetry-item">
+                  <span class="telemetry-label">RESPONSE TIME</span>
+                  <span class="telemetry-val text-medical">~6 mins (Level 1 ICU)</span>
+                </div>
+              </div>
+            </div>
+
           </div>
         </section>
 
