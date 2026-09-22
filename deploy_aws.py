@@ -19,6 +19,26 @@ from pathlib import Path
 REPO_ROOT = Path(__file__).parent.resolve()
 PUBLIC_DIR = REPO_ROOT / "public"
 
+def load_env():
+    """Load key-value pairs from .env into os.environ if not already set."""
+    env_path = REPO_ROOT / ".env"
+    if env_path.exists():
+        try:
+            with open(env_path, "r", encoding="utf-8") as f:
+                for line in f:
+                    line = line.strip()
+                    if not line or line.startswith("#") or "=" not in line:
+                        continue
+                    k, v = line.split("=", 1)
+                    k = k.strip()
+                    v = v.strip().strip('"').strip("'")
+                    if k and k not in os.environ:
+                        os.environ[k] = v
+        except Exception:
+            pass
+
+load_env()
+
 
 def check_aws_credentials():
     """Verify AWS credentials exist in environment or ~/.aws."""
@@ -222,10 +242,19 @@ def deploy_via_boto3(stack_name: str, region: str):
     change_set_type = "UPDATE" if stack_exists else "CREATE"
     print(f"\n[*] Creating CloudFormation Change Set ({change_set_type}) for '{stack_name}'...")
 
+    cfn_params = []
+    groq_key = os.environ.get("GROQ_API_KEY", "")
+    if groq_key:
+        cfn_params.append({"ParameterKey": "GroqApiKey", "ParameterValue": groq_key})
+        print(f"  • Configured Groq API Key for Lambda: {groq_key[:8]}...")
+    elif stack_exists:
+        cfn_params.append({"ParameterKey": "GroqApiKey", "UsePreviousValue": True})
+
     cfn.create_change_set(
         StackName=stack_name,
         ChangeSetName=change_set_name,
         TemplateBody=template_body,
+        Parameters=cfn_params,
         Capabilities=["CAPABILITY_IAM", "CAPABILITY_AUTO_EXPAND"],
         ChangeSetType=change_set_type,
     )
@@ -301,6 +330,10 @@ def main():
             "--resolve-s3",
             "--no-confirm-changeset",
         ]
+        groq_key = os.environ.get("GROQ_API_KEY", "")
+        if groq_key:
+            deploy_cmd.extend(["--parameter-overrides", f"GroqApiKey={groq_key}"])
+
         run_command(deploy_cmd)
     else:
         print("\n[*] SAM CLI not present in PATH. Switching to native AWS Boto3 Serverless Engine...")

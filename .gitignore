@@ -16,6 +16,7 @@ __pycache__/
 # Environment / credentials
 .env
 .env.*
+!.env.example
 
 # Internal dev & technical architecture documentation
 README_DEV.md

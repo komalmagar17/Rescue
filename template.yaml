@@ -21,6 +21,11 @@ Parameters:
     Type: String
     Default: Hospitals
     Description: Name of the DynamoDB table storing verified hospital directory and capacity info.
+  GroqApiKey:
+    Type: String
+    Default: ""
+    NoEcho: true
+    Description: Optional Groq API Key for high-speed AI medical triage summaries.
 
 Resources:
   # ============================================================================
@@ -103,6 +108,7 @@ Resources:
         Variables:
           TOURIST_PROFILES_TABLE: !Ref TouristProfilesTable
           HOSPITALS_TABLE: !Ref HospitalsTable
+          GROQ_API_KEY: !Ref GroqApiKey
       # Least privilege IAM permissions: scoped strictly to CRUD on the two DynamoDB tables
       Policies:
         - DynamoDBCrudPolicy:

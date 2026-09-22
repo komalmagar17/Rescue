@@ -210,6 +210,50 @@ class TestEmergencyHandler(unittest.TestCase):
         self.assertIn("disaster_type", alert)
         self.assertIn("safe_shelters", alert)
 
+    @patch("src.emergency_handler.app.urllib.request.urlopen")
+    def test_groq_ai_summarization(self, mock_urlopen):
+        import io
+        import os
+        mock_response = io.BytesIO(json.dumps({
+            "choices": [{
+                "message": {
+                    "content": "• Elena Rostova (29 y/o, Blood: O+)\n• CONTRAINDICATION: Penicillin, Peanuts\n• Chronic: Asthma, Hypertension\n• Lang: English, Russian\n• Contact: Mark Rostova (+1-555-0199)"
+                }
+            }]
+        }).encode("utf-8"))
+        mock_urlopen.return_value.__enter__.return_value = mock_response
+
+        with patch.dict(os.environ, {"GROQ_API_KEY": "gsk_test_mock_12345"}):
+            event = {
+                "rawPath": "/emergency",
+                "requestContext": {"http": {"method": "GET", "path": "/emergency"}},
+                "queryStringParameters": {"tourist_id": "T-1001"},
+            }
+            response = lambda_handler(event, None)
+            self.assertEqual(response["statusCode"], 200)
+            body = json.loads(response["body"])
+            self.assertEqual(body["ai_provider"], "groq")
+            self.assertIn("Elena Rostova", body["ai_summary"])
+            self.assertIn("Penicillin", body["ai_summary"])
+
+    @patch("src.emergency_handler.app.urllib.request.urlopen")
+    def test_groq_ai_fallback_on_network_error(self, mock_urlopen):
+        import os
+        import urllib.error
+        mock_urlopen.side_effect = urllib.error.URLError("Connection refused")
+
+        with patch.dict(os.environ, {"GROQ_API_KEY": "gsk_test_mock_12345"}):
+            event = {
+                "rawPath": "/emergency",
+                "requestContext": {"http": {"method": "GET", "path": "/emergency"}},
+                "queryStringParameters": {"tourist_id": "T-1001"},
+            }
+            response = lambda_handler(event, None)
+            self.assertEqual(response["statusCode"], 200)
+            body = json.loads(response["body"])
+            self.assertIn("ai_summary", body)
+            self.assertIn("CRITICAL ALLERGIES", body["ai_summary"])
+
 
 if __name__ == "__main__":
     unittest.main()

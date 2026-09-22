@@ -9,6 +9,8 @@ import logging
 import math
 import os
 import re
+import urllib.error
+import urllib.request
 from decimal import Decimal
 from typing import Any, Dict, List, Optional, Tuple
 
@@ -213,41 +215,94 @@ def match_hospital(
 
 
 # ---------------------------------------------------------------------------
-# Paramedic AI Briefing Engine (Bedrock + Deterministic Fallback)
+# Paramedic AI Briefing Engine (Groq Llama 3 + Bedrock Claude + Fallback)
 # ---------------------------------------------------------------------------
-def summarize_with_bedrock(profile: Dict[str, Any], location: str = "unknown") -> str:
+def summarize_with_groq(
+    profile: Dict[str, Any],
+    location: str = "unknown",
+    api_key: Optional[str] = None,
+) -> Optional[str]:
     """
-    Call Amazon Bedrock (Claude 3 Haiku) to create a concise paramedic briefing.
-    Falls back gracefully to a deterministic local summary if Bedrock is offline.
+    Call Groq API (ultra-fast Llama-3.3-70b-versatile / Llama-3.1-8b-instant inference)
+    to synthesize an urgent 5-bullet paramedic clinical briefing.
+    Uses standard library urllib.request (zero extra dependencies in AWS Lambda).
     """
-    # Build deterministic fallback (guaranteed to never fail)
-    raw_conditions = profile.get("Conditions", []) or []
-    conditions_list = sorted(list(raw_conditions)) if isinstance(raw_conditions, (set, list)) else [str(raw_conditions)]
-    conditions_str = ", ".join(conditions_list) if conditions_list else "None reported"
+    key = api_key or os.environ.get("GROQ_API_KEY")
+    if not key:
+        return None
 
-    raw_allergies = profile.get("Allergies", []) or []
-    allergies_list = sorted(list(raw_allergies)) if isinstance(raw_allergies, (set, list)) else [str(raw_allergies)]
-    allergies_str = ", ".join(allergies_list) if allergies_list else "None reported"
+    model = os.environ.get("GROQ_MODEL", "llama-3.3-70b-versatile")
+    url = "https://api.groq.com/openai/v1/chat/completions"
 
-    raw_contacts = profile.get("EmergencyContacts", []) or []
-    contacts_list = sorted(list(raw_contacts)) if isinstance(raw_contacts, (set, list)) else [str(raw_contacts)]
-    contacts_str = "; ".join(contacts_list) if contacts_list else "None listed"
-
-    fallback = (
-        f"• {profile.get('Age', '?')} y/o ({profile.get('Name', 'Unknown')}), Blood Type: {profile.get('BloodType', 'Unknown')}\n"
-        f"• CRITICAL ALLERGIES: {allergies_str}\n"
-        f"• CONDITIONS: {conditions_str}\n"
-        f"• LANGUAGE: {profile.get('Language', 'English')}\n"
-        f"• EMERGENCY CONTACTS: {contacts_str}\n"
-        f"• LOCATION: {location}"
+    system_prompt = (
+        "You are an expert emergency medical dispatcher assisting first responders in the field during the Golden Hour. "
+        "Analyze the verified patient health record and provide an urgent, strictly factual 5-bullet clinical briefing. "
+        "Strictly adhere to the facts provided. Do NOT speculate or hallucinate diagnoses. "
+        "Highlight critical drug contraindications and severe allergies prominently."
     )
 
-    client = get_bedrock_client()
-    if not client:
-        return fallback
+    user_prompt = f"""Generate an urgent 5-bullet field summary for arriving paramedics:
+1. Patient Age, Blood Type, and Full Name.
+2. CRITICAL ALLERGIES & CONTRAINDICATIONS to avoid immediately (e.g. Penicillin, NSAIDs).
+3. Known chronic pre-existing medical conditions.
+4. Primary language spoken & communication directives.
+5. Primary emergency contact with relationship & phone number.
+
+Patient Data:
+{json.dumps(profile, default=str, cls=DecimalEncoder)}
+
+Incident Location: {location}
+"""
+
+    payload = {
+        "model": model,
+        "messages": [
+            {"role": "system", "content": system_prompt},
+            {"role": "user", "content": user_prompt},
+        ],
+        "temperature": 0.1,
+        "max_tokens": 280,
+    }
+
+    req = urllib.request.Request(
+        url,
+        data=json.dumps(payload).encode("utf-8"),
+        headers={
+            "Authorization": f"Bearer {key.strip()}",
+            "Content-Type": "application/json",
+            "User-Agent": "EmergencyPassport-Triage/2.0",
+        },
+        method="POST",
+    )
 
     try:
-        prompt = f"""You are an emergency medical dispatcher assisting first responders in the field.
+        with urllib.request.urlopen(req, timeout=4.5) as resp:
+            data = json.loads(resp.read().decode("utf-8"))
+            content = data["choices"][0]["message"]["content"].strip()
+            return content
+    except Exception as e:
+        logger.warning("Groq AI invocation failed (%s). Falling back to next engine.", e)
+        return None
+
+
+def summarize_with_ai(profile: Dict[str, Any], location: str = "unknown") -> str:
+    """
+    Multi-Provider Paramedic Clinical Briefing Engine:
+    1. Priority 1: Groq API (High-speed Llama 3 inference, free-tier friendly, sub-250ms).
+    2. Priority 2: Amazon Bedrock (Claude 3 Haiku).
+    3. Priority 3: High-fidelity deterministic clinical fallback algorithm.
+    """
+    # 1. Try Groq if GROQ_API_KEY is present
+    if os.environ.get("GROQ_API_KEY"):
+        groq_result = summarize_with_groq(profile, location=location)
+        if groq_result:
+            return groq_result
+
+    # 2. Try Bedrock if client available and credentials present
+    client = get_bedrock_client()
+    if client:
+        try:
+            prompt = f"""You are an emergency medical dispatcher assisting first responders in the field.
 Use ONLY the patient data below. Do NOT hallucinate diagnoses.
 Format an urgent, 5-bullet summary for paramedics:
 1. Patient Age, Blood Type, and Name.
@@ -261,26 +316,50 @@ Patient data:
 
 Incident Location: {location}
 """
-        body = {
-            "anthropic_version": "bedrock-2023-05-31",
-            "max_tokens": 250,
-            "temperature": 0.0,
-            "messages": [{"role": "user", "content": prompt}],
-        }
+            body = {
+                "anthropic_version": "bedrock-2023-05-31",
+                "max_tokens": 250,
+                "temperature": 0.0,
+                "messages": [{"role": "user", "content": prompt}],
+            }
 
-        response = client.invoke_model(
-            modelId="anthropic.claude-3-haiku-20240307-v1:0",
-            contentType="application/json",
-            accept="application/json",
-            body=json.dumps(body),
-        )
+            response = client.invoke_model(
+                modelId="anthropic.claude-3-haiku-20240307-v1:0",
+                contentType="application/json",
+                accept="application/json",
+                body=json.dumps(body),
+            )
 
-        result = json.loads(response["body"].read())
-        return result["content"][0]["text"].strip()
+            result = json.loads(response["body"].read())
+            return result["content"][0]["text"].strip()
+        except Exception as e:
+            logger.warning("Bedrock invocation failed (%s). Using clinical fallback.", e)
 
-    except Exception as e:
-        logger.warning("Bedrock invocation failed (%s). Using clinical fallback.", e)
-        return fallback
+    # 3. Deterministic clinical fallback (guaranteed to never fail)
+    raw_conditions = profile.get("Conditions", []) or []
+    conditions_list = sorted(list(raw_conditions)) if isinstance(raw_conditions, (set, list)) else [str(raw_conditions)]
+    conditions_str = ", ".join(conditions_list) if conditions_list else "None reported"
+
+    raw_allergies = profile.get("Allergies", []) or []
+    allergies_list = sorted(list(raw_allergies)) if isinstance(raw_allergies, (set, list)) else [str(raw_allergies)]
+    allergies_str = ", ".join(allergies_list) if allergies_list else "None reported"
+
+    raw_contacts = profile.get("EmergencyContacts", []) or []
+    contacts_list = sorted(list(raw_contacts)) if isinstance(raw_contacts, (set, list)) else [str(raw_contacts)]
+    contacts_str = "; ".join(contacts_list) if contacts_list else "None listed"
+
+    return (
+        f"• {profile.get('Age', '?')} y/o ({profile.get('Name', 'Unknown')}), Blood Type: {profile.get('BloodType', 'Unknown')}\n"
+        f"• CRITICAL ALLERGIES: {allergies_str}\n"
+        f"• CONDITIONS: {conditions_str}\n"
+        f"• LANGUAGE: {profile.get('Language', 'English')}\n"
+        f"• EMERGENCY CONTACTS: {contacts_str}\n"
+        f"• LOCATION: {location}"
+    )
+
+
+# Backwards-compatibility alias
+summarize_with_bedrock = summarize_with_ai
 
 
 # ---------------------------------------------------------------------------
@@ -301,13 +380,24 @@ def list_hospitals() -> List[Dict[str, Any]]:
 # ---------------------------------------------------------------------------
 def handle_health() -> Dict[str, Any]:
     db_info = db_repository.get_info()
+    groq_active = bool(os.environ.get("GROQ_API_KEY"))
+    bedrock_active = bool(get_bedrock_client())
+    active_ai = "groq" if groq_active else ("bedrock" if bedrock_active else "clinical_deterministic")
+
     return build_response(200, {
         "status": "healthy",
         "service": "emergency-passport",
         "runtime": "python3.12",
         "database": db_info,
+        "ai_engine": {
+            "active_provider": active_ai,
+            "groq_configured": groq_active,
+            "groq_model": os.environ.get("GROQ_MODEL", "llama-3.3-70b-versatile"),
+            "bedrock_available": bedrock_active,
+        },
         "features": {
-            "bedrock_ai_briefing": True,
+            "groq_ai_briefing": groq_active,
+            "bedrock_ai_briefing": bedrock_active,
             "capability_matching": True,
             "proximity_routing": True,
             "pluggable_storage": True,
@@ -427,7 +517,8 @@ def handle_emergency(
 
     hospitals = list_hospitals()
     matched = match_hospital(profile, hospitals, user_lat=latitude, user_lon=longitude)
-    summary = summarize_with_bedrock(profile, location=location)
+    summary = summarize_with_ai(profile, location=location)
+    ai_provider = "groq" if os.environ.get("GROQ_API_KEY") else ("bedrock" if get_bedrock_client() else "clinical_deterministic")
 
     return build_response(200, {
         "status": "emergency_processed",
@@ -435,6 +526,7 @@ def handle_emergency(
         "tourist_id": tourist_id,
         "profile": profile,
         "ai_summary": summary,
+        "ai_provider": ai_provider,
         "recommended_hospital": matched,
         "all_hospitals": hospitals,
         "location": location,

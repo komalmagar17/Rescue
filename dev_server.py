@@ -23,6 +23,26 @@ from http.server import BaseHTTPRequestHandler, HTTPServer
 REPO_ROOT = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, REPO_ROOT)
 
+def load_env():
+    """Load key-value pairs from .env into os.environ if not already set."""
+    env_path = os.path.join(REPO_ROOT, ".env")
+    if os.path.exists(env_path):
+        try:
+            with open(env_path, "r", encoding="utf-8") as f:
+                for line in f:
+                    line = line.strip()
+                    if not line or line.startswith("#") or "=" not in line:
+                        continue
+                    k, v = line.split("=", 1)
+                    k = k.strip()
+                    v = v.strip().strip('"').strip("'")
+                    if k and k not in os.environ:
+                        os.environ[k] = v
+        except Exception as e:
+            sys.stderr.write(f"[!] Warning reading .env: {e}\n")
+
+load_env()
+
 from src.emergency_handler.app import lambda_handler
 from src.db.repository import db_repository
 
@@ -148,11 +168,20 @@ def run_server(port: int = 3000):
     httpd = HTTPServer(server_address, EmergencyPassportHandler)
     db_info = db_repository.get_info()
 
+    groq_key = os.environ.get("GROQ_API_KEY")
+    groq_model = os.environ.get("GROQ_MODEL", "llama-3.3-70b-versatile")
+    if groq_key:
+        masked_key = groq_key[:8] + "..." + groq_key[-4:] if len(groq_key) > 12 else "Configured"
+        ai_status = f"GROQ AI ({groq_model}, Key: {masked_key})"
+    else:
+        ai_status = "Clinical Algorithm (Add GROQ_API_KEY in .env for Llama 3)"
+
     print("=" * 65)
     print("      🚑 EMERGENCY PASSPORT — LOCAL PRODUCTION SERVER 🌍    ")
     print("=" * 65)
     print(f"  Server URL:        http://localhost:{port}")
     print(f"  Active Database:   {db_info['active_backend'].upper()}")
+    print(f"  AI Triage Engine:  {ai_status}")
     print(f"  Supabase Config:   {'Configured' if db_info['supabase_configured'] else 'Not set (using zero-config local engine)'}")
     print(f"  DynamoDB Status:   {'Available' if db_info['dynamo_available'] else 'Not active'}")
     print("=" * 65)
