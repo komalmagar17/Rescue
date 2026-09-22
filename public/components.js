@@ -543,7 +543,7 @@ const UI = {
 
             <!-- Clinical Security Footer Stamp -->
             <div class="passport-security-footer">
-              <span class="footer-timestamp">LAST VERIFIED: <strong class="text-gold">${p.lastVerified || 'TODAY'}</strong> • AWS KMS 256-BIT ENCRYPTED</span>
+              <span class="footer-timestamp">LAST VERIFIED: <strong class="text-gold">${p.lastVerified || 'TODAY'}</strong> • 256-BIT HARDWARE ENCRYPTED</span>
               <span class="footer-seal-symbol text-gold">✦ SECURE SPEC 4.2</span>
             </div>
           </div>

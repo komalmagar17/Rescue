@@ -126,7 +126,7 @@ const Views = {
             <div class="story-step-card glass-card" data-parallax-card>
               <span class="step-num-mono" data-parallax-depth="8">STEP 02</span>
               <h3 class="step-heading" data-parallax-depth="14">Verify</h3>
-              <p class="step-body-copy">Your clinical records are cryptographically sealed with AWS KMS 256-bit envelope encryption and point-in-time recovery on Amazon DynamoDB.</p>
+              <p class="step-body-copy">Your clinical records are cryptographically sealed with enterprise-grade 256-bit envelope encryption and point-in-time vault recovery.</p>
             </div>
 
             <div class="story-step-card glass-card" data-parallax-card>
@@ -138,7 +138,7 @@ const Views = {
             <div class="story-step-card glass-card" data-parallax-card>
               <span class="step-num-mono" data-parallax-depth="8">STEP 04</span>
               <h3 class="step-heading" data-parallax-depth="14">Respond</h3>
-              <p class="step-body-copy">First responders scan your QR with zero app installation. Amazon Bedrock Claude 3 synthesizes an urgent 5-point clinical triage briefing.</p>
+              <p class="step-body-copy">First responders scan your QR with zero app installation. The clinical intelligence engine synthesizes an urgent 5-point emergency briefing.</p>
             </div>
           </div>
         </section>
@@ -202,7 +202,7 @@ const Views = {
 
           <div class="auth-visual-footer">
             <div style="font-family: var(--font-mono); font-size: 0.7rem; color: var(--gold);">
-              ✦ SECURE ENCLAVE • AWS KMS 256-BIT ENCRYPTED
+              ✦ SECURE ENCLAVE • 256-BIT ZERO-KNOWLEDGE VAULT
             </div>
           </div>
         </div>
@@ -702,7 +702,7 @@ const Views = {
                   <span class="timeline-bullet"></span>
                   <div class="activity-text-wrap">
                     <span class="activity-main-text">Clinical passport verified & encrypted</span>
-                    <span class="activity-time-stamp">AWS KMS Envelope • Today</span>
+                    <span class="activity-time-stamp">Encrypted Vault • Today</span>
                   </div>
                 </div>
 
@@ -952,7 +952,7 @@ const Views = {
           <div>
             <span class="story-eyebrow">EMERGENCY FIRST RESPONDER PROTOCOL</span>
             <h1 style="font-size: 2rem;">Golden Hour Clinical Triage</h1>
-            <p style="font-size: 0.9rem; color: var(--text-secondary);">Sub-800ms identity decoding & Amazon Bedrock Claude 3 field assessment.</p>
+            <p style="font-size: 0.9rem; color: var(--text-secondary);">Sub-800ms identity decoding & clinical emergency field assessment.</p>
           </div>
 
           <div style="display: flex; gap: 8px;">
@@ -1052,7 +1052,7 @@ const Views = {
           <div style="display: flex; justify-content: space-between; align-items: center;">
             <div>
               <span style="font-size: 0.8rem; color: var(--text-secondary);">Encryption & Compliance</span>
-              <div style="font-family: var(--font-mono); font-size: 0.75rem; color: var(--text-muted);">AWS KMS Envelope 256-Bit • Last Verified: ${p.lastVerified || 'Today'}</div>
+              <div style="font-family: var(--font-mono); font-size: 0.75rem; color: var(--text-muted);">Encrypted Enclave 256-Bit • Last Verified: ${p.lastVerified || 'Today'}</div>
             </div>
             <span class="editorial-status-pill verified">VERIFIED</span>
           </div>

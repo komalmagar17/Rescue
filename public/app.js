@@ -1,7 +1,7 @@
 /**
  * Emergency Passport — Production Controller & Creative Motion Engine
  * Luxury Editorial × Medical Technology Design Language
- * Ambient Canvas Geographic Contour • Interactive Leaflet Maps • Bedrock Claude 3 Triage
+ * Ambient Canvas Geographic Contour • Interactive Leaflet Maps • Clinical AI Triage
  */
 
 // -----------------------------------------------------------------------------
@@ -668,7 +668,7 @@ function generateQrSvg(text) {
 }
 
 // -----------------------------------------------------------------------------
-// 7. Emergency Triage Engine & Bedrock Claude 3 Integration
+// 7. Emergency Triage Engine & Clinical AI Integration
 // -----------------------------------------------------------------------------
 async function fetchEmergencyTriage(touristId, location = 'Tokyo Central Station', lat = null, lon = null) {
   const displayContainer = document.getElementById('triageActiveDisplay');
@@ -677,7 +677,7 @@ async function fetchEmergencyTriage(touristId, location = 'Tokyo Central Station
       <div class="glass-card" style="padding: 48px; text-align: center;">
         <div class="status-indicator-dot" style="margin: 0 auto 16px auto; width: 12px; height: 12px;"></div>
         <h3 style="font-size: 1.4rem;">DECODING EMERGENCY IDENTITY (${touristId})</h3>
-        <p style="color: var(--text-secondary); font-size: 0.9rem; margin-top: 6px;">Querying Amazon DynamoDB & synthesising Amazon Bedrock Claude 3 clinical briefing...</p>
+        <p style="color: var(--text-secondary); font-size: 0.9rem; margin-top: 6px;">Retrieving verified health records & synthesizing clinical briefing...</p>
       </div>
     `;
   }
@@ -738,11 +738,11 @@ function renderTriageViewContent(data) {
         dob: `${profile.Age || 29} Years Old`
       })}
 
-      <!-- Authoritative Amazon Bedrock Claude 3 Clinical Field Briefing Document -->
+      <!-- Authoritative Clinical Field Briefing Document -->
       <div class="field-briefing-sheet glass-card">
         <div class="briefing-header-row">
           <div>
-            <span class="briefing-claude-badge">AMAZON BEDROCK CLAUDE 3 • FIELD BRIEFING SPECIFICATION</span>
+            <span class="briefing-claude-badge">CLINICAL TRIAGE INTELLIGENCE • FIELD BRIEFING</span>
             <h3 style="font-size: 1.3rem; margin-top: 4px;">Urgent Clinical Field Briefing</h3>
           </div>
           <button class="btn btn-sm btn-outline" onclick="navigator.clipboard.writeText(\`${(summary || '').replace(/`/g, '\\`')}\`); showToast('Briefing copied to EMS radio buffer', 'success');">
@@ -1071,7 +1071,7 @@ function initStitchCommandDock() {
   });
 
   simulateBtn?.addEventListener('click', () => {
-    showToast('Initiating Golden Hour Bedrock AI Triage Simulation...', 'emergency');
+    showToast('Initiating Golden Hour Clinical Triage Simulation...', 'emergency');
     if (typeof appRouter !== 'undefined') {
       appRouter.navigate('/triage');
       setTimeout(() => {
@@ -1086,7 +1086,7 @@ function initStitchCommandDock() {
     if (chip) {
       chip.style.transform = 'scale(0.95)';
       setTimeout(() => { chip.style.transform = ''; }, 150);
-      showToast('NFC Lifeline Scanned: AWS 256-Bit Encrypted Record Read in 42ms', 'medical');
+      showToast('NFC Lifeline Scanned: 256-Bit Encrypted Record Read in 42ms', 'medical');
     }
   });
 }

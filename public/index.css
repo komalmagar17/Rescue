@@ -2456,7 +2456,7 @@ p {
   background: var(--gold-subtle);
 }
 
-/* Bedrock Claude 3 Clinical Field Briefing */
+/* Clinical Field Briefing */
 .field-briefing-sheet {
   padding: 36px;
   border-left: 4px solid var(--gold);
