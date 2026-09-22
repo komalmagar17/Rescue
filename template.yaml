@@ -133,18 +133,54 @@ Resources:
             ApiId: !Ref EmergencyHttpApi
             Path: /emergency
             Method: POST
+        TouristsList:
+          Type: HttpApi
+          Properties:
+            ApiId: !Ref EmergencyHttpApi
+            Path: /tourists
+            Method: GET
+        TouristCreate:
+          Type: HttpApi
+          Properties:
+            ApiId: !Ref EmergencyHttpApi
+            Path: /tourists
+            Method: POST
         TouristLookup:
           Type: HttpApi
           Properties:
             ApiId: !Ref EmergencyHttpApi
             Path: /tourists/{tourist_id}
             Method: GET
+        TouristUpdate:
+          Type: HttpApi
+          Properties:
+            ApiId: !Ref EmergencyHttpApi
+            Path: /tourists/{tourist_id}
+            Method: PUT
+        TouristDelete:
+          Type: HttpApi
+          Properties:
+            ApiId: !Ref EmergencyHttpApi
+            Path: /tourists/{tourist_id}
+            Method: DELETE
         HospitalsList:
           Type: HttpApi
           Properties:
             ApiId: !Ref EmergencyHttpApi
             Path: /hospitals
             Method: GET
+        HospitalLookup:
+          Type: HttpApi
+          Properties:
+            ApiId: !Ref EmergencyHttpApi
+            Path: /hospitals/{hospital_id}
+            Method: GET
+        HospitalCreate:
+          Type: HttpApi
+          Properties:
+            ApiId: !Ref EmergencyHttpApi
+            Path: /hospitals
+            Method: POST
       Tags:
         Project: EmergencyPassport
 

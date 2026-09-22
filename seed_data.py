@@ -65,7 +65,7 @@ SAMPLE_TOURISTS: List[Dict[str, Any]] = [
         "Age": 67,
         "BloodType": "O-",
         "Conditions": {"Type 2 Diabetes", "History of Heatstroke"},
-        "Allergies": set(),
+        "Allergies": {"None Reported"},
         "EmergencyContacts": {"+91-98765-43210 (Son - Rohan)"},
         "Language": "Hindi, English",
         "LastUpdated": datetime.now(timezone.utc).isoformat(),
@@ -161,10 +161,18 @@ def seed_table(
         raise
 
     for item in items:
-        item_id = str(item.get(id_key))
+        # Sanitize item: convert empty sets to None or non-empty sets
+        sanitized_item = {}
+        for k, v in item.items():
+            if isinstance(v, set) and len(v) == 0:
+                sanitized_item[k] = {"None Reported"}
+            else:
+                sanitized_item[k] = v
+
+        item_id = str(sanitized_item.get(id_key))
         try:
-            table.put_item(Item=item)
-            print(f"  [OK] Inserted {id_key}={item_id} ({item.get('Name')})")
+            table.put_item(Item=sanitized_item)
+            print(f"  [OK] Inserted {id_key}={item_id} ({sanitized_item.get('Name')})")
         except ClientError as e:
             print(f"  [FAIL] Failed inserting {id_key}={item_id}: {e}")
             raise

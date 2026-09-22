@@ -1,0 +1,138 @@
+{
+  "tourists": {
+    "T-1001": {
+      "TouristID": "T-1001",
+      "Name": "Elena Rostova",
+      "Age": 29,
+      "BloodType": "O+",
+      "Conditions": [
+        "Asthma",
+        "Mild Hypertension"
+      ],
+      "Allergies": [
+        "Penicillin",
+        "Peanuts"
+      ],
+      "EmergencyContacts": [
+        "+1-555-0199 (Spouse - Mark)",
+        "+1-555-0123 (Father - Viktor)"
+      ],
+      "Language": "English, Russian",
+      "Notes": "Carries emergency albuterol inhaler.",
+      "LastUpdated": "2026-09-22T09:00:00Z"
+    },
+    "T-1002": {
+      "TouristID": "T-1002",
+      "Name": "Kenji Sato",
+      "Age": 34,
+      "BloodType": "A-",
+      "Conditions": [
+        "Type 1 Diabetes"
+      ],
+      "Allergies": [
+        "Latex",
+        "Sulfa Drugs"
+      ],
+      "EmergencyContacts": [
+        "+81-90-1234-5678 (Sister - Yuko)"
+      ],
+      "Language": "Japanese, English",
+      "Notes": "Carries insulin pump on left abdominal quadrant.",
+      "LastUpdated": "2026-09-22T09:00:00Z"
+    },
+    "T-1003": {
+      "TouristID": "T-1003",
+      "Name": "Maria Gonzalez",
+      "Age": 42,
+      "BloodType": "B+",
+      "Conditions": [
+        "Cardiac Arrhythmia"
+      ],
+      "Allergies": [
+        "Aspirin"
+      ],
+      "EmergencyContacts": [
+        "+34-600-112233 (Partner - Carlos)",
+        "+34-600-445566 (Dr. Morales)"
+      ],
+      "Language": "Spanish, English",
+      "Notes": "History of supraventricular tachycardia.",
+      "LastUpdated": "2026-09-22T09:00:00Z"
+    },
+    "T-1004": {
+      "TouristID": "T-1004",
+      "Name": "Arjun Patel",
+      "Age": 67,
+      "BloodType": "O-",
+      "Conditions": [
+        "Type 2 Diabetes",
+        "History of Heatstroke"
+      ],
+      "Allergies": [
+        "None Reported"
+      ],
+      "EmergencyContacts": [
+        "+91-98765-43210 (Son - Rohan)"
+      ],
+      "Language": "Hindi, English",
+      "Notes": "Sensitive to high heat. Check electrolyte balance.",
+      "LastUpdated": "2026-09-22T09:00:00Z"
+    }
+  },
+  "hospitals": {
+    "H-201": {
+      "HospitalID": "H-201",
+      "Name": "City General ICU & Cardiology Center",
+      "Latitude": 26.85,
+      "Longitude": 80.95,
+      "Services": [
+        "ICU",
+        "Cardiology",
+        "Emergency Surgery",
+        "Stroke Care"
+      ],
+      "ContactInfo": "+91-522-234-5000 (ER Hotline)",
+      "Capacity": 420
+    },
+    "H-202": {
+      "HospitalID": "H-202",
+      "Name": "Riverside Trauma & Orthopedic Hospital",
+      "Latitude": 26.78,
+      "Longitude": 80.92,
+      "Services": [
+        "Trauma Center Level 1",
+        "Orthopedics",
+        "Emergency Surgery",
+        "Air Ambulance"
+      ],
+      "ContactInfo": "+91-522-234-6000 (Trauma Desk)",
+      "Capacity": 280
+    },
+    "H-203": {
+      "HospitalID": "H-203",
+      "Name": "Community Primary Care Clinic",
+      "Latitude": 26.82,
+      "Longitude": 80.88,
+      "Services": [
+        "General ER",
+        "Basic First Aid"
+      ],
+      "ContactInfo": "+91-522-234-7000",
+      "Capacity": 60
+    },
+    "H-204": {
+      "HospitalID": "H-204",
+      "Name": "Alpine High-Altitude & Hyperbaric Center",
+      "Latitude": 26.9,
+      "Longitude": 80.98,
+      "Services": [
+        "Hyperbaric Medicine",
+        "ICU",
+        "Orthopedics",
+        "Air Ambulance"
+      ],
+      "ContactInfo": "+91-522-234-8000 (Helipad)",
+      "Capacity": 150
+    }
+  }
+}

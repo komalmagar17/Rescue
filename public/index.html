@@ -1,0 +1,514 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Emergency Passport — Borderless First Responder Triage</title>
+  <meta name="description" content="Instant emergency medical profile retrieval, AI paramedic triage briefings, and intelligent hospital routing for international travelers.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="index.css">
+</head>
+<body>
+  <!-- Ambient background glow effects -->
+  <div class="ambient-glow glow-red"></div>
+  <div class="ambient-glow glow-blue"></div>
+
+  <!-- Top Navigation / HUD Bar -->
+  <header class="hud-header">
+    <div class="hud-container">
+      <div class="brand-section">
+        <div class="brand-icon">
+          <span class="pulsing-heart">🚑</span>
+        </div>
+        <div class="brand-text">
+          <div class="brand-title">EMERGENCY PASSPORT</div>
+          <div class="brand-subtitle">CARE WITHOUT BORDERS • GOLDEN HOUR LIFELINE</div>
+        </div>
+      </div>
+
+      <div class="hud-telemetry">
+        <div class="telemetry-pill" id="healthPill" title="API System Health">
+          <span class="status-dot dot-pulse" id="healthDot"></span>
+          <span id="healthText">CONNECTING...</span>
+        </div>
+        <div class="telemetry-pill" id="databasePill" title="Active Database Backend">
+          <span class="pill-label">DB:</span>
+          <span class="pill-val" id="databaseText">DETECTING</span>
+        </div>
+        <div class="telemetry-pill" id="aiPill" title="Bedrock Claude AI Status">
+          <span class="pill-label">AI:</span>
+          <span class="pill-val" id="aiStatusText">CLAUDE 3 HAIKU</span>
+        </div>
+        <button id="sirenBtn" class="hud-btn siren-btn" title="Toggle Emergency Audio Alert">
+          <span class="siren-icon">🔔</span>
+          <span class="siren-label">AUDIO ALERT</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- Navigation Tabs -->
+    <nav class="hud-nav">
+      <div class="hud-container nav-container">
+        <button class="nav-tab active" id="tabTriageBtn" data-target="viewTriage">
+          <span class="nav-icon">⚡</span> First Responder Triage
+        </button>
+        <button class="nav-tab" id="tabStudioBtn" data-target="viewStudio">
+          <span class="nav-icon">💳</span> Traveler Passport Studio
+        </button>
+        <button class="nav-tab" id="tabHospitalsBtn" data-target="viewHospitals">
+          <span class="nav-icon">🏥</span> Hospital Directory
+        </button>
+        <button class="nav-tab" id="tabSimulatorBtn" data-target="viewSimulator">
+          <span class="nav-icon">🎯</span> Incident Simulator
+        </button>
+      </div>
+    </nav>
+  </header>
+
+  <!-- Notification Toast Container -->
+  <div id="toastContainer" class="toast-container" aria-live="polite"></div>
+
+  <!-- Global Error Alert Banner -->
+  <div id="globalErrorBanner" class="global-error-banner hidden">
+    <div class="error-content">
+      <span class="error-icon">⚠️</span>
+      <span id="globalErrorMessage">An error occurred.</span>
+    </div>
+    <button id="globalErrorRetryBtn" class="btn btn-sm btn-retry">Retry Connection</button>
+    <button id="globalErrorDismissBtn" class="btn-close">&times;</button>
+  </div>
+
+  <main class="main-content hud-container">
+
+    <!-- =================================================================== -->
+    <!-- VIEW 1: FIRST RESPONDER TRIAGE HUD -->
+    <!-- =================================================================== -->
+    <section id="viewTriage" class="view-panel active">
+      <!-- Quick Scanner & Search Toolbar -->
+      <div class="scanner-toolbar glass-panel">
+        <div class="toolbar-search">
+          <div class="search-input-group">
+            <span class="search-prefix">ID:</span>
+            <input type="text" id="manualTouristIdInput" placeholder="Enter Tourist ID (e.g. T-1001)" autocomplete="off" />
+            <button id="lookupBtn" class="btn btn-primary">
+              <span class="btn-text">TRIAGE NOW</span>
+              <span class="btn-spinner hidden"></span>
+            </button>
+          </div>
+        </div>
+
+        <div class="toolbar-presets">
+          <span class="presets-label">QUICK SCAN PRESETS:</span>
+          <div class="preset-buttons">
+            <button class="btn btn-preset" data-tourist="T-1001">
+              <span class="preset-avatar">ER</span>
+              <span class="preset-name">Elena (Asthma/Penicillin)</span>
+            </button>
+            <button class="btn btn-preset" data-tourist="T-1002">
+              <span class="preset-avatar">KS</span>
+              <span class="preset-name">Kenji (Diabetes T1/Latex)</span>
+            </button>
+            <button class="btn btn-preset" data-tourist="T-1003">
+              <span class="preset-avatar">MG</span>
+              <span class="preset-name">Maria (Arrhythmia/Aspirin)</span>
+            </button>
+            <button class="btn btn-preset" data-tourist="T-1004">
+              <span class="preset-avatar">AP</span>
+              <span class="preset-name">Arjun (Heatstroke/T2)</span>
+            </button>
+          </div>
+        </div>
+
+        <div class="toolbar-camera">
+          <label for="qrUploadInput" class="btn btn-secondary qr-upload-label" title="Upload QR Code Image">
+            <span>📷 Scan QR Image</span>
+            <input type="file" id="qrUploadInput" accept="image/*" class="sr-only" />
+          </label>
+        </div>
+      </div>
+
+      <!-- Triage Loading State -->
+      <div id="triageLoading" class="triage-loading glass-panel hidden">
+        <div class="radar-spinner">
+          <div class="radar-sweep"></div>
+        </div>
+        <div class="loading-status">
+          <div class="loading-title">DECODING EMERGENCY PASSPORT...</div>
+          <div class="loading-subtitle">Querying patient health records, invoking Claude AI clinical briefing, and routing nearest specialized trauma center.</div>
+        </div>
+      </div>
+
+      <!-- Triage Empty / Standby State -->
+      <div id="triageStandby" class="triage-standby glass-panel">
+        <div class="standby-icon">🚑</div>
+        <h2>READY FOR EMERGENCY SCAN</h2>
+        <p>Scan a patient's Emergency Passport QR code or click a preset above to surface verified blood types, severe allergies, Bedrock AI paramedic briefing, and hospital dispatch in <strong>&lt;800ms</strong>.</p>
+        <div class="quick-start-tips">
+          <div class="tip-card">
+            <span class="tip-num">1</span>
+            <strong>Instant Profile</strong>
+            <p>Access blood types and allergies with zero login barriers.</p>
+          </div>
+          <div class="tip-card">
+            <span class="tip-num">2</span>
+            <strong>Bedrock Claude AI</strong>
+            <p>Generates high-urgency clinical field briefing instantly.</p>
+          </div>
+          <div class="tip-card">
+            <span class="tip-num">3</span>
+            <strong>Hospital Routing</strong>
+            <p>Directs ambulance to facilities with matching open units (ICU, Trauma 1).</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Triage Results Display Grid (Active when patient loaded) -->
+      <div id="triageResults" class="triage-grid hidden">
+
+        <!-- Column 1: Patient Emergency Profile Card -->
+        <div class="triage-col">
+          <div class="emergency-card glass-panel" id="patientProfileCard">
+            <div class="card-header border-red">
+              <div class="card-tag alert-tag">PATIENT EMERGENCY PROFILE</div>
+              <div class="patient-id-badge" id="patientIdDisplay">T-1001</div>
+            </div>
+
+            <div class="patient-hero">
+              <div class="patient-avatar-circle" id="patientAvatar">ER</div>
+              <div class="patient-identity">
+                <h1 class="patient-name" id="patientName">Elena Rostova</h1>
+                <div class="patient-meta">
+                  <span id="patientAge">29 y/o</span> • 
+                  <span id="patientLanguage">English, Russian</span>
+                </div>
+              </div>
+              <div class="blood-badge-large" id="patientBloodBadge" title="Verified Blood Type">
+                <span class="blood-label">BLOOD</span>
+                <span class="blood-type" id="patientBloodType">O+</span>
+              </div>
+            </div>
+
+            <!-- Critical Allergies Alert Banner -->
+            <div class="critical-alert-box" id="allergiesBox">
+              <div class="alert-box-header">
+                <span class="alert-icon-pulse">⚠️</span>
+                <span class="alert-title">CRITICAL ALLERGIES — DO NOT ADMINISTER:</span>
+              </div>
+              <div class="tags-container" id="allergiesTags">
+                <!-- Injected via JS -->
+              </div>
+            </div>
+
+            <!-- Pre-existing Conditions -->
+            <div class="medical-section">
+              <div class="section-label">CHRONIC CONDITIONS:</div>
+              <div class="tags-container" id="conditionsTags">
+                <!-- Injected via JS -->
+              </div>
+            </div>
+
+            <!-- Clinical Notes -->
+            <div class="medical-section" id="clinicalNotesSection">
+              <div class="section-label">CLINICAL & RESCUE NOTES:</div>
+              <p class="notes-text" id="patientNotes">Carries emergency albuterol inhaler.</p>
+            </div>
+
+            <!-- Emergency Family Contacts -->
+            <div class="contacts-section">
+              <div class="section-label">PRIMARY EMERGENCY CONTACTS:</div>
+              <div class="contacts-list" id="contactsList">
+                <!-- Injected via JS -->
+              </div>
+            </div>
+
+            <div class="card-footer">
+              <span class="update-time" id="patientLastUpdated">Last verified: Today</span>
+              <button class="btn btn-sm btn-outline" id="printPassportBtn">🖨️ Print Card</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Column 2: AI Clinical Briefing & Smart Hospital Routing -->
+        <div class="triage-col">
+          <!-- Amazon Bedrock AI Paramedic Briefing -->
+          <div class="ai-briefing-card glass-panel">
+            <div class="card-header border-purple">
+              <div class="card-tag ai-tag">
+                <span class="ai-sparkle">✨</span> AMAZON BEDROCK (CLAUDE 3)
+              </div>
+              <div class="ai-mode-badge" id="aiModeBadge">AI VERIFIED</div>
+            </div>
+
+            <div class="ai-content-box">
+              <div class="ai-header-bar">
+                <span class="ai-brief-title">FIELD PARAMEDIC 5-POINT BRIEFING</span>
+                <button class="btn btn-xs btn-outline" id="copyAiBriefBtn" title="Copy clinical summary to clipboard">
+                  📋 Copy
+                </button>
+              </div>
+              <div class="ai-briefing-text" id="aiBriefingText">
+                <!-- Injected via JS -->
+              </div>
+            </div>
+            <div class="ai-disclaimer">
+              Generated in real-time from verified patient EHR with deterministic clinical fallback.
+            </div>
+          </div>
+
+          <!-- Smart Hospital Matching & Routing -->
+          <div class="hospital-match-card glass-panel" id="hospitalMatchCard">
+            <div class="card-header border-blue">
+              <div class="card-tag match-tag">RECOMMENDED EMERGENCY FACILITY</div>
+              <div class="match-score-badge" id="hospitalMatchScore">98% MATCH</div>
+            </div>
+
+            <div class="hospital-hero">
+              <div class="hospital-info">
+                <h2 class="hospital-name" id="hospitalName">City General ICU & Cardiology Center</h2>
+                <div class="hospital-contact" id="hospitalContact">+91-522-234-5000 (ER Hotline)</div>
+              </div>
+              <a href="#" class="btn btn-emergency-call" id="callHospitalBtn">
+                📞 CALL ER DESK
+              </a>
+            </div>
+
+            <div class="hospital-telemetry-grid">
+              <div class="telemetry-cell">
+                <span class="cell-label">OPEN CAPACITY</span>
+                <span class="cell-value" id="hospitalCapacity">420 Beds</span>
+              </div>
+              <div class="telemetry-cell">
+                <span class="cell-label">DISTANCE</span>
+                <span class="cell-value" id="hospitalDistance">3.2 km</span>
+              </div>
+              <div class="telemetry-cell">
+                <span class="cell-label">EST. DRIVE TIME</span>
+                <span class="cell-value" id="hospitalEta">~7 min</span>
+              </div>
+            </div>
+
+            <div class="hospital-services-section">
+              <div class="section-label">MATCHED SPECIALIZED UNITS:</div>
+              <div class="tags-container" id="hospitalServicesTags">
+                <!-- Injected via JS -->
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- =================================================================== -->
+    <!-- VIEW 2: TRAVELER PASSPORT STUDIO (CREATOR & QR GENERATOR) -->
+    <!-- =================================================================== -->
+    <section id="viewStudio" class="view-panel hidden">
+      <div class="studio-layout">
+        <!-- Form Side -->
+        <div class="studio-form-col glass-panel">
+          <div class="section-header">
+            <h2>EMERGENCY PASSPORT STUDIO</h2>
+            <p>Register or update your emergency profile. Your life-saving data is synchronized directly to the database and can be encoded into a universal QR code.</p>
+          </div>
+
+          <form id="passportForm" class="passport-form">
+            <div class="form-row">
+              <div class="form-group col-4">
+                <label for="studioIdInput">Tourist ID</label>
+                <input type="text" id="studioIdInput" placeholder="Auto-generated (e.g. T-1005)" />
+              </div>
+              <div class="form-group col-8">
+                <label for="studioNameInput">Full Legal Name *</label>
+                <input type="text" id="studioNameInput" required placeholder="e.g. Elena Rostova" />
+              </div>
+            </div>
+
+            <div class="form-row">
+              <div class="form-group col-4">
+                <label for="studioAgeInput">Age *</label>
+                <input type="number" id="studioAgeInput" required min="1" max="120" placeholder="29" />
+              </div>
+              <div class="form-group col-4">
+                <label for="studioBloodSelect">Blood Type *</label>
+                <select id="studioBloodSelect" required>
+                  <option value="O+">O+ (Positive)</option>
+                  <option value="O-">O- (Negative)</option>
+                  <option value="A+">A+ (Positive)</option>
+                  <option value="A-">A- (Negative)</option>
+                  <option value="B+">B+ (Positive)</option>
+                  <option value="B-">B- (Negative)</option>
+                  <option value="AB+">AB+ (Positive)</option>
+                  <option value="AB-">AB- (Negative)</option>
+                  <option value="Unknown">Unknown</option>
+                </select>
+              </div>
+              <div class="form-group col-4">
+                <label for="studioLangInput">Languages Spoken</label>
+                <input type="text" id="studioLangInput" placeholder="English, Russian, etc." />
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label for="studioAllergiesInput">Severe Allergies (comma separated) *</label>
+              <input type="text" id="studioAllergiesInput" placeholder="e.g. Penicillin, Peanuts, Latex" />
+              <small class="form-help">Enter "None Reported" if you have no known drug/food allergies.</small>
+            </div>
+
+            <div class="form-group">
+              <label for="studioConditionsInput">Pre-existing Medical Conditions (comma separated)</label>
+              <input type="text" id="studioConditionsInput" placeholder="e.g. Asthma, Type 1 Diabetes, Cardiac Arrhythmia" />
+            </div>
+
+            <div class="form-group">
+              <label for="studioContactsInput">Emergency Family Contacts (comma separated) *</label>
+              <input type="text" id="studioContactsInput" required placeholder="e.g. +1-555-0199 (Spouse - Mark), +1-555-0123 (Father)" />
+            </div>
+
+            <div class="form-group">
+              <label for="studioNotesInput">Rescue Instructions & Medication Notes</label>
+              <textarea id="studioNotesInput" rows="2" placeholder="e.g. Carries EpiPen in backpack right pocket. Inhaler in coat."></textarea>
+            </div>
+
+            <div class="form-actions">
+              <button type="submit" id="savePassportBtn" class="btn btn-primary btn-lg">
+                <span class="btn-text">💾 Save Passport to Database</span>
+                <span class="btn-spinner hidden"></span>
+              </button>
+              <button type="button" id="resetFormBtn" class="btn btn-secondary">Clear Form</button>
+            </div>
+          </form>
+        </div>
+
+        <!-- Live Preview & QR Card Side -->
+        <div class="studio-preview-col">
+          <div class="preview-card-container">
+            <div class="physical-card" id="passportPhysicalCard">
+              <div class="card-watermark">PASSPORT</div>
+              <div class="pcard-header">
+                <div class="pcard-brand">
+                  <span class="pcard-cross">✚</span>
+                  <span class="pcard-title">EMERGENCY PASSPORT</span>
+                </div>
+                <div class="pcard-id" id="previewCardId">T-1001</div>
+              </div>
+
+              <div class="pcard-body">
+                <div class="pcard-info">
+                  <div class="pcard-name" id="previewCardName">ELENA ROSTOVA</div>
+                  <div class="pcard-meta" id="previewCardMeta">29 Y/O • ENG, RUS</div>
+                  <div class="pcard-blood">
+                    BLOOD: <strong id="previewCardBlood">O+</strong>
+                  </div>
+                  <div class="pcard-alert">
+                    <span class="pcard-alert-lbl">ALLERGIES:</span>
+                    <span id="previewCardAllergies">Penicillin, Peanuts</span>
+                  </div>
+                </div>
+
+                <div class="pcard-qr-box">
+                  <div id="qrCodeContainer" class="qr-canvas-holder">
+                    <!-- SVG QR code generated live -->
+                  </div>
+                  <div class="qr-scan-label">SCAN IN EMERGENCY</div>
+                </div>
+              </div>
+
+              <div class="pcard-footer">
+                <span>VERIFIED MEDICAL RECORD • SECURED VIA AWS SERVERLESS</span>
+              </div>
+            </div>
+
+            <div class="preview-actions">
+              <button id="downloadQrBtn" class="btn btn-secondary btn-block">
+                📥 Download Card Image / QR
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- =================================================================== -->
+    <!-- VIEW 3: HOSPITAL DIRECTORY -->
+    <!-- =================================================================== -->
+    <section id="viewHospitals" class="view-panel hidden">
+      <div class="directory-header glass-panel">
+        <div>
+          <h2>REGIONAL EMERGENCY HOSPITALS DIRECTORY</h2>
+          <p>Real-time directory of medical facilities, specialized trauma departments, and live bed capacity.</p>
+        </div>
+        <div class="directory-filter">
+          <select id="serviceFilterSelect">
+            <option value="all">All Facilities</option>
+            <option value="ICU">ICU Equipped</option>
+            <option value="Trauma Center Level 1">Trauma Center Level 1</option>
+            <option value="Cardiology">Cardiology Emergency</option>
+            <option value="Air Ambulance">Air Ambulance / Helipad</option>
+            <option value="Hyperbaric Medicine">Hyperbaric Medicine</option>
+          </select>
+        </div>
+      </div>
+
+      <div id="hospitalsListGrid" class="hospitals-grid">
+        <!-- Rendered via JS -->
+      </div>
+    </section>
+
+    <!-- =================================================================== -->
+    <!-- VIEW 4: INCIDENT SIMULATOR -->
+    <!-- =================================================================== -->
+    <section id="viewSimulator" class="view-panel hidden">
+      <div class="simulator-panel glass-panel">
+        <div class="section-header">
+          <h2>EMERGENCY INCIDENT SIMULATOR</h2>
+          <p>Test the end-to-end golden hour response cycle: Patient Collapse $\rightarrow$ Paramedic QR Scan $\rightarrow$ Claude AI Triage $\rightarrow$ Dynamic Hospital Dispatch.</p>
+        </div>
+
+        <div class="scenario-selector">
+          <label for="scenarioSelect"><strong>Select Medical Crisis Scenario:</strong></label>
+          <select id="scenarioSelect" class="scenario-dropdown">
+            <option value="1">Scenario 1: Acute Anaphylaxis in Tokyo Subway (Elena Rostova - Penicillin/Peanut)</option>
+            <option value="2">Scenario 2: Diabetic Hypoglycemic Shock at Alpine Lodge (Kenji Sato - Type 1 Diabetes)</option>
+            <option value="3">Scenario 3: Cardiac Arrhythmia Collapse during Solo Tour (Maria Gonzalez - Cardiac)</option>
+            <option value="4">Scenario 4: Heatstroke & Severe Dehydration during Trek (Arjun Patel - Type 2 Diabetes)</option>
+          </select>
+        </div>
+
+        <div class="simulator-action-row">
+          <button id="runSimulationBtn" class="btn btn-emergency-pulse btn-lg">
+            🚨 RUN LIVE INCIDENT SIMULATION
+          </button>
+        </div>
+
+        <!-- Simulation Telemetry Console -->
+        <div class="simulation-console">
+          <div class="console-header">
+            <span>LIVE INCIDENT TELEMETRY LOG</span>
+            <span class="console-indicator">RECORDING</span>
+          </div>
+          <div class="console-body" id="simulationConsoleBody">
+            <div class="console-line text-muted">[00:00.000] Standby. Click 'Run Live Incident Simulation' to initiate emergency dispatch test.</div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- Footer -->
+  <footer class="hud-footer">
+    <div class="hud-container footer-container">
+      <div class="footer-copy">
+        <strong>Emergency Passport</strong> — Built with Amazon Bedrock (Claude 3 Haiku), AWS Lambda, API Gateway & DynamoDB.
+      </div>
+      <div class="footer-links">
+        <a href="#github" id="githubRepoLink" target="_blank" rel="noopener">GitHub: komalmagar17/Rescue</a>
+        <span>•</span>
+        <span class="footer-secure">🔒 HIPAA & GDPR Privacy Compliant Architecture</span>
+      </div>
+    </div>
+  </footer>
+
+  <script src="app.js"></script>
+</body>
+</html>
