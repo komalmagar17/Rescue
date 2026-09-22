@@ -140,6 +140,268 @@ body {
   background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
 }
 
+/* ==============================================================================
+   SMOOTH WAVE-LIKE TRANSITION SYSTEM (VIEW TRANSITIONS + LIQUID SHOCKWAVE)
+   ============================================================================== */
+::view-transition-old(root),
+::view-transition-new(root) {
+  animation: none;
+  mix-blend-mode: normal;
+}
+
+::view-transition-old(root) {
+  z-index: 1;
+}
+
+::view-transition-new(root) {
+  z-index: 999999;
+}
+
+/* Fluid Liquid Wave Shockwave Portal Overlay */
+.theme-wave-portal {
+  position: fixed;
+  pointer-events: none;
+  z-index: 9999999;
+  transform: translate(-50%, -50%);
+  width: 10px;
+  height: 10px;
+}
+
+.liquid-wave-ring {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%) scale(0);
+  border-radius: 50%;
+  pointer-events: none;
+}
+
+/* Wave 1: Ultra-fast Gold/Ivory Wave Crest */
+.liquid-wave-ring.wave-1 {
+  width: 320vmax;
+  height: 320vmax;
+  border: 2.5px solid var(--gold);
+  box-shadow: 0 0 60px var(--gold-glow), inset 0 0 50px var(--gold-subtle);
+  animation: liquidWaveCrest 0.92s cubic-bezier(0.18, 0.95, 0.28, 1) forwards;
+}
+
+/* Wave 2: Liquid Refractive Wash */
+.liquid-wave-ring.wave-2 {
+  width: 280vmax;
+  height: 280vmax;
+  background: radial-gradient(circle, transparent 72%, var(--gold-subtle) 90%, transparent 100%);
+  backdrop-filter: blur(3px);
+  -webkit-backdrop-filter: blur(3px);
+  animation: liquidWaveRefract 1.05s cubic-bezier(0.2, 0.9, 0.3, 1) forwards 0.04s;
+}
+
+/* Wave 3: Ambient Glow Dissipation */
+.liquid-wave-ring.wave-3 {
+  width: 360vmax;
+  height: 360vmax;
+  border: 1.5px solid var(--medical-glow);
+  box-shadow: 0 0 90px var(--medical-glow);
+  animation: liquidWaveFade 1.15s cubic-bezier(0.22, 1, 0.36, 1) forwards 0.08s;
+}
+
+@keyframes liquidWaveCrest {
+  0% {
+    transform: translate(-50%, -50%) scale(0);
+    opacity: 0.95;
+  }
+  60% {
+    opacity: 0.7;
+  }
+  100% {
+    transform: translate(-50%, -50%) scale(1);
+    opacity: 0;
+  }
+}
+
+@keyframes liquidWaveRefract {
+  0% {
+    transform: translate(-50%, -50%) scale(0);
+    opacity: 0.85;
+  }
+  100% {
+    transform: translate(-50%, -50%) scale(1);
+    opacity: 0;
+  }
+}
+
+@keyframes liquidWaveFade {
+  0% {
+    transform: translate(-50%, -50%) scale(0);
+    opacity: 0.65;
+  }
+  100% {
+    transform: translate(-50%, -50%) scale(1);
+    opacity: 0;
+  }
+}
+
+/* ==============================================================================
+   STITCH CREATIVE DEVELOPER PARALLAX & SPECULAR GLARE
+   3D Perspective • Hairline Border Spotlight • Specular Glass Sheen
+   ============================================================================== */
+[data-parallax-card],
+.glass-card {
+  position: relative;
+  isolation: isolate;
+  transform-style: preserve-3d;
+  will-change: transform;
+}
+
+/* Specular Glass Sheen following cursor */
+.glass-card::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background: radial-gradient(
+    550px circle at var(--mouse-x, 50%) var(--mouse-y, 50%),
+    rgba(255, 255, 255, 0.06),
+    transparent 65%
+  );
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  pointer-events: none;
+  z-index: 1;
+}
+
+[data-theme="light"] .glass-card::before {
+  background: radial-gradient(
+    550px circle at var(--mouse-x, 50%) var(--mouse-y, 50%),
+    rgba(177, 138, 82, 0.08),
+    transparent 65%
+  );
+}
+
+.glass-card:hover::before {
+  opacity: 1;
+}
+
+/* Hairline Border Spotlight tracking cursor */
+.glass-card::after {
+  content: '';
+  position: absolute;
+  inset: -1px;
+  border-radius: inherit;
+  padding: 1px;
+  background: radial-gradient(
+    320px circle at var(--mouse-px, -500px) var(--mouse-py, -500px),
+    var(--gold),
+    transparent 65%
+  );
+  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.35s ease;
+  z-index: 2;
+}
+
+.glass-card:hover::after {
+  opacity: 0.85;
+}
+
+/* Multi-plane depth for inner parallax elements */
+[data-parallax-depth] {
+  transform-style: preserve-3d;
+  backface-visibility: hidden;
+  will-change: transform;
+}
+
+/* Ambient Parallax Atmospheric Orbs (Stitch Designer Feature) */
+.ambient-parallax-orb {
+  position: fixed;
+  border-radius: 50%;
+  pointer-events: none;
+  filter: blur(110px);
+  -webkit-filter: blur(110px);
+  opacity: 0.18;
+  z-index: 0;
+  transition: opacity 0.5s var(--ease-out);
+  will-change: transform;
+}
+
+.orb-primary {
+  width: 550px;
+  height: 550px;
+  top: -80px;
+  left: -80px;
+  background: radial-gradient(circle, var(--gold) 0%, transparent 70%);
+  animation: orbFloat1 20s infinite alternate ease-in-out;
+}
+
+.orb-secondary {
+  width: 600px;
+  height: 600px;
+  bottom: -150px;
+  right: -100px;
+  background: radial-gradient(circle, var(--medical) 0%, transparent 70%);
+  animation: orbFloat2 24s infinite alternate ease-in-out;
+}
+
+[data-theme="light"] .ambient-parallax-orb {
+  opacity: 0.12;
+}
+
+@keyframes orbFloat1 {
+  0% { transform: translate3d(0, 0, 0) scale(1); }
+  100% { transform: translate3d(40px, 60px, 0) scale(1.08); }
+}
+
+@keyframes orbFloat2 {
+  0% { transform: translate3d(0, 0, 0) scale(1); }
+  100% { transform: translate3d(-50px, -40px, 0) scale(1.06); }
+}
+
+/* Radar Sweep Beam & Sonar Wave on Live Trauma Radar */
+.radar-sweep-beam {
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background: conic-gradient(from 0deg at 50% 50%, rgba(112, 181, 170, 0) 0deg, rgba(112, 181, 170, 0.14) 50deg, transparent 55deg);
+  pointer-events: none;
+  animation: radarBeamSpin 6s linear infinite;
+  z-index: 400;
+  mix-blend-mode: screen;
+}
+
+@keyframes radarBeamSpin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+.radar-sonar-ping {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  border: 1.5px solid var(--gold);
+  pointer-events: none;
+  z-index: 410;
+  animation: sonarPulse 3s cubic-bezier(0.1, 0.8, 0.2, 1) infinite;
+}
+
+@keyframes sonarPulse {
+  0% {
+    width: 14px;
+    height: 14px;
+    opacity: 0.95;
+  }
+  100% {
+    width: 240px;
+    height: 240px;
+    opacity: 0;
+  }
+}
+
 /* Global Hidden & Utility Classes */
 .hidden {
   display: none !important;
@@ -377,6 +639,210 @@ p {
   width: 17px;
   height: 17px;
   stroke-width: 1.75;
+}
+
+/* ==============================================================================
+   STITCH TACTILE ANIMATED THEME SWITCH
+   Capsule Track • Spring Recoil Thumb • Celestial Stars & Sunbeams
+   ============================================================================== */
+.stitch-theme-switch {
+  position: relative;
+  width: 58px;
+  height: 30px;
+  border-radius: var(--radius-pill);
+  background: transparent;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  outline: none;
+  display: inline-flex;
+  align-items: center;
+  user-select: none;
+  transition: transform 0.22s var(--ease-spring);
+}
+
+.stitch-theme-switch:hover {
+  transform: scale(1.05);
+}
+
+.stitch-theme-switch:active {
+  transform: scale(0.93);
+}
+
+.stitch-switch-track {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  border-radius: var(--radius-pill);
+  border: 1px solid var(--border);
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.24), 0 2px 8px -2px rgba(0, 0, 0, 0.18);
+  transition: background 0.4s var(--ease-out), border-color 0.4s var(--ease-out);
+}
+
+/* Dark Mode Track State */
+.stitch-theme-switch.is-dark .stitch-switch-track {
+  background: linear-gradient(135deg, #111413 0%, #1a201d 100%);
+  border-color: rgba(198, 165, 107, 0.32);
+}
+
+/* Light Mode Track State */
+.stitch-theme-switch.is-light .stitch-switch-track {
+  background: linear-gradient(135deg, #E6E1D3 0%, #F5F1E6 100%);
+  border-color: rgba(177, 138, 82, 0.38);
+  box-shadow: inset 0 2px 4px rgba(45, 42, 35, 0.12), 0 2px 8px -2px rgba(177, 138, 82, 0.2);
+}
+
+/* Track Details: Celestial Stars (Dark Mode) */
+.track-stars {
+  position: absolute;
+  right: 8px;
+  top: 50%;
+  transform: translateY(-50%);
+  display: flex;
+  gap: 3px;
+  opacity: 0;
+  transition: opacity 0.35s ease, transform 0.35s var(--ease-out);
+}
+
+.stitch-theme-switch.is-dark .track-stars {
+  opacity: 0.9;
+  transform: translateY(-50%) translateX(0);
+}
+
+.stitch-theme-switch.is-light .track-stars {
+  opacity: 0;
+  transform: translateY(-50%) translateX(6px);
+}
+
+.star {
+  display: block;
+  background: #C6A56B;
+  border-radius: 50%;
+  animation: starTwinkle 2.5s infinite alternate ease-in-out;
+}
+.star.s1 { width: 3px; height: 3px; animation-delay: 0s; }
+.star.s2 { width: 2px; height: 2px; animation-delay: 0.7s; }
+.star.s3 { width: 2.5px; height: 2.5px; animation-delay: 1.4s; }
+
+@keyframes starTwinkle {
+  0% { opacity: 0.3; transform: scale(0.8); }
+  100% { opacity: 1; transform: scale(1.25); }
+}
+
+/* Track Details: Sunbeam Rays (Light Mode) */
+.track-sunrays {
+  position: absolute;
+  left: 7px;
+  top: 50%;
+  transform: translateY(-50%);
+  display: flex;
+  gap: 3px;
+  opacity: 0;
+  transition: opacity 0.35s ease, transform 0.35s var(--ease-out);
+}
+
+.stitch-theme-switch.is-light .track-sunrays {
+  opacity: 0.9;
+  transform: translateY(-50%) translateX(0);
+}
+
+.stitch-theme-switch.is-dark .track-sunrays {
+  opacity: 0;
+  transform: translateY(-50%) translateX(-6px);
+}
+
+.ray {
+  display: block;
+  width: 2.5px;
+  height: 2.5px;
+  border-radius: 50%;
+  background: #B18A52;
+}
+
+/* Switch Thumb */
+.stitch-switch-thumb {
+  position: absolute;
+  top: 3px;
+  left: 3px;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: transform 0.45s cubic-bezier(0.34, 1.56, 0.64, 1), background 0.35s ease, box-shadow 0.35s ease;
+  z-index: 2;
+}
+
+.stitch-theme-switch.is-dark .stitch-switch-thumb {
+  transform: translateX(0px);
+  background: #1E2421;
+  border: 1px solid rgba(198, 165, 107, 0.45);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.55), 0 0 10px rgba(198, 165, 107, 0.25);
+}
+
+.stitch-theme-switch.is-light .stitch-switch-thumb {
+  transform: translateX(28px);
+  background: #FFFFFF;
+  border: 1px solid rgba(177, 138, 82, 0.5);
+  box-shadow: 0 2px 6px rgba(45, 42, 35, 0.18), 0 0 12px rgba(177, 138, 82, 0.35);
+}
+
+.thumb-icon-wrap {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: opacity 0.32s var(--ease-out), transform 0.45s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.thumb-icon-wrap .ui-icon {
+  width: 13px;
+  height: 13px;
+}
+
+/* Moon Icon in Dark Mode */
+.stitch-theme-switch.is-dark .thumb-icon-wrap.icon-moon {
+  opacity: 1;
+  transform: rotate(0deg) scale(1);
+  color: #C6A56B;
+}
+
+.stitch-theme-switch.is-dark .thumb-icon-wrap.icon-sun {
+  opacity: 0;
+  transform: rotate(-110deg) scale(0.3);
+  color: #B18A52;
+}
+
+/* Sun Icon in Light Mode */
+.stitch-theme-switch.is-light .thumb-icon-wrap.icon-sun {
+  opacity: 1;
+  transform: rotate(0deg) scale(1);
+  color: #B18A52;
+}
+
+.stitch-theme-switch.is-light .thumb-icon-wrap.icon-moon {
+  opacity: 0;
+  transform: rotate(110deg) scale(0.3);
+  color: #C6A56B;
+}
+
+.thumb-glow-aura {
+  position: absolute;
+  inset: -2px;
+  border-radius: 50%;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.stitch-theme-switch:hover .thumb-glow-aura {
+  opacity: 1;
+  box-shadow: 0 0 12px var(--gold-glow);
 }
 
 .role-switch-badge {

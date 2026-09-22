@@ -44,7 +44,8 @@ const UI = {
     clock: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" class="ui-icon"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>`,
     cross: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" class="ui-icon"><path d="M11 2a2 2 0 0 0-2 2v5H4a2 2 0 0 0-2 2v2c0 1.1.9 2 2 2h5v5c0 1.1.9 2 2 2h2a2 2 0 0 0 2-2v-5h5a2 2 0 0 0 2-2v-2a2 2 0 0 0-2-2h-5V4a2 2 0 0 0-2-2h-2z"/></svg>`,
     bed: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" class="ui-icon"><path d="M2 4v16"/><path d="M2 8h18a2 2 0 0 1 2 2v10"/><path d="M2 17h20"/><circle cx="6" cy="8" r="2"/></svg>`,
-    sparkle: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" class="ui-icon"><path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275L12 3Z"/></svg>`
+    sparkle: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" class="ui-icon"><path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275L12 3Z"/></svg>`,
+    palette: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" class="ui-icon"><circle cx="13.5" cy="6.5" r=".7" fill="currentColor"/><circle cx="17.5" cy="10.5" r=".7" fill="currentColor"/><circle cx="8.5" cy="7.5" r=".7" fill="currentColor"/><circle cx="6.5" cy="12.5" r=".7" fill="currentColor"/><path d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10c.926 0 1.648-.746 1.648-1.688 0-.437-.18-.835-.437-1.125-.29-.289-.438-.652-.438-1.125a1.64 1.64 0 0 1 1.668-1.668h1.996c3.051 0 5.555-2.503 5.555-5.554C21.965 6.012 17.461 2 12 2z"/></svg>`
   },
 
   // ---------------------------------------------------------------------------
@@ -110,10 +111,34 @@ const UI = {
               <span class="btn-caption" id="navLangText">English</span>
             </button>
 
-            <!-- Theme Switcher (Quiet Obsidian <-> Warm Ivory) -->
-            <button class="nav-icon-btn theme-morph-btn" id="navThemeBtn" title="Toggle Atmosphere Mode" aria-label="Toggle Theme">
-              <span class="icon-wrap theme-sun-icon">${UI.icons.sun}</span>
-              <span class="icon-wrap theme-moon-icon hidden">${UI.icons.moon}</span>
+            <!-- Stitch Tactile Animated Theme Toggle Switch -->
+            <button class="stitch-theme-switch ${((typeof state !== 'undefined' && state.themeMode) || 'dark') === 'dark' ? 'is-dark' : 'is-light'}" 
+                    id="navThemeSwitch" 
+                    role="switch" 
+                    aria-checked="${((typeof state !== 'undefined' && state.themeMode) || 'dark') === 'dark' ? 'true' : 'false'}" 
+                    title="Toggle Atmosphere (Dark / Light)" 
+                    aria-label="Toggle Atmosphere Mode">
+              <span class="stitch-switch-track">
+                <span class="track-stars" aria-hidden="true">
+                  <span class="star s1"></span>
+                  <span class="star s2"></span>
+                  <span class="star s3"></span>
+                </span>
+                <span class="track-sunrays" aria-hidden="true">
+                  <span class="ray r1"></span>
+                  <span class="ray r2"></span>
+                </span>
+                <span class="stitch-switch-thumb">
+                  <span class="thumb-icon-wrap icon-sun">${UI.icons.sun}</span>
+                  <span class="thumb-icon-wrap icon-moon">${UI.icons.moon}</span>
+                  <span class="thumb-glow-aura"></span>
+                </span>
+              </span>
+            </button>
+
+            <!-- Color Palette Customizer Modal Trigger -->
+            <button class="nav-icon-btn palette-btn" id="navPaletteBtn" title="Customize Accent Colors & UI Theme" aria-label="Palette Engine">
+              <span class="icon-wrap">${UI.icons.palette}</span>
             </button>
 
             <!-- Emergency Alert Chime Toggle -->
@@ -380,18 +405,18 @@ const UI = {
     const contacts = Array.isArray(p.emergencyContacts) ? p.emergencyContacts : [];
 
     return `
-      <div class="luxury-passport-document" id="passportDocumentSheet">
+      <div class="luxury-passport-document" id="passportDocumentSheet" data-parallax-card>
         
         <!-- Document Guilloché Security Border & Gold Crest -->
         <div class="passport-security-header">
-          <div class="passport-crest-lockup">
+          <div class="passport-crest-lockup" data-parallax-depth="10">
             <span class="crest-sigil">✦</span>
             <div class="crest-text-block">
               <span class="doc-country">GLOBAL EMERGENCY PASSPORT</span>
               <span class="doc-sub">INTERNATIONAL GOLDEN HOUR LIFELINE SPECIFICATION</span>
             </div>
           </div>
-          <div class="passport-id-box">
+          <div class="passport-id-box" data-parallax-depth="16">
             <span class="id-label">DOCUMENT NO.</span>
             <span class="id-mono">${u.passportId || 'T-1001'}</span>
           </div>
@@ -400,7 +425,7 @@ const UI = {
         <div class="passport-body-grid">
           <!-- Left: Identity & Photo Block -->
           <div class="passport-photo-col">
-            <div class="traveler-portrait-frame">
+            <div class="traveler-portrait-frame" data-parallax-depth="24">
               <div class="portrait-placeholder">${u.avatar || 'ER'}</div>
               <div class="security-watermark-seal">
                 <span>VERIFIED</span>
@@ -426,7 +451,7 @@ const UI = {
           <div class="passport-clinical-col">
             <div class="traveler-name-row">
               <h2 class="traveler-full-name">${u.name || 'Elena Rostova'}</h2>
-              <div class="blood-type-display-badge">
+              <div class="blood-type-display-badge" data-parallax-depth="20">
                 <span class="blood-caption">BLOOD GROUP</span>
                 <span class="blood-value">${p.bloodGroup || 'O+'}</span>
               </div>

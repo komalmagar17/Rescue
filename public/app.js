@@ -9,7 +9,7 @@
 // -----------------------------------------------------------------------------
 const state = {
   lang: localStorage.getItem('emergency_lang') || 'en',
-  themeMode: localStorage.getItem('emergency_theme_mode') || 'dark',
+  themeMode: (typeof window !== 'undefined' && new URLSearchParams(window.location.search).get('theme')) || localStorage.getItem('emergency_theme_mode') || 'dark',
   accentColor: localStorage.getItem('emergency_accent_color') || '#C6A56B',
   hospitals: [],
   systemHealthy: false,
@@ -27,7 +27,7 @@ const state = {
 const API_BASE = '';
 
 // -----------------------------------------------------------------------------
-// 1. Ambient Canvas Geographic Contour & Constellation Engine
+// 1. Ambient Canvas Geographic Contour & Constellation Engine (Parallax Enabled)
 // -----------------------------------------------------------------------------
 class AmbientCanvasEngine {
   constructor(canvasId) {
@@ -40,10 +40,25 @@ class AmbientCanvasEngine {
     this.pulses = [];
     this.animFrameId = null;
     this.reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    
+    // Parallax tracking
+    this.mouseX = window.innerWidth / 2;
+    this.mouseY = window.innerHeight / 2;
+    this.targetMouseX = this.mouseX;
+    this.targetMouseY = this.mouseY;
+    this.scrollY = 0;
 
     this._resize();
     this._initNodes();
     window.addEventListener('resize', () => this._resize());
+    window.addEventListener('mousemove', (e) => {
+      this.targetMouseX = e.clientX;
+      this.targetMouseY = e.clientY;
+    }, { passive: true });
+    window.addEventListener('scroll', () => {
+      this.scrollY = window.scrollY;
+    }, { passive: true });
+
     if (!this.reducedMotion) this._animate();
   }
 
@@ -57,7 +72,7 @@ class AmbientCanvasEngine {
 
   _initNodes() {
     this.nodes = [];
-    const count = Math.min(32, Math.floor((this.width * this.height) / 45000));
+    const count = Math.min(36, Math.floor((this.width * this.height) / 42000));
     for (let i = 0; i < count; i++) {
       this.nodes.push({
         x: Math.random() * this.width,
@@ -94,17 +109,25 @@ class AmbientCanvasEngine {
     const isDark = state.themeMode === 'dark';
     this.ctx.clearRect(0, 0, this.width, this.height);
 
-    // 1. Delicate Topographical Contour Rings
-    this.ctx.strokeStyle = isDark ? 'rgba(198, 165, 107, 0.04)' : 'rgba(177, 138, 82, 0.06)';
+    // Inertial lerp for mouse parallax
+    this.mouseX += (this.targetMouseX - this.mouseX) * 0.04;
+    this.mouseY += (this.targetMouseY - this.mouseY) * 0.04;
+    const mouseOffsetX = (this.mouseX - this.width / 2) * 0.035;
+    const mouseOffsetY = (this.mouseY - this.height / 2) * 0.035;
+    const scrollOffsetY = (this.scrollY * 0.12) % 180;
+
+    // 1. Delicate Topographical Contour Rings (with multi-layer parallax)
+    this.ctx.strokeStyle = isDark ? 'rgba(198, 165, 107, 0.045)' : 'rgba(177, 138, 82, 0.07)';
     this.ctx.lineWidth = 1;
     const time = Date.now() * 0.0003;
 
     for (let i = 1; i <= 3; i++) {
       this.ctx.beginPath();
       const wave = Math.sin(time + i) * 15;
+      const depthMultiplier = i * 0.4;
       this.ctx.ellipse(
-        this.width * 0.6 + wave,
-        this.height * 0.35,
+        this.width * 0.6 + wave + (mouseOffsetX * depthMultiplier),
+        this.height * 0.35 + (mouseOffsetY * depthMultiplier) - scrollOffsetY,
         180 * i,
         110 * i,
         Math.PI / 10,
@@ -324,12 +347,21 @@ function focusHospitalOnMap(hospitalId) {
 }
 
 // -----------------------------------------------------------------------------
-// 3. Theme & Atmosphere Engine
+// 3. Theme & Atmosphere Engine (Stitch Wave Transition)
 // -----------------------------------------------------------------------------
 function applyCurrentTheme() {
   document.documentElement.setAttribute('data-theme', state.themeMode);
 
-  // Sync Sun / Moon icon
+  // Sync Stitch Tactile Theme Switch
+  const themeSwitch = document.getElementById('navThemeSwitch');
+  if (themeSwitch) {
+    const isDark = state.themeMode === 'dark';
+    themeSwitch.classList.toggle('is-dark', isDark);
+    themeSwitch.classList.toggle('is-light', !isDark);
+    themeSwitch.setAttribute('aria-checked', isDark ? 'true' : 'false');
+  }
+
+  // Sync legacy icons if present
   const sunIcon = document.querySelector('.theme-sun-icon');
   const moonIcon = document.querySelector('.theme-moon-icon');
   if (sunIcon && moonIcon) {
@@ -354,6 +386,89 @@ function applyCurrentTheme() {
       if (layer instanceof L.TileLayer) layer.setUrl(getMapTileUrl());
     });
   }
+}
+
+function spawnLiquidWaveRipples(x, y, targetMode) {
+  // Create fluid organic wave portal overlay across viewport
+  const portal = document.createElement('div');
+  portal.className = `theme-wave-portal mode-${targetMode}`;
+  portal.style.left = `${x}px`;
+  portal.style.top = `${y}px`;
+
+  portal.innerHTML = `
+    <div class="liquid-wave-ring wave-1"></div>
+    <div class="liquid-wave-ring wave-2"></div>
+    <div class="liquid-wave-ring wave-3"></div>
+  `;
+
+  document.body.appendChild(portal);
+
+  setTimeout(() => {
+    if (portal && portal.parentNode) {
+      portal.parentNode.removeChild(portal);
+    }
+  }, 1150);
+}
+
+function triggerThemeWaveTransition(e) {
+  const nextMode = state.themeMode === 'dark' ? 'light' : 'dark';
+
+  // Calculate origin coordinates for the wave
+  let x = window.innerWidth / 2;
+  let y = window.innerHeight / 2;
+  if (e && typeof e.clientX === 'number' && e.clientX > 0) {
+    x = e.clientX;
+    y = e.clientY;
+  } else {
+    const switchBtn = document.getElementById('navThemeSwitch');
+    if (switchBtn) {
+      const rect = switchBtn.getBoundingClientRect();
+      x = rect.left + rect.width / 2;
+      y = rect.top + rect.height / 2;
+    }
+  }
+
+  // 1. Always fire fluid liquid wave ripple rings
+  spawnLiquidWaveRipples(x, y, nextMode);
+
+  // 2. View Transitions API circular sweep if supported
+  const supportsViewTransitions = Boolean(document.startViewTransition) && 
+    !window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  if (supportsViewTransitions) {
+    const maxRadius = Math.hypot(
+      Math.max(x, window.innerWidth - x),
+      Math.max(y, window.innerHeight - y)
+    );
+
+    const transition = document.startViewTransition(() => {
+      state.themeMode = nextMode;
+      localStorage.setItem('emergency_theme_mode', nextMode);
+      applyCurrentTheme();
+    });
+
+    transition.ready.then(() => {
+      document.documentElement.animate(
+        {
+          clipPath: [
+            `circle(0px at ${x}px ${y}px)`,
+            `circle(${maxRadius}px at ${x}px ${y}px)`
+          ]
+        },
+        {
+          duration: 720,
+          easing: 'cubic-bezier(0.22, 1, 0.36, 1)',
+          pseudoElement: '::view-transition-new(root)'
+        }
+      );
+    });
+  } else {
+    state.themeMode = nextMode;
+    localStorage.setItem('emergency_theme_mode', nextMode);
+    applyCurrentTheme();
+  }
+
+  showToast(`Atmosphere switched to ${nextMode === 'dark' ? 'Quiet Obsidian' : 'Warm Ivory'}`, 'info');
 }
 
 function setDisplayMode(mode) {
@@ -724,6 +839,20 @@ function setupGlobalListeners() {
     langSearchInput.addEventListener('input', (e) => renderLanguageList(e.target.value));
   }
 
+  // Theme Switch & Palette Trigger
+  const navThemeSwitch = document.getElementById('navThemeSwitch');
+  if (navThemeSwitch) {
+    navThemeSwitch.addEventListener('click', (e) => triggerThemeWaveTransition(e));
+  }
+
+  const navPaletteBtn = document.getElementById('navPaletteBtn');
+  if (navPaletteBtn) {
+    navPaletteBtn.addEventListener('click', () => {
+      const modal = document.getElementById('themeModal');
+      if (modal) modal.classList.remove('hidden');
+    });
+  }
+
   // Theme Modal & Controls
   const themeModal = document.getElementById('themeModal');
   const closeThemeBtn = document.getElementById('closeThemeModalBtn');
@@ -736,8 +865,12 @@ function setupGlobalListeners() {
   if (closeThemeBtn && themeModal) {
     closeThemeBtn.addEventListener('click', () => themeModal.classList.add('hidden'));
   }
-  if (btnModeDark) btnModeDark.addEventListener('click', () => setDisplayMode('dark'));
-  if (btnModeLight) btnModeLight.addEventListener('click', () => setDisplayMode('light'));
+  if (btnModeDark) btnModeDark.addEventListener('click', (e) => {
+    if (state.themeMode !== 'dark') triggerThemeWaveTransition(e);
+  });
+  if (btnModeLight) btnModeLight.addEventListener('click', (e) => {
+    if (state.themeMode !== 'light') triggerThemeWaveTransition(e);
+  });
 
   document.querySelectorAll('.preset-color-chip').forEach(chip => {
     chip.addEventListener('click', () => {
@@ -770,11 +903,130 @@ function setupGlobalListeners() {
 }
 
 // -----------------------------------------------------------------------------
-// 10. Bootstrap Application
+// 10. Stitch Creative Developer Parallax & Specular Glare Engine
+// -----------------------------------------------------------------------------
+class StitchParallaxEngine {
+  constructor() {
+    this.isReduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    this._onScroll = this._onScroll.bind(this);
+    this.init();
+  }
+
+  init() {
+    if (this.isReduced) return;
+    this.scan();
+    window.removeEventListener('scroll', this._onScroll);
+    window.addEventListener('scroll', this._onScroll, { passive: true });
+  }
+
+  scan() {
+    if (this.isReduced) return;
+    const cards = document.querySelectorAll('[data-parallax-card], .glass-card, .editorial-step-card, .relationship-contact-card, .editorial-hospital-card');
+    cards.forEach(card => {
+      if (!card.__hasStitchParallax) {
+        card.__hasStitchParallax = true;
+        card.addEventListener('mousemove', (e) => this._handleCardMove(e, card));
+        card.addEventListener('mouseleave', () => this._handleCardLeave(card));
+        card.addEventListener('mouseenter', () => this._handleCardEnter(card));
+      }
+    });
+
+    // Staggered perspective reveal for elements entering viewport
+    if ('IntersectionObserver' in window) {
+      const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+          if (entry.isIntersecting) {
+            entry.target.classList.add('in-view');
+            observer.unobserve(entry.target);
+          }
+        });
+      }, { threshold: 0.1, rootMargin: '0px 0px -30px 0px' });
+
+      cards.forEach(c => observer.observe(c));
+    }
+  }
+
+  _handleCardEnter(card) {
+    card.style.transition = 'transform 0.15s cubic-bezier(0.2, 0.8, 0.2, 1), box-shadow 0.3s ease';
+  }
+
+  _handleCardMove(e, card) {
+    const rect = card.getBoundingClientRect();
+    const x = e.clientX - rect.left;
+    const y = e.clientY - rect.top;
+
+    // Percentages for CSS specular sheen & border light
+    const px = Math.max(0, Math.min(100, (x / rect.width) * 100));
+    const py = Math.max(0, Math.min(100, (y / rect.height) * 100));
+    card.style.setProperty('--mouse-x', `${px.toFixed(1)}%`);
+    card.style.setProperty('--mouse-y', `${py.toFixed(1)}%`);
+    card.style.setProperty('--mouse-px', `${x.toFixed(0)}px`);
+    card.style.setProperty('--mouse-py', `${y.toFixed(0)}px`);
+
+    // 3D Pitch and Roll
+    const normX = (x / rect.width) - 0.5;
+    const normY = (y / rect.height) - 0.5;
+    const maxTilt = 7.5; // degrees
+    const rotateX = (-normY * maxTilt).toFixed(2);
+    const rotateY = (normX * maxTilt).toFixed(2);
+
+    card.style.transform = `perspective(1100px) rotateX(${rotateX}deg) rotateY(${rotateY}deg) scale3d(1.012, 1.012, 1.012)`;
+
+    // Multi-plane inner elements depth parallax
+    const depthElements = card.querySelectorAll('[data-parallax-depth]');
+    depthElements.forEach(el => {
+      const depth = parseFloat(el.getAttribute('data-parallax-depth')) || 12;
+      const transX = (normX * depth).toFixed(1);
+      const transY = (normY * depth).toFixed(1);
+      el.style.transform = `translate3d(${transX}px, ${transY}px, ${depth * 1.5}px)`;
+      el.style.transition = 'none';
+    });
+  }
+
+  _handleCardLeave(card) {
+    card.style.transition = 'transform 0.6s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.6s ease';
+    card.style.transform = 'perspective(1100px) rotateX(0deg) rotateY(0deg) scale3d(1, 1, 1)';
+
+    const depthElements = card.querySelectorAll('[data-parallax-depth]');
+    depthElements.forEach(el => {
+      el.style.transition = 'transform 0.6s cubic-bezier(0.16, 1, 0.3, 1)';
+      el.style.transform = 'translate3d(0px, 0px, 0px)';
+    });
+  }
+
+  _onScroll() {
+    const scrollY = window.scrollY;
+    
+    // Parallax atmospheric blur spheres
+    const orb1 = document.querySelector('.orb-primary');
+    const orb2 = document.querySelector('.orb-secondary');
+    if (orb1) orb1.style.transform = `translate3d(0, ${scrollY * 0.16}px, 0)`;
+    if (orb2) orb2.style.transform = `translate3d(0, ${-scrollY * 0.1}px, 0)`;
+
+    // Gentle parallax on hero header
+    const heroContent = document.querySelector('.hero-editorial-center');
+    if (heroContent && scrollY < 700) {
+      heroContent.style.transform = `translate3d(0, ${scrollY * 0.1}px, 0)`;
+    }
+  }
+}
+
+let stitchParallaxInstance = null;
+function initStitchParallax() {
+  if (!stitchParallaxInstance) {
+    stitchParallaxInstance = new StitchParallaxEngine();
+  } else {
+    stitchParallaxInstance.scan();
+  }
+}
+
+// -----------------------------------------------------------------------------
+// 11. Bootstrap Application
 // -----------------------------------------------------------------------------
 async function initApp() {
-  // 1. Initialize Ambient Canvas
+  // 1. Initialize Ambient Canvas & Parallax
   new AmbientCanvasEngine('ambientCanvas');
+  initStitchParallax();
 
   // 2. Apply theme & language
   applyCurrentTheme();

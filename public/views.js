@@ -58,7 +58,7 @@ const Views = {
           <div class="hero-showcase-grid">
             
             <!-- Left: High-Precision Verified Medical Passport -->
-            <div class="showcase-passport-card">
+            <div class="showcase-passport-card" data-parallax-card>
               ${UI.renderPassportDocument({
                 bloodGroup: 'O+',
                 allergies: ['Penicillin (Anaphylaxis)', 'Peanuts (Severe)'],
@@ -79,8 +79,11 @@ const Views = {
             </div>
 
             <!-- Right: Interactive Live Emergency Trauma Radar Console -->
-            <div class="showcase-map-card glass-card">
-              <div class="showcase-map-header">
+            <div class="showcase-map-card glass-card" data-parallax-card>
+              <div class="radar-sweep-beam" aria-hidden="true"></div>
+              <div class="radar-sonar-ping" aria-hidden="true"></div>
+              
+              <div class="showcase-map-header" data-parallax-depth="12">
                 <div class="radar-live-badge">
                   <span class="pulse-dot"></span>
                   <span>LIVE TRAUMA RADAR</span>
@@ -90,7 +93,7 @@ const Views = {
 
               <div id="heroInteractiveMap" class="interactive-hero-map"></div>
 
-              <div class="showcase-map-footer">
+              <div class="showcase-map-footer" data-parallax-depth="14">
                 <div class="telemetry-item">
                   <span class="telemetry-label">NEAREST TRAUMA CENTER</span>
                   <span class="telemetry-val">St. Jude Emergency Center</span>
@@ -114,27 +117,27 @@ const Views = {
           </div>
 
           <div class="story-steps-grid">
-            <div class="story-step-card glass-card">
-              <span class="step-num-mono">STEP 01</span>
-              <h3 class="step-heading">Create</h3>
+            <div class="story-step-card glass-card" data-parallax-card>
+              <span class="step-num-mono" data-parallax-depth="8">STEP 01</span>
+              <h3 class="step-heading" data-parallax-depth="14">Create</h3>
               <p class="step-body-copy">Record your verified blood group, fatal drug contraindications, chronic conditions, and emergency family contacts in under two minutes.</p>
             </div>
 
-            <div class="story-step-card glass-card">
-              <span class="step-num-mono">STEP 02</span>
-              <h3 class="step-heading">Verify</h3>
+            <div class="story-step-card glass-card" data-parallax-card>
+              <span class="step-num-mono" data-parallax-depth="8">STEP 02</span>
+              <h3 class="step-heading" data-parallax-depth="14">Verify</h3>
               <p class="step-body-copy">Your clinical records are cryptographically sealed with AWS KMS 256-bit envelope encryption and point-in-time recovery on Amazon DynamoDB.</p>
             </div>
 
-            <div class="story-step-card glass-card">
-              <span class="step-num-mono">STEP 03</span>
-              <h3 class="step-heading">Carry</h3>
+            <div class="story-step-card glass-card" data-parallax-card>
+              <span class="step-num-mono" data-parallax-depth="8">STEP 03</span>
+              <h3 class="step-heading" data-parallax-depth="14">Carry</h3>
               <p class="step-body-copy">Carry your universal QR code on your phone lockscreen, Apple Health wallet, or print a durable physical medical identity card.</p>
             </div>
 
-            <div class="story-step-card glass-card">
-              <span class="step-num-mono">STEP 04</span>
-              <h3 class="step-heading">Respond</h3>
+            <div class="story-step-card glass-card" data-parallax-card>
+              <span class="step-num-mono" data-parallax-depth="8">STEP 04</span>
+              <h3 class="step-heading" data-parallax-depth="14">Respond</h3>
               <p class="step-body-copy">First responders scan your QR with zero app installation. Amazon Bedrock Claude 3 synthesizes an urgent 5-point clinical triage briefing.</p>
             </div>
           </div>

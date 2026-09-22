@@ -158,9 +158,18 @@ class Router {
       });
     }
 
-    const navThemeBtn = document.getElementById('navThemeBtn');
-    if (navThemeBtn) {
-      navThemeBtn.addEventListener('click', () => {
+    const navThemeSwitch = document.getElementById('navThemeSwitch');
+    if (navThemeSwitch) {
+      navThemeSwitch.addEventListener('click', (e) => {
+        if (typeof triggerThemeWaveTransition === 'function') {
+          triggerThemeWaveTransition(e);
+        }
+      });
+    }
+
+    const navPaletteBtn = document.getElementById('navPaletteBtn');
+    if (navPaletteBtn) {
+      navPaletteBtn.addEventListener('click', () => {
         const modal = document.getElementById('themeModal');
         if (modal) modal.classList.remove('hidden');
       });
@@ -270,6 +279,10 @@ class Router {
           setTimeout(() => initHeroMap(), 60);
         }
         break;
+    }
+
+    if (typeof initStitchParallax === 'function') {
+      setTimeout(() => initStitchParallax(), 70);
     }
   }
 
