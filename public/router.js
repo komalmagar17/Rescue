@@ -1,6 +1,7 @@
 /**
  * Emergency Passport — Client-Side Router & Route Guard
  * Handles SPA navigation, protected routes, and view mounting.
+ * Shared-Element Motion Transitions • Map Lifecycle Hooks
  */
 
 class Router {
@@ -67,13 +68,11 @@ class Router {
     const isPublic = publicRoutes.includes(route);
 
     if (!isAuth && !isPublic) {
-      // Redirect unauthenticated to login
       window.location.hash = '#/login';
       return;
     }
 
     if (isAuth && (route === '/login' || route === '/signup')) {
-      // Already authenticated, redirect to dashboard or role dashboard
       if (user.role === ROLES.RESPONDER) {
         window.location.hash = '#/responder';
       } else if (user.role === ROLES.ADMIN) {
@@ -84,7 +83,7 @@ class Router {
       return;
     }
 
-    // Role-specific redirects
+    // Role-specific auto switches
     if (isAuth) {
       if (route === '/responder' && user.role !== ROLES.RESPONDER) {
         authService.switchRole(ROLES.RESPONDER);
@@ -113,7 +112,6 @@ class Router {
   }
 
   _bindNavbarEvents() {
-    // User dropdown toggle
     const userMenuBtn = document.getElementById('userMenuBtn');
     const userDropdownMenu = document.getElementById('userDropdownMenu');
     if (userMenuBtn && userDropdownMenu) {
@@ -127,7 +125,6 @@ class Router {
       });
     }
 
-    // Role Switcher Select
     const roleSelect = document.getElementById('roleSwitchSelect');
     if (roleSelect) {
       roleSelect.addEventListener('change', (e) => {
@@ -144,7 +141,6 @@ class Router {
       });
     }
 
-    // Logout
     const logoutBtn = document.getElementById('logoutBtn');
     if (logoutBtn) {
       logoutBtn.addEventListener('click', async () => {
@@ -154,7 +150,6 @@ class Router {
       });
     }
 
-    // Language modal
     const navLangBtn = document.getElementById('navLangBtn');
     if (navLangBtn) {
       navLangBtn.addEventListener('click', () => {
@@ -163,7 +158,6 @@ class Router {
       });
     }
 
-    // Theme modal
     const navThemeBtn = document.getElementById('navThemeBtn');
     if (navThemeBtn) {
       navThemeBtn.addEventListener('click', () => {
@@ -172,7 +166,6 @@ class Router {
       });
     }
 
-    // Siren
     const navSirenBtn = document.getElementById('navSirenBtn');
     if (navSirenBtn && typeof toggleEmergencySiren === 'function') {
       navSirenBtn.addEventListener('click', toggleEmergencySiren);
@@ -188,6 +181,9 @@ class Router {
     switch (route) {
       case '/':
         viewMount.innerHTML = Views.renderLanding(user);
+        if (typeof initHeroMap === 'function') {
+          setTimeout(() => initHeroMap(), 60);
+        }
         break;
 
       case '/login':
@@ -246,10 +242,12 @@ class Router {
       case '/hospitals':
         viewMount.innerHTML = Views.renderHospitals(state.hospitals || []);
         this._bindHospitalsEvents();
+        if (typeof initHospitalsMap === 'function') {
+          setTimeout(() => initHospitalsMap(state.hospitals || []), 60);
+        }
         break;
 
       case '/triage':
-        // Reuse the rich Triage experience
         this._renderTriageView(viewMount);
         break;
 
@@ -268,6 +266,9 @@ class Router {
 
       default:
         viewMount.innerHTML = Views.renderLanding(user);
+        if (typeof initHeroMap === 'function') {
+          setTimeout(() => initHeroMap(), 60);
+        }
         break;
     }
   }
@@ -292,7 +293,6 @@ class Router {
         e.preventDefault();
         const submitBtn = document.getElementById('submitLoginBtn');
         submitBtn.disabled = true;
-        submitBtn.querySelector('.btn-spinner').classList.remove('hidden');
 
         try {
           const email = document.getElementById('loginEmail').value.trim();
@@ -306,7 +306,6 @@ class Router {
           showToast(err.message || 'Login failed', 'error');
         } finally {
           submitBtn.disabled = false;
-          submitBtn.querySelector('.btn-spinner').classList.add('hidden');
         }
       });
     }
@@ -314,7 +313,7 @@ class Router {
     if (googleBtn) {
       googleBtn.addEventListener('click', async () => {
         await authService.loginWithGoogle();
-        showToast('Signed in with Google.', 'success');
+        showToast('Signed in with Google authentication.', 'success');
         this.navigate('/dashboard');
       });
     }
@@ -336,7 +335,6 @@ class Router {
 
       const submitBtn = document.getElementById('submitSignupBtn');
       submitBtn.disabled = true;
-      submitBtn.querySelector('.btn-spinner').classList.remove('hidden');
 
       try {
         const payload = {
@@ -345,7 +343,7 @@ class Router {
           password: pw,
           dob: document.getElementById('signupDob').value,
           country: document.getElementById('signupCountry').value.trim(),
-          language: document.getElementById('signupLang').value.trim(),
+          language: 'English',
           emergencyContact: document.getElementById('signupContact').value.trim(),
         };
 
@@ -356,7 +354,6 @@ class Router {
         showToast(err.message, 'error');
       } finally {
         submitBtn.disabled = false;
-        submitBtn.querySelector('.btn-spinner').classList.add('hidden');
       }
     });
   }
@@ -417,21 +414,12 @@ class Router {
       addContactBtn.addEventListener('click', () => {
         const card = document.createElement('div');
         card.className = 'contact-entry-card glass-card';
-        card.style.marginTop = '10px';
+        card.style.padding = '16px';
         card.innerHTML = `
-          <div class="form-row">
-            <div class="form-field col-4">
-              <label>Contact Name</label>
-              <input type="text" class="contact-input-name" placeholder="Contact Name" required />
-            </div>
-            <div class="form-field col-4">
-              <label>Relationship</label>
-              <input type="text" class="contact-input-rel" placeholder="Relationship" required />
-            </div>
-            <div class="form-field col-4">
-              <label>Phone Number</label>
-              <input type="tel" class="contact-input-phone" placeholder="+1-555-..." required />
-            </div>
+          <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px;">
+            <input type="text" class="contact-input-name editorial-input" placeholder="Contact Name" required />
+            <input type="text" class="contact-input-rel editorial-input" placeholder="Relationship" required />
+            <input type="tel" class="contact-input-phone editorial-input" placeholder="Phone Number" required />
           </div>
         `;
         contactsContainer.appendChild(card);
@@ -442,7 +430,6 @@ class Router {
       form.addEventListener('submit', (e) => {
         e.preventDefault();
 
-        // Extract contacts
         const contactCards = document.querySelectorAll('#obContactsContainer .contact-entry-card');
         const contacts = [];
         contactCards.forEach((c, idx) => {
@@ -462,7 +449,7 @@ class Router {
           allergies: (document.getElementById('obAllergies')?.value || '').split(',').map(s => s.trim()).filter(Boolean),
           conditions: (document.getElementById('obConditions')?.value || '').split(',').map(s => s.trim()).filter(Boolean),
           medications: (document.getElementById('obMedications')?.value || '').split(',').map(s => s.trim()).filter(Boolean),
-          emergencyNotes: document.getElementById('obNotes')?.value,
+          emergencyNotes: '',
           contacts,
           privacySettings: {
             emergencyAccess: true,
@@ -484,11 +471,8 @@ class Router {
     for (let i = 1; i <= 4; i++) {
       const stepElem = document.getElementById(`wizardStep${i}`);
       const indicator = document.getElementById(`stepIndicator${i}`);
-      const line = document.getElementById(`stepLine${i - 1}`);
-
       if (stepElem) stepElem.classList.toggle('hidden', i.toString() !== stepNum.toString());
       if (indicator) indicator.classList.toggle('active', i <= parseInt(stepNum, 10));
-      if (line) line.classList.toggle('active', i <= parseInt(stepNum, 10));
     }
   }
 
@@ -528,10 +512,10 @@ class Router {
     const openAddBtn = document.getElementById('openAddContactModalBtn');
     if (openAddBtn) {
       openAddBtn.addEventListener('click', () => {
-        const name = prompt('Contact Name:');
+        const name = prompt('Contact Full Name:');
         if (!name) return;
-        const rel = prompt('Relationship (e.g. Spouse, Father):', 'Family');
-        const phone = prompt('Phone Number:');
+        const rel = prompt('Relationship (e.g. Spouse, Father, Physician):', 'Family');
+        const phone = prompt('Emergency Phone Number:');
         if (!phone) return;
 
         authService.addEmergencyContact({ name, relationship: rel || 'Family', phone });
@@ -544,7 +528,7 @@ class Router {
     deleteBtns.forEach(btn => {
       btn.addEventListener('click', () => {
         const id = btn.getAttribute('data-id');
-        if (confirm('Are you sure you want to remove this emergency contact?')) {
+        if (confirm('Remove this emergency contact?')) {
           authService.deleteEmergencyContact(id);
           showToast('Contact removed.', 'info');
           this.handleRoute();
@@ -556,15 +540,22 @@ class Router {
   _bindQREvents(passport) {
     const qrHolder = document.getElementById('largeQrHolder');
     if (qrHolder) {
+      const scanLine = qrHolder.querySelector('.qr-scan-line');
       qrHolder.innerHTML = generateQrSvg(passport.passportId);
+      if (scanLine) qrHolder.appendChild(scanLine);
     }
 
     const regenBtn = document.getElementById('regenerateQrBtn');
     if (regenBtn) {
       regenBtn.addEventListener('click', () => {
-        showToast('Generating new secure cryptographic QR sequence...', 'info');
+        showToast('Re-keying cryptographic emergency identity token...', 'info');
         setTimeout(() => {
-          if (qrHolder) qrHolder.innerHTML = generateQrSvg(passport.passportId + '-' + Date.now().toString().slice(-4));
+          if (qrHolder) {
+            qrHolder.innerHTML = generateQrSvg(passport.passportId + '-' + Date.now().toString().slice(-4));
+            const sl = document.createElement('div');
+            sl.className = 'qr-scan-line';
+            qrHolder.appendChild(sl);
+          }
           showToast('Emergency QR regenerated and active.', 'success');
         }, 600);
       });
@@ -572,9 +563,7 @@ class Router {
 
     const downloadBtn = document.getElementById('downloadQrImageBtn');
     if (downloadBtn) {
-      downloadBtn.addEventListener('click', () => {
-        window.print();
-      });
+      downloadBtn.addEventListener('click', () => window.print());
     }
   }
 
@@ -591,8 +580,21 @@ class Router {
               return s.some(serv => serv.toLowerCase().includes(filter.toLowerCase()));
             });
         grid.innerHTML = filtered.map(h => UI.renderHospitalCard(h)).join('');
+        this._bindHospitalCardActions();
       });
     }
+    this._bindHospitalCardActions();
+  }
+
+  _bindHospitalCardActions() {
+    document.querySelectorAll('.locate-facility-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const id = btn.getAttribute('data-id');
+        if (typeof focusHospitalOnMap === 'function') {
+          focusHospitalOnMap(id);
+        }
+      });
+    });
   }
 
   _bindSettingsEvents() {
@@ -625,49 +627,19 @@ class Router {
     const query = this.getQueryParams();
     const defaultId = query.id || 'T-1001';
 
-    viewMount.innerHTML = `
-      <div class="triage-page-wrapper">
-        <div class="triage-top-bar glass-card">
-          <div class="triage-search-wrap">
-            <svg class="search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
-            <input type="text" id="triageSearchInput" placeholder="Enter Tourist ID (e.g. T-1001)" value="${defaultId}" />
-            <button class="btn btn-primary" id="triageExecuteBtn">TRIAGE NOW</button>
-          </div>
+    viewMount.innerHTML = Views.renderTriageExperience(defaultId);
 
-          <div class="triage-demo-chips">
-            <button class="preset-chip active" data-tourist="T-1001">Elena (Penicillin/Asthma)</button>
-            <button class="preset-chip" data-tourist="T-1002">Kenji (Diabetes T1/Latex)</button>
-            <button class="preset-chip" data-tourist="T-1003">Maria (Cardiac/Aspirin)</button>
-            <button class="preset-chip" data-tourist="T-1004">Arjun (Heatstroke/T2)</button>
-          </div>
-        </div>
-
-        <div id="triageActiveDisplay">
-          <!-- Populated by fetchEmergencyTriage -->
-        </div>
-      </div>
-    `;
-
-    // Bind Triage Search
     const searchInput = document.getElementById('triageSearchInput');
     const execBtn = document.getElementById('triageExecuteBtn');
     if (execBtn && searchInput) {
       execBtn.addEventListener('click', () => {
         fetchEmergencyTriage(searchInput.value.trim());
       });
+      searchInput.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter') fetchEmergencyTriage(searchInput.value.trim());
+      });
     }
 
-    document.querySelectorAll('.triage-demo-chips .preset-chip').forEach(chip => {
-      chip.addEventListener('click', () => {
-        document.querySelectorAll('.triage-demo-chips .preset-chip').forEach(c => c.classList.remove('active'));
-        chip.classList.add('active');
-        const id = chip.getAttribute('data-tourist');
-        if (searchInput) searchInput.value = id;
-        fetchEmergencyTriage(id);
-      });
-    });
-
-    // Auto-trigger initial triage query
     fetchEmergencyTriage(defaultId);
   }
 }

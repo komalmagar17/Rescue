@@ -4,35 +4,37 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Emergency Passport — Borderless Golden Hour Lifeline</title>
-  <meta name="description" content="Award-winning medical emergency identity, instant QR triage, Bedrock AI briefings, and capability-aware trauma routing.">
+  <meta name="description" content="Luxury editorial medical identity, instant QR triage, Bedrock AI briefings, and capability-aware trauma routing.">
   
-  <!-- SaaS Typography -->
+  <!-- Luxury Editorial & UI Typography -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800;900&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=JetBrains+Mono:wght@400;500;600&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  
+  <!-- Leaflet Interactive Emergency Mapping -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
   
   <link rel="stylesheet" href="index.css">
 </head>
 <body>
 
-  <!-- Dynamic Ambient Mesh Background -->
-  <div class="mesh-bg">
-    <div class="mesh-orb orb-1"></div>
-    <div class="mesh-orb orb-2"></div>
-    <div class="mesh-orb orb-3"></div>
-    <div class="mesh-grid"></div>
-  </div>
+  <!-- Ambient Geographic Contour & Star Constellation Canvas -->
+  <canvas id="ambientCanvas" class="ambient-canvas" aria-hidden="true"></canvas>
 
-  <!-- App Shell: Top Navbar Mount -->
+  <!-- Tactile Luxury Paper Grain Layer -->
+  <div class="paper-texture" aria-hidden="true"></div>
+
+  <!-- App Shell: Floating Translucent Pill Navbar Mount -->
   <div id="navbarMount"></div>
 
-  <!-- Global Error Notice Banner -->
-  <div id="globalErrorBanner" class="error-banner hidden" role="alert">
-    <div class="banner-inner">
-      <span class="banner-icon">⚠️</span>
-      <span id="globalErrorMessage">System notice</span>
-      <button class="btn-banner-retry" id="globalErrorRetryBtn">Retry</button>
-      <button class="btn-banner-close" id="globalErrorDismissBtn">&times;</button>
+  <!-- Refined Editorial System Status Banner -->
+  <div id="globalErrorBanner" class="system-status-banner hidden" role="status" aria-live="polite">
+    <div class="status-banner-inner">
+      <span class="status-indicator-dot"></span>
+      <span id="globalErrorMessage">System operational</span>
+      <button class="btn-status-action" id="globalErrorRetryBtn">Refresh</button>
+      <button class="btn-status-dismiss" id="globalErrorDismissBtn" aria-label="Dismiss">&times;</button>
     </div>
   </div>
 
@@ -48,17 +50,18 @@
 
   <!-- 1. LANGUAGE SELECTOR MODAL (ALL 22 SCHEDULED INDIAN LANGUAGES) -->
   <div class="modal-backdrop hidden" id="langModal">
-    <div class="modal-box glass-card">
+    <div class="modal-box glass-sheet">
       <div class="modal-header">
         <div>
-          <h3>Choose Language / भाषा चुनें</h3>
-          <p>Available in all 22 officially scheduled Indian languages + English</p>
+          <span class="modal-eyebrow">LOCALIZATION ENGINE</span>
+          <h3 class="modal-title">Select Language / भाषा चुनें</h3>
+          <p class="modal-desc">Supported in all 22 officially scheduled Indian languages & English.</p>
         </div>
-        <button class="modal-close-btn" id="closeLangModalBtn">&times;</button>
+        <button class="modal-close-btn" id="closeLangModalBtn" aria-label="Close modal">&times;</button>
       </div>
 
-      <div class="lang-search-bar">
-        <input type="text" id="langSearchInput" placeholder="Search language... (e.g. Hindi, Bengali, Tamil)" autocomplete="off" />
+      <div class="lang-search-wrap">
+        <input type="text" id="langSearchInput" class="editorial-input" placeholder="Search language... (Hindi, Bengali, Tamil, Telugu, Marathi)" autocomplete="off" />
       </div>
 
       <div class="lang-grid" id="langGridContainer">
@@ -67,86 +70,117 @@
     </div>
   </div>
 
-  <!-- 2. THEME & ACCENT COLOR CUSTOMIZER MODAL -->
+  <!-- 2. THEME & PALETTE CUSTOMIZER MODAL -->
   <div class="modal-backdrop hidden" id="themeModal">
-    <div class="modal-box glass-card theme-modal-box">
+    <div class="modal-box glass-sheet theme-sheet">
       <div class="modal-header">
         <div>
-          <h3 data-i18n="theme_title">Custom UI Appearance & Color Engine</h3>
-          <p data-i18n="theme_desc">Personalize your interface with custom accent hues and dark/light modes.</p>
+          <span class="modal-eyebrow">AESTHETIC CONTROLS</span>
+          <h3 class="modal-title" data-i18n="theme_title">Atmosphere & Visual Mode</h3>
+          <p class="modal-desc" data-i18n="theme_desc">Tailor the visual temperature between Warm Porcelain and Quiet Obsidian.</p>
         </div>
-        <button class="modal-close-btn" id="closeThemeModalBtn">&times;</button>
+        <button class="modal-close-btn" id="closeThemeModalBtn" aria-label="Close modal">&times;</button>
       </div>
 
       <!-- Mode Switch -->
-      <div class="theme-section">
-        <label class="section-title">Display Mode</label>
+      <div class="theme-option-group">
+        <label class="option-group-label">Surface Atmosphere</label>
         <div class="mode-toggles">
-          <button class="mode-btn active" id="btnModeDark">
-            <span class="mode-icon">🌙</span>
-            <span data-i18n="theme_mode_dark">Dark Mode (Command Center)</span>
+          <button class="mode-toggle-card active" id="btnModeDark">
+            <span class="mode-glyph">🌙</span>
+            <div class="mode-text">
+              <strong>Quiet Obsidian</strong>
+              <span>Deep charcoal medical night command</span>
+            </div>
           </button>
-          <button class="mode-btn" id="btnModeLight">
-            <span class="mode-icon">☀️</span>
-            <span data-i18n="theme_mode_light">Light Mode (Clinical Day)</span>
+          <button class="mode-toggle-card" id="btnModeLight">
+            <span class="mode-glyph">☀️</span>
+            <div class="mode-text">
+              <strong>Warm Ivory</strong>
+              <span>Porcelain daylight & editorial stationary</span>
+            </div>
           </button>
         </div>
       </div>
 
       <!-- Accent Presets -->
-      <div class="theme-section">
-        <label class="section-title">SaaS Accent Palette Presets</label>
-        <div class="accent-presets">
-          <button class="preset-color-chip active" data-color="#ef4444" style="--chip-color: #ef4444;">
-            <span class="chip-dot"></span>
-            <span>Obsidian Crimson (Emergency)</span>
+      <div class="theme-option-group">
+        <label class="option-group-label">Signature Accent Palette</label>
+        <div class="accent-presets-grid">
+          <button class="preset-color-chip active" data-color="#B18A52" style="--chip-color: #B18A52;">
+            <span class="chip-color-swatch"></span>
+            <span class="chip-title">Champagne Gold (Passport)</span>
           </button>
-          <button class="preset-color-chip" data-color="#06b6d4" style="--chip-color: #06b6d4;">
-            <span class="chip-dot"></span>
-            <span>Electric Cyan (Verified)</span>
+          <button class="preset-color-chip" data-color="#4D817B" style="--chip-color: #4D817B;">
+            <span class="chip-color-swatch"></span>
+            <span class="chip-title">Clinical Teal (Verified)</span>
           </button>
-          <button class="preset-color-chip" data-color="#3b82f6" style="--chip-color: #3b82f6;">
-            <span class="chip-dot"></span>
-            <span>Linear Cobalt</span>
+          <button class="preset-color-chip" data-color="#D95C52" style="--chip-color: #D95C52;">
+            <span class="chip-color-swatch"></span>
+            <span class="chip-title">Emergency Crimson (Action)</span>
           </button>
-          <button class="preset-color-chip" data-color="#10b981" style="--chip-color: #10b981;">
-            <span class="chip-dot"></span>
-            <span>Emerald Pulse</span>
-          </button>
-          <button class="preset-color-chip" data-color="#8b5cf6" style="--chip-color: #8b5cf6;">
-            <span class="chip-dot"></span>
-            <span>Royal Amethyst (AI)</span>
-          </button>
-          <button class="preset-color-chip" data-color="#f59e0b" style="--chip-color: #f59e0b;">
-            <span class="chip-dot"></span>
-            <span>Sunset Amber</span>
+          <button class="preset-color-chip" data-color="#3B82F6" style="--chip-color: #3B82F6;">
+            <span class="chip-color-swatch"></span>
+            <span class="chip-title">Linear Cobalt</span>
           </button>
         </div>
       </div>
 
       <!-- Custom Color Picker -->
-      <div class="theme-section">
-        <label class="section-title" data-i18n="custom_accent_color">Custom Primary Accent Color:</label>
-        <div class="custom-color-picker-row">
-          <input type="color" id="customColorInput" value="#ef4444" />
-          <input type="text" id="customColorHex" value="#ef4444" maxlength="7" />
-          <button class="btn btn-sm btn-primary" id="applyCustomColorBtn">Apply Color</button>
+      <div class="theme-option-group">
+        <label class="option-group-label" data-i18n="custom_accent_color">Custom Primary Accent Color</label>
+        <div class="custom-color-row">
+          <input type="color" id="customColorInput" value="#B18A52" class="color-picker-input" />
+          <input type="text" id="customColorHex" value="#B18A52" maxlength="7" class="editorial-input hex-input" />
+          <button class="btn btn-sm btn-outline" id="applyCustomColorBtn">Apply Accent</button>
         </div>
       </div>
     </div>
   </div>
 
-  <!-- Modern SaaS Footer -->
+  <!-- Modern Luxury Editorial Footer -->
   <footer class="site-footer">
     <div class="footer-container">
-      <div class="footer-left">
-        <strong>Emergency Passport</strong> — Lifesaving Golden Hour Infrastructure.
+      <div class="footer-brand-col">
+        <div class="footer-brand-mark">
+          <span class="brand-crest-symbol">✦</span>
+          <strong>Emergency Passport</strong>
+        </div>
+        <p class="footer-tagline">“Carry what matters when every second counts.”</p>
+        <div class="footer-telemetry">
+          <span class="telemetry-pill operational">
+            <span class="pulse-beacon"></span>
+            SYSTEM OPERATIONAL
+          </span>
+          <span class="telemetry-stamp">AWS BEDROCK • 680MS DISPATCH</span>
+        </div>
       </div>
-      <div class="footer-right">
+
+      <div class="footer-links-col">
+        <span class="footer-col-header">PRODUCT</span>
+        <a href="#/passport" data-route="/passport">Digital Passport</a>
+        <a href="#/qr" data-route="/qr">Emergency QR</a>
+        <a href="#/hospitals" data-route="/hospitals">Hospital Directory</a>
+        <a href="#/triage" data-route="/triage">Triage Workflow</a>
+      </div>
+
+      <div class="footer-links-col">
+        <span class="footer-col-header">SECURITY & COMPLIANCE</span>
+        <span>HIPAA Zero-Login Compliant</span>
+        <span>GDPR Article 9 Life Safety</span>
+        <span>AWS KMS Envelope Encryption</span>
+        <span>Point-in-Time DynamoDB Recovery</span>
+      </div>
+
+      <div class="footer-links-col">
+        <span class="footer-col-header">REPOSITORY</span>
         <a href="https://github.com/komalmagar17/Rescue" target="_blank" rel="noopener">GitHub: komalmagar17/Rescue</a>
-        <span>•</span>
-        <span>HIPAA & GDPR-Compliant Zero-Login Emergency Access</span>
+        <span>Designed for Golden Hour Safety</span>
       </div>
+    </div>
+    <div class="footer-bottom-bar">
+      <span>© 2026 Emergency Passport Platform. All rights reserved.</span>
+      <div class="footer-coordinates">35.6762° N, 139.6503° E • TOKYO / GLOBAL DISPATCH</div>
     </div>
   </footer>
 

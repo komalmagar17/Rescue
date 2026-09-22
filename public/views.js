@@ -1,274 +1,349 @@
 /**
- * Emergency Passport — Page Views & Renderers
- * Implements Landing, Auth (Login/Signup/Forgot/Reset), Onboarding Wizard,
- * Dashboard, Profile, Digital Passport, QR Identity, Contacts, Triage, and Admin.
+ * Emergency Passport — Page Views & Editorial Renderers
+ * Luxury Editorial × Medical Technology Design System
+ * Clean Typography • Asymmetrical Layouts • Tactile Stationary Cards
  */
 
 const Views = {
   // ===========================================================================
-  // 1. LANDING PAGE
+  // 1. LANDING EXPERIENCE (Editorial Storytelling)
   // ===========================================================================
   renderLanding(user) {
     const isAuth = Boolean(user);
 
     return `
-      <div class="landing-page-wrapper">
-        <!-- Hero Section -->
-        <section class="landing-hero">
-          <div class="hero-chip">
-            <span class="chip-spark">⚡</span>
-            <span>AMAZON BEDROCK AI + DYNAMODB • GOLDEN HOUR NETWORK</span>
+      <div class="landing-editorial-wrap">
+        
+        <!-- Immersive Hero Block -->
+        <section class="landing-hero-block">
+          <div class="hero-eyebrow-pill">
+            <span class="crest-star">✦</span>
+            <span>EMERGENCY PASSPORT • GOLDEN HOUR LIFELINE</span>
           </div>
 
-          <h1 class="landing-title">
-            Your Emergency Information.<br>
-            <span class="text-gradient">Available When It Matters.</span>
+          <h1 class="editorial-display hero-title-main">
+            Your medical identity,<br>
+            <span class="editorial-italic">when every second matters.</span>
           </h1>
 
-          <p class="landing-subtitle">
-            Carry verified medical and emergency information wherever you go. When crisis strikes abroad, first responders scan your universal QR to access blood types, fatal allergies, and AI clinical briefings in under 800 milliseconds.
+          <p class="hero-sub-text">
+            Carry verified medical and emergency information wherever you go. When crisis strikes abroad, first responders access blood types, fatal allergies, and AI clinical briefings in under 800 milliseconds.
           </p>
 
-          <div class="landing-cta-group">
+          <div class="hero-actions-row">
             ${isAuth ? `
-              <a href="#/passport" class="btn btn-primary btn-lg" data-route="/passport">
-                💳 Open My Passport
+              <a href="#/passport" class="btn btn-lg btn-primary" data-route="/passport">
+                <span class="btn-icon">${UI.icons.fileText}</span>
+                <span>Open My Passport</span>
               </a>
-              <a href="#/qr" class="btn btn-outline btn-lg" data-route="/qr">
-                📲 View Emergency QR
+              <a href="#/qr" class="btn btn-lg btn-outline" data-route="/qr">
+                <span class="btn-icon">${UI.icons.qrCode}</span>
+                <span>Emergency QR</span>
               </a>
             ` : `
-              <a href="#/signup" class="btn btn-primary btn-lg" data-route="/signup">
-                🚑 Create Emergency Passport
+              <a href="#/signup" class="btn btn-lg btn-primary" data-route="/signup">
+                <span>Create Emergency Passport</span>
+                <span class="btn-icon">${UI.icons.arrowRight}</span>
               </a>
-              <a href="#/triage" class="btn btn-outline btn-lg" data-route="/triage">
-                ⚡ View Live Responder Demo
+              <a href="#/triage" class="btn btn-lg btn-outline" data-route="/triage">
+                <span class="btn-icon">${UI.icons.heartPulse}</span>
+                <span>Explore How It Works</span>
               </a>
             `}
           </div>
         </section>
 
-        <!-- 4-Step Golden Hour Workflow -->
-        <section class="workflow-section">
-          <div class="section-title-wrap">
-            <span class="sub-label">HOW IT WORKS</span>
-            <h2 class="section-heading">Four Steps to Borderless Emergency Care</h2>
+        <!-- Hero Visual Composition: Luxury Passport Floating over Interactive Map -->
+        <section class="hero-visual-stage">
+          <div class="stage-map-backdrop" id="heroMapStage">
+            <div id="heroInteractiveMap" class="interactive-hero-map"></div>
+          </div>
+          
+          <div class="floating-passport-preview">
+            ${UI.renderPassportDocument({
+              bloodGroup: 'O+',
+              allergies: ['Penicillin (Anaphylaxis)', 'Peanuts (Severe)'],
+              conditions: ['Asthma (Carry Inhaler)', 'Mild Hypertension'],
+              emergencyContacts: [
+                { name: 'Mark Rostova', relationship: 'Spouse', phone: '+1 (555) 019-2834' },
+                { name: 'Dr. Viktor Rostov', relationship: 'Father · Physician', phone: '+1 (555) 018-9921' }
+              ],
+              lastVerified: '2026-09-22'
+            }, {
+              name: 'Elena Rostova',
+              passportId: 'T-1001',
+              avatar: 'ER',
+              country: 'International Traveler',
+              language: 'English, Russian',
+              dob: '1995-04-12'
+            })}
+          </div>
+        </section>
+
+        <!-- 4-Step Golden Hour Storytelling -->
+        <section class="editorial-story-section">
+          <div class="story-header-center">
+            <span class="story-eyebrow">THE LIFESAVING PROTOCOL</span>
+            <h2 class="story-title editorial-italic">One passport. Every emergency.</h2>
+            <p>From sudden collapse to hospital arrival, how the borderless lifeline protects you.</p>
           </div>
 
-          <div class="workflow-grid">
-            <div class="workflow-card glass-card">
-              <div class="step-badge">01</div>
-              <h3 class="step-title">Create Your Passport</h3>
-              <p class="step-desc">Enter your verified blood group, fatal drug allergies, chronic conditions, and emergency family contacts in under 2 minutes.</p>
+          <div class="story-steps-grid">
+            <div class="story-step-card glass-card">
+              <span class="step-num-mono">STEP 01</span>
+              <h3 class="step-heading">Create</h3>
+              <p class="step-body-copy">Record your verified blood group, fatal drug contraindications, chronic conditions, and emergency family contacts in under two minutes.</p>
             </div>
 
-            <div class="workflow-card glass-card">
-              <div class="step-badge">02</div>
-              <h3 class="step-title">Verify Your Information</h3>
-              <p class="step-desc">Your clinical records are encrypted at rest with AWS KMS and validated with point-in-time recovery on Amazon DynamoDB.</p>
+            <div class="story-step-card glass-card">
+              <span class="step-num-mono">STEP 02</span>
+              <h3 class="step-heading">Verify</h3>
+              <p class="step-body-copy">Your clinical records are cryptographically sealed with AWS KMS 256-bit envelope encryption and point-in-time recovery on Amazon DynamoDB.</p>
             </div>
 
-            <div class="workflow-card glass-card">
-              <div class="step-badge">03</div>
-              <h3 class="step-title">Carry Your Emergency QR</h3>
-              <p class="step-desc">Save your universal QR code to your phone lockscreen, smartwatch, or print an ultra-durable wallet card.</p>
+            <div class="story-step-card glass-card">
+              <span class="step-num-mono">STEP 03</span>
+              <h3 class="step-heading">Carry</h3>
+              <p class="step-body-copy">Carry your universal QR code on your phone lockscreen, Apple Health wallet, or print a durable physical medical identity card.</p>
             </div>
 
-            <div class="workflow-card glass-card">
-              <div class="step-badge">04</div>
-              <h3 class="step-title">Responders Save Your Life</h3>
-              <p class="step-desc">Paramedics scan your QR with zero app installation. Bedrock Claude 3 synthesizes an urgent 5-point clinical brief.</p>
+            <div class="story-step-card glass-card">
+              <span class="step-num-mono">STEP 04</span>
+              <h3 class="step-heading">Respond</h3>
+              <p class="step-body-copy">First responders scan your QR with zero app installation. Amazon Bedrock Claude 3 synthesizes an urgent 5-point clinical triage briefing.</p>
             </div>
           </div>
         </section>
 
-        <!-- Trust & Security Section -->
-        <section class="trust-security-section glass-card">
-          <div class="trust-content">
-            <div class="trust-badge">🔒 ZERO UNNECESSARY DATA EXPOSURE</div>
-            <h3 class="trust-heading">Medical Privacy First Architecture</h3>
-            <p class="trust-desc">
-              We never expose financial data, national IDs, or continuous GPS tracking. In life-or-death emergencies, first responders access only actionable clinical contraindications (allergies, blood group, vital contacts) according to your explicit sharing settings.
+        <!-- Medical Privacy Trust Seal -->
+        <section class="editorial-trust-seal">
+          <div>
+            <div class="trust-badge-label">
+              <span class="icon-inline">${UI.icons.shieldCheck}</span>
+              <span>MEDICAL PRIVACY FIRST ARCHITECTURE</span>
+            </div>
+            <h3 class="trust-title">Zero Unnecessary Data Exposure</h3>
+            <p class="trust-copy">
+              We never expose financial data, national IDs, or continuous GPS tracks. In life-or-death situations, first responders access only actionable clinical contraindications (allergies, blood group, vital family contacts) according to your explicit sharing settings.
             </p>
-            <div class="trust-tags">
-              <span>✓ HIPAA-Ready Encryption</span>
-              <span>✓ Sub-800ms Retrieval</span>
-              <span>✓ Zero-Login Paramedic Access</span>
-              <span>✓ Offline Clinical Fallback</span>
+          </div>
+
+          <div class="trust-pillars-row">
+            <div class="trust-pillar-item">
+              <span class="icon-inline">${UI.icons.check}</span>
+              <span>HIPAA-Ready Encryption</span>
+            </div>
+            <div class="trust-pillar-item">
+              <span class="icon-inline">${UI.icons.check}</span>
+              <span>Sub-800ms Retrieval</span>
+            </div>
+            <div class="trust-pillar-item">
+              <span class="icon-inline">${UI.icons.check}</span>
+              <span>Zero-Login Paramedic Access</span>
+            </div>
+            <div class="trust-pillar-item">
+              <span class="icon-inline">${UI.icons.check}</span>
+              <span>Offline Clinical Fallback</span>
             </div>
           </div>
         </section>
+
       </div>
     `;
   },
 
   // ===========================================================================
-  // 2. AUTHENTICATION: LOGIN
+  // 2. AUTHENTICATION: LOGIN (Editorial Split-Screen)
   // ===========================================================================
   renderLogin() {
     return `
-      <div class="auth-page-container">
-        <div class="auth-card glass-card">
-          <div class="auth-header">
-            <div class="auth-brand-icon">🚑</div>
-            <h2 class="auth-title">Welcome Back</h2>
-            <p class="auth-subtitle">Sign in to manage your Emergency Medical Passport</p>
+      <div class="auth-editorial-viewport">
+        <!-- Left: Visual & Security Motif -->
+        <div class="auth-visual-pane">
+          <div>
+            <div class="brand-crest-icon" style="margin-bottom: 24px;">
+              <span class="crest-star">✦</span>
+            </div>
+            <h2 class="editorial-display" style="font-size: 2.4rem; margin-bottom: 12px;">
+              Enter your<br><span class="editorial-italic">medical identity.</span>
+            </h2>
+            <p style="font-size: 0.92rem; color: var(--text-secondary); line-height: 1.6;">
+              Secure access to your global emergency medical passport, verified clinical contraindications, and active QR tokens.
+            </p>
           </div>
 
+          <div class="auth-visual-footer">
+            <div style="font-family: var(--font-mono); font-size: 0.7rem; color: var(--gold);">
+              ✦ SECURE ENCLAVE • AWS KMS 256-BIT ENCRYPTED
+            </div>
+          </div>
+        </div>
+
+        <!-- Right: Luxury Auth Form -->
+        <div class="auth-form-pane">
+          <h3 style="font-size: 1.5rem; margin-bottom: 6px;">Sign In</h3>
+          <p style="font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 24px;">
+            Don't have an emergency passport? <a href="#/signup" data-route="/signup" style="color: var(--gold); font-weight: 600; text-decoration: none;">Create one now</a>
+          </p>
+
           <form id="loginForm" class="auth-form">
-            <div class="form-field">
-              <label for="loginEmail">Email Address or Username</label>
-              <input type="text" id="loginEmail" required placeholder="elena@rescue.io" value="elena@rescue.io" />
+            <div class="editorial-field">
+              <label for="loginEmail" class="editorial-label">Email Address or Username</label>
+              <input type="text" id="loginEmail" class="editorial-input" required placeholder="elena@rescue.io" value="elena@rescue.io" autocomplete="username" />
             </div>
 
-            <div class="form-field">
-              <div class="field-label-row">
-                <label for="loginPassword">Password</label>
-                <a href="#/forgot-password" class="forgot-link" data-route="/forgot-password">Forgot password?</a>
+            <div class="editorial-field">
+              <div style="display: flex; justify-content: space-between; align-items: center;">
+                <label for="loginPassword" class="editorial-label">Password</label>
+                <a href="#/forgot-password" data-route="/forgot-password" style="font-size: 0.75rem; color: var(--text-secondary); text-decoration: none;">Forgot password?</a>
               </div>
-              <div class="password-input-wrap">
-                <input type="password" id="loginPassword" required placeholder="••••••••" value="password123" />
-                <button type="button" class="btn-toggle-pw" id="togglePasswordBtn" title="Show/Hide Password">👁️</button>
+              <div style="position: relative;">
+                <input type="password" id="loginPassword" class="editorial-input" required placeholder="••••••••" value="password123" autocomplete="current-password" />
+                <button type="button" id="togglePasswordBtn" class="btn btn-icon-only" style="position: absolute; right: 8px; top: 50%; transform: translateY(-50%); background: transparent; border: none; cursor: pointer; color: var(--text-secondary);" title="Toggle Password">
+                  <span class="icon-wrap">${UI.icons.eye}</span>
+                </button>
               </div>
             </div>
 
-            <div class="remember-row">
-              <label class="checkbox-label">
-                <input type="checkbox" id="rememberMe" checked />
-                <span>Remember me on this device</span>
-              </label>
+            <div style="display: flex; align-items: center; gap: 8px; font-size: 0.82rem; color: var(--text-secondary);">
+              <input type="checkbox" id="rememberMe" checked style="accent-color: var(--gold);" />
+              <label for="rememberMe">Remember me on this trusted terminal</label>
             </div>
 
             <button type="submit" class="btn btn-primary btn-block btn-lg" id="submitLoginBtn">
-              <span class="btn-text">Sign In to Passport</span>
+              <span>Sign In to Passport</span>
               <span class="btn-spinner hidden"></span>
             </button>
 
-            <div class="auth-divider">
-              <span>OR</span>
+            <div style="display: flex; align-items: center; gap: 12px; margin: 10px 0;">
+              <div style="flex: 1; height: 1px; background: var(--border);"></div>
+              <span style="font-size: 0.72rem; color: var(--text-muted); font-family: var(--font-mono);">OR</span>
+              <div style="flex: 1; height: 1px; background: var(--border);"></div>
             </div>
 
-            <button type="button" class="btn btn-outline btn-block btn-google" id="googleLoginBtn">
-              <svg viewBox="0 0 24 24" width="18" height="18"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z"/><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z"/></svg>
+            <button type="button" class="btn btn-outline btn-block" id="googleLoginBtn">
               <span>Continue with Google</span>
             </button>
           </form>
-
-          <div class="auth-footer">
-            <span>Don't have an Emergency Passport?</span>
-            <a href="#/signup" class="signup-link" data-route="/signup">Create Account</a>
-          </div>
         </div>
       </div>
     `;
   },
 
   // ===========================================================================
-  // 3. AUTHENTICATION: SIGNUP
+  // 3. AUTHENTICATION: SIGNUP (Clean Multi-Step Identity Registration)
   // ===========================================================================
   renderSignup() {
     return `
-      <div class="auth-page-container">
-        <div class="auth-card glass-card">
-          <div class="auth-header">
-            <div class="auth-brand-icon">💳</div>
-            <h2 class="auth-title">Create Emergency Passport</h2>
-            <p class="auth-subtitle">Set up your borderless life-saving medical identity</p>
+      <div class="auth-editorial-viewport">
+        <div class="auth-visual-pane">
+          <div>
+            <div class="brand-crest-icon" style="margin-bottom: 24px;">
+              <span class="crest-star">✦</span>
+            </div>
+            <h2 class="editorial-display" style="font-size: 2.4rem; margin-bottom: 12px;">
+              Your lifeline<br><span class="editorial-italic">starts here.</span>
+            </h2>
+            <p style="font-size: 0.92rem; color: var(--text-secondary); line-height: 1.6;">
+              Create your universal medical identity in minutes. Accessible by first responders anywhere on Earth in under 800 milliseconds.
+            </p>
           </div>
 
+          <div class="auth-visual-footer">
+            <div style="font-family: var(--font-mono); font-size: 0.7rem; color: var(--gold);">
+              ✦ ZERO UNNECESSARY EXPOSURE • HIPAA COMPLIANT
+            </div>
+          </div>
+        </div>
+
+        <div class="auth-form-pane">
+          <h3 style="font-size: 1.5rem; margin-bottom: 6px;">Create Passport</h3>
+          <p style="font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 24px;">
+            Already have an account? <a href="#/login" data-route="/login" style="color: var(--gold); font-weight: 600; text-decoration: none;">Sign in</a>
+          </p>
+
           <form id="signupForm" class="auth-form">
-            <div class="form-field">
-              <label for="signupName">Full Legal Name *</label>
-              <input type="text" id="signupName" required placeholder="Elena Rostova" />
+            <div class="editorial-field">
+              <label for="signupName" class="editorial-label">Full Name</label>
+              <input type="text" id="signupName" class="editorial-input" required placeholder="Elena Rostova" />
             </div>
 
-            <div class="form-field">
-              <label for="signupEmail">Email Address *</label>
-              <input type="email" id="signupEmail" required placeholder="elena@example.com" />
+            <div class="editorial-field">
+              <label for="signupEmail" class="editorial-label">Email Address</label>
+              <input type="email" id="signupEmail" class="editorial-input" required placeholder="elena@rescue.io" />
             </div>
 
-            <div class="form-row">
-              <div class="form-field col-6">
-                <label for="signupPassword">Password *</label>
-                <input type="password" id="signupPassword" required minlength="8" placeholder="••••••••" />
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 14px;">
+              <div class="editorial-field">
+                <label for="signupPassword" class="editorial-label">Password</label>
+                <input type="password" id="signupPassword" class="editorial-input" required placeholder="••••••••" />
               </div>
-              <div class="form-field col-6">
-                <label for="signupConfirmPassword">Confirm Password *</label>
-                <input type="password" id="signupConfirmPassword" required minlength="8" placeholder="••••••••" />
-              </div>
-            </div>
-
-            <div class="form-row">
-              <div class="form-field col-6">
-                <label for="signupDob">Date of Birth *</label>
-                <input type="date" id="signupDob" required value="1997-04-12" />
-              </div>
-              <div class="form-field col-6">
-                <label for="signupCountry">Country of Residence *</label>
-                <input type="text" id="signupCountry" required placeholder="United States" />
+              <div class="editorial-field">
+                <label for="signupConfirmPassword" class="editorial-label">Confirm Password</label>
+                <input type="password" id="signupConfirmPassword" class="editorial-input" required placeholder="••••••••" />
               </div>
             </div>
 
-            <div class="form-row">
-              <div class="form-field col-6">
-                <label for="signupLang">Preferred Language</label>
-                <input type="text" id="signupLang" placeholder="English, Spanish, Hindi..." />
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 14px;">
+              <div class="editorial-field">
+                <label for="signupDob" class="editorial-label">Date of Birth</label>
+                <input type="date" id="signupDob" class="editorial-input" required value="1995-04-12" />
               </div>
-              <div class="form-field col-6">
-                <label for="signupContact">Primary Emergency Phone</label>
-                <input type="tel" id="signupContact" placeholder="+1-555-0199" />
+              <div class="editorial-field">
+                <label for="signupCountry" class="editorial-label">Nationality</label>
+                <input type="text" id="signupCountry" class="editorial-input" required placeholder="International" />
               </div>
             </div>
 
-            <div class="terms-row">
-              <label class="checkbox-label">
-                <input type="checkbox" id="signupTerms" required checked />
-                <span>I agree to the Terms of Medical Data Protection & Emergency Access.</span>
-              </label>
+            <div class="editorial-field">
+              <label for="signupContact" class="editorial-label">Primary Emergency Contact</label>
+              <input type="text" id="signupContact" class="editorial-input" required placeholder="Mark Rostova (+1-555-019-2834)" />
+            </div>
+
+            <div style="display: flex; align-items: flex-start; gap: 8px; font-size: 0.78rem; color: var(--text-secondary);">
+              <input type="checkbox" id="signupTerms" required checked style="margin-top: 3px; accent-color: var(--gold);" />
+              <label for="signupTerms">I accept the Emergency Passport terms and authorize zero-login emergency responder access to my clinical contraindications.</label>
             </div>
 
             <button type="submit" class="btn btn-primary btn-block btn-lg" id="submitSignupBtn">
-              <span class="btn-text">Create Account & Start Onboarding</span>
+              <span>Create Account & Continue</span>
               <span class="btn-spinner hidden"></span>
             </button>
           </form>
-
-          <div class="auth-footer">
-            <span>Already have an account?</span>
-            <a href="#/login" class="signup-link" data-route="/login">Sign In</a>
-          </div>
         </div>
       </div>
     `;
   },
 
   // ===========================================================================
-  // 4. FORGOT & RESET PASSWORD
+  // 4. AUTHENTICATION: FORGOT & RESET PASSWORD
   // ===========================================================================
   renderForgotPassword() {
     return `
-      <div class="auth-page-container">
-        <div class="auth-card glass-card">
-          <div class="auth-header">
-            <div class="auth-brand-icon">🔑</div>
-            <h2 class="auth-title">Reset Password</h2>
-            <p class="auth-subtitle">Enter your registered email and we'll send recovery instructions.</p>
+      <div class="auth-editorial-viewport" style="max-width: 600px; grid-template-columns: 1fr;">
+        <div class="auth-form-pane">
+          <div class="brand-crest-icon" style="margin-bottom: 20px;">
+            <span class="crest-star">✦</span>
           </div>
+          <h2 style="font-size: 1.6rem; margin-bottom: 6px;">Reset Password</h2>
+          <p style="font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 24px;">
+            Enter your registered email address to receive an emergency password reset link.
+          </p>
 
           <form id="forgotForm" class="auth-form">
-            <div class="form-field">
-              <label for="forgotEmail">Email Address</label>
-              <input type="email" id="forgotEmail" required placeholder="elena@rescue.io" />
+            <div class="editorial-field">
+              <label for="forgotEmail" class="editorial-label">Email Address</label>
+              <input type="email" id="forgotEmail" class="editorial-input" required placeholder="elena@rescue.io" value="elena@rescue.io" />
             </div>
 
-            <button type="submit" class="btn btn-primary btn-block" id="submitForgotBtn">
-              Send Password Reset Link
+            <button type="submit" class="btn btn-primary btn-block btn-lg">
+              <span>Send Recovery Link</span>
             </button>
-          </form>
 
-          <div class="auth-footer">
-            <a href="#/login" class="signup-link" data-route="/login">← Back to Sign In</a>
-          </div>
+            <a href="#/login" data-route="/login" class="btn btn-ghost btn-block" style="margin-top: 8px;">
+              <span>← Back to Sign In</span>
+            </a>
+          </form>
         </div>
       </div>
     `;
@@ -276,27 +351,29 @@ const Views = {
 
   renderResetPassword() {
     return `
-      <div class="auth-page-container">
-        <div class="auth-card glass-card">
-          <div class="auth-header">
-            <div class="auth-brand-icon">🔐</div>
-            <h2 class="auth-title">Set New Password</h2>
-            <p class="auth-subtitle">Create a secure password for your Emergency Passport.</p>
+      <div class="auth-editorial-viewport" style="max-width: 600px; grid-template-columns: 1fr;">
+        <div class="auth-form-pane">
+          <div class="brand-crest-icon" style="margin-bottom: 20px;">
+            <span class="crest-star">✦</span>
           </div>
+          <h2 style="font-size: 1.6rem; margin-bottom: 6px;">Create New Password</h2>
+          <p style="font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 24px;">
+            Choose a strong passphrase to protect your clinical records.
+          </p>
 
           <form id="resetForm" class="auth-form">
-            <div class="form-field">
-              <label for="newPassword">New Password</label>
-              <input type="password" id="newPassword" required minlength="8" placeholder="••••••••" />
+            <div class="editorial-field">
+              <label for="newPassword" class="editorial-label">New Password</label>
+              <input type="password" id="newPassword" class="editorial-input" required placeholder="••••••••" />
             </div>
 
-            <div class="form-field">
-              <label for="confirmNewPassword">Confirm New Password</label>
-              <input type="password" id="confirmNewPassword" required minlength="8" placeholder="••••••••" />
+            <div class="editorial-field">
+              <label for="confirmNewPassword" class="editorial-label">Confirm New Password</label>
+              <input type="password" id="confirmNewPassword" class="editorial-input" required placeholder="••••••••" />
             </div>
 
-            <button type="submit" class="btn btn-primary btn-block">
-              Update Password
+            <button type="submit" class="btn btn-primary btn-block btn-lg">
+              <span>Update Password</span>
             </button>
           </form>
         </div>
@@ -305,604 +382,417 @@ const Views = {
   },
 
   // ===========================================================================
-  // 5. ONBOARDING WIZARD (4 STEPS)
+  // 5. USER ONBOARDING WIZARD (4 Guided Steps)
   // ===========================================================================
   renderOnboarding(user, passport) {
     return `
-      <div class="onboarding-page-container">
-        <div class="onboarding-card glass-card">
-          <!-- Step Progress Indicator -->
-          <div class="onboarding-progress-bar">
-            <div class="step-indicator active" id="stepIndicator1">
-              <span class="indicator-num">1</span>
-              <span class="indicator-label">Identity</span>
+      <div class="triage-workflow-viewport">
+        <div class="triage-progress-bar glass-card">
+          <div class="progress-step-node active" id="stepIndicator1">
+            <span class="node-number">1</span>
+            <span>Identity</span>
+          </div>
+          <div class="progress-step-node" id="stepIndicator2">
+            <span class="node-number">2</span>
+            <span>Clinical Info</span>
+          </div>
+          <div class="progress-step-node" id="stepIndicator3">
+            <span class="node-number">3</span>
+            <span>Contacts</span>
+          </div>
+          <div class="progress-step-node" id="stepIndicator4">
+            <span class="node-number">4</span>
+            <span>Privacy</span>
+          </div>
+        </div>
+
+        <form id="onboardingForm">
+          <!-- Step 1: Identity -->
+          <div class="triage-step-card glass-card" id="wizardStep1">
+            <div>
+              <span class="story-eyebrow">STEP 01 OF 04</span>
+              <h2 style="font-size: 1.8rem; margin-bottom: 8px;">Basic Identity</h2>
+              <p style="font-size: 0.9rem; color: var(--text-secondary);">Verify your name and international document details.</p>
+
+              <div class="auth-form" style="margin-top: 24px;">
+                <div class="editorial-field">
+                  <label class="editorial-label">Full Name</label>
+                  <input type="text" id="obName" class="editorial-input" value="${user?.name || 'Elena Rostova'}" required />
+                </div>
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 14px;">
+                  <div class="editorial-field">
+                    <label class="editorial-label">Nationality</label>
+                    <input type="text" id="obNationality" class="editorial-input" value="${user?.country || 'International Traveler'}" required />
+                  </div>
+                  <div class="editorial-field">
+                    <label class="editorial-label">Preferred Language</label>
+                    <input type="text" id="obLanguage" class="editorial-input" value="${user?.language || 'English, Russian'}" required />
+                  </div>
+                </div>
+              </div>
             </div>
-            <div class="step-line" id="stepLine1"></div>
-            <div class="step-indicator" id="stepIndicator2">
-              <span class="indicator-num">2</span>
-              <span class="indicator-label">Medical</span>
-            </div>
-            <div class="step-line" id="stepLine2"></div>
-            <div class="step-indicator" id="stepIndicator3">
-              <span class="indicator-num">3</span>
-              <span class="indicator-label">Contacts</span>
-            </div>
-            <div class="step-line" id="stepLine3"></div>
-            <div class="step-indicator" id="stepIndicator4">
-              <span class="indicator-num">4</span>
-              <span class="indicator-label">Privacy</span>
+
+            <div style="display: flex; justify-content: flex-end; margin-top: 32px;">
+              <button type="button" class="btn btn-primary next-step-btn" data-next="2">
+                <span>Continue to Clinical Info</span>
+                <span class="btn-icon">${UI.icons.arrowRight}</span>
+              </button>
             </div>
           </div>
 
-          <!-- Wizard Content Area -->
-          <form id="onboardingForm" class="onboarding-form-content">
-            <!-- STEP 1: Basic Identity -->
-            <div class="wizard-step" id="wizardStep1">
-              <h2 class="step-heading">Step 1: Traveler Identity</h2>
-              <p class="step-subheading">Verify your legal traveler profile as it appears on official travel documents.</p>
+          <!-- Step 2: Clinical -->
+          <div class="triage-step-card glass-card hidden" id="wizardStep2">
+            <div>
+              <span class="story-eyebrow">STEP 02 OF 04</span>
+              <h2 style="font-size: 1.8rem; margin-bottom: 8px;">Clinical Emergency Data</h2>
+              <p style="font-size: 0.9rem; color: var(--text-secondary);">Crucial medical data accessed by paramedics during golden hour trauma.</p>
 
-              <div class="form-field">
-                <label for="obName">Full Legal Name *</label>
-                <input type="text" id="obName" required value="${user?.name || ''}" />
-              </div>
-
-              <div class="form-row">
-                <div class="form-field col-6">
-                  <label for="obDob">Date of Birth</label>
-                  <input type="date" id="obDob" value="${user?.dob || '1997-04-12'}" />
-                </div>
-                <div class="form-field col-6">
-                  <label for="obNationality">Nationality</label>
-                  <input type="text" id="obNationality" value="${user?.country || 'United States'}" />
-                </div>
-              </div>
-
-              <div class="form-field">
-                <label for="obLanguage">Primary Spoken Languages</label>
-                <input type="text" id="obLanguage" value="${user?.language || 'English, Russian'}" placeholder="English, Spanish, Hindi..." />
-              </div>
-
-              <div class="wizard-actions">
-                <div></div>
-                <button type="button" class="btn btn-primary next-step-btn" data-next="2">
-                  Continue to Medical Info →
-                </button>
-              </div>
-            </div>
-
-            <!-- STEP 2: Emergency Medical Info -->
-            <div class="wizard-step hidden" id="wizardStep2">
-              <h2 class="step-heading">Step 2: Emergency Medical Details</h2>
-              <p class="step-subheading">Critical clinical facts needed by first responders during the Golden Hour.</p>
-
-              <div class="form-row">
-                <div class="form-field col-6">
-                  <label for="obBloodGroup">Verified Blood Group *</label>
-                  <select id="obBloodGroup" required>
-                    <option value="O+" selected>O+ (Positive)</option>
-                    <option value="O-">O- (Negative)</option>
-                    <option value="A+">A+ (Positive)</option>
-                    <option value="A-">A- (Negative)</option>
-                    <option value="B+">B+ (Positive)</option>
-                    <option value="B-">B- (Negative)</option>
-                    <option value="AB+">AB+ (Positive)</option>
-                    <option value="AB-">AB- (Negative)</option>
-                    <option value="Unknown">Unknown</option>
+              <div class="auth-form" style="margin-top: 24px;">
+                <div class="editorial-field">
+                  <label class="editorial-label">Blood Group & Rh Factor</label>
+                  <select id="obBloodGroup" class="editorial-input" style="cursor: pointer;">
+                    <option value="O+" selected>O+ (Rh Positive)</option>
+                    <option value="O-">O- (Universal Donor)</option>
+                    <option value="A+">A+ (Rh Positive)</option>
+                    <option value="A-">A- (Rh Negative)</option>
+                    <option value="B+">B+ (Rh Positive)</option>
+                    <option value="B-">B- (Rh Negative)</option>
+                    <option value="AB+">AB+ (Universal Recipient)</option>
+                    <option value="AB-">AB- (Rh Negative)</option>
                   </select>
                 </div>
-                <div class="form-field col-6">
-                  <label for="obAllergies">Fatal & Severe Drug Allergies *</label>
-                  <input type="text" id="obAllergies" placeholder="e.g. Penicillin, Peanuts, Latex" value="${(passport?.allergies || []).join(', ')}" />
+
+                <div class="editorial-field">
+                  <label class="editorial-label" style="color: var(--emergency);">Critical Drug Allergies & Anaphylaxis Risks (Comma-separated)</label>
+                  <input type="text" id="obAllergies" class="editorial-input" value="Penicillin, Peanuts" placeholder="e.g. Penicillin, Latex, Sulfa" />
                 </div>
-              </div>
 
-              <div class="form-field">
-                <label for="obConditions">Pre-existing Medical Conditions</label>
-                <input type="text" id="obConditions" placeholder="e.g. Asthma, Type 1 Diabetes, Cardiac Arrhythmia" value="${(passport?.conditions || []).join(', ')}" />
-              </div>
+                <div class="editorial-field">
+                  <label class="editorial-label">Chronic Conditions (Comma-separated)</label>
+                  <input type="text" id="obConditions" class="editorial-input" value="Asthma, Mild Hypertension" placeholder="e.g. Asthma, Diabetes Type 1" />
+                </div>
 
-              <div class="form-field">
-                <label for="obMedications">Current Prescription Medications</label>
-                <input type="text" id="obMedications" placeholder="e.g. Albuterol Inhaler, Insulin, Lisinopril" value="${(passport?.medications || []).join(', ')}" />
-              </div>
-
-              <div class="form-field">
-                <label for="obNotes">Emergency Responder Rescue Instructions</label>
-                <textarea id="obNotes" rows="2" placeholder="e.g. Carries inhaler in right coat pocket. Insulin pump on abdomen.">${passport?.emergencyNotes || ''}</textarea>
-              </div>
-
-              <div class="wizard-actions">
-                <button type="button" class="btn btn-ghost prev-step-btn" data-prev="1">← Back</button>
-                <button type="button" class="btn btn-primary next-step-btn" data-next="3">Continue to Contacts →</button>
+                <div class="editorial-field">
+                  <label class="editorial-label">Current Medications</label>
+                  <input type="text" id="obMedications" class="editorial-input" value="Albuterol HFA Inhaler, Lisinopril 10mg" />
+                </div>
               </div>
             </div>
 
-            <!-- STEP 3: Emergency Contacts -->
-            <div class="wizard-step hidden" id="wizardStep3">
-              <h2 class="step-heading">Step 3: Family Emergency Contacts</h2>
-              <p class="step-subheading">Who should paramedics call when emergency care begins?</p>
+            <div style="display: flex; justify-content: space-between; margin-top: 32px;">
+              <button type="button" class="btn btn-outline prev-step-btn" data-prev="1">Back</button>
+              <button type="button" class="btn btn-primary next-step-btn" data-next="3">Continue to Contacts</button>
+            </div>
+          </div>
 
-              <div id="obContactsContainer" class="ob-contacts-list">
-                <div class="contact-entry-card glass-card">
-                  <div class="form-row">
-                    <div class="form-field col-4">
-                      <label>Contact Name</label>
-                      <input type="text" class="contact-input-name" placeholder="Mark Rostova" value="Mark Rostova" required />
-                    </div>
-                    <div class="form-field col-4">
-                      <label>Relationship</label>
-                      <input type="text" class="contact-input-rel" placeholder="Spouse" value="Spouse" required />
-                    </div>
-                    <div class="form-field col-4">
-                      <label>Phone Number</label>
-                      <input type="tel" class="contact-input-phone" placeholder="+1-555-0199" value="+1-555-0199" required />
-                    </div>
+          <!-- Step 3: Emergency Contacts -->
+          <div class="triage-step-card glass-card hidden" id="wizardStep3">
+            <div>
+              <span class="story-eyebrow">STEP 03 OF 04</span>
+              <h2 style="font-size: 1.8rem; margin-bottom: 8px;">Emergency Family Contacts</h2>
+              <p style="font-size: 0.9rem; color: var(--text-secondary);">Direct phone contacts for immediate hospital notification.</p>
+
+              <div id="obContactsContainer" style="display: flex; flex-direction: column; gap: 12px; margin-top: 24px;">
+                <div class="contact-entry-card glass-card" style="padding: 16px;">
+                  <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px;">
+                    <input type="text" class="contact-input-name editorial-input" placeholder="Contact Name" value="Mark Rostova" required />
+                    <input type="text" class="contact-input-rel editorial-input" placeholder="Relationship" value="Spouse" required />
+                    <input type="tel" class="contact-input-phone editorial-input" placeholder="Phone Number" value="+1 (555) 019-2834" required />
                   </div>
                 </div>
               </div>
 
-              <button type="button" class="btn btn-outline btn-sm" id="obAddContactBtn" style="margin-top: 12px;">
-                + Add Another Emergency Contact
+              <button type="button" class="btn btn-sm btn-outline" id="obAddContactBtn" style="margin-top: 14px;">
+                <span class="btn-icon">${UI.icons.plus}</span>
+                <span>Add Another Contact</span>
               </button>
+            </div>
 
-              <div class="wizard-actions">
-                <button type="button" class="btn btn-ghost prev-step-btn" data-prev="2">← Back</button>
-                <button type="button" class="btn btn-primary next-step-btn" data-next="4">Continue to Privacy →</button>
+            <div style="display: flex; justify-content: space-between; margin-top: 32px;">
+              <button type="button" class="btn btn-outline prev-step-btn" data-prev="2">Back</button>
+              <button type="button" class="btn btn-primary next-step-btn" data-next="4">Continue to Privacy</button>
+            </div>
+          </div>
+
+          <!-- Step 4: Privacy Settings -->
+          <div class="triage-step-card glass-card hidden" id="wizardStep4">
+            <div>
+              <span class="story-eyebrow">STEP 04 OF 04</span>
+              <h2 style="font-size: 1.8rem; margin-bottom: 8px;">Privacy & Emergency Sharing</h2>
+              <p style="font-size: 0.9rem; color: var(--text-secondary);">Control exactly which fields are visible when your QR code is scanned.</p>
+
+              <div style="display: flex; flex-direction: column; gap: 14px; margin-top: 24px;">
+                <label style="display: flex; align-items: center; gap: 10px; font-size: 0.88rem; cursor: pointer;">
+                  <input type="checkbox" id="privBlood" checked style="accent-color: var(--gold);" />
+                  <span>Share Blood Group & Rh Factor</span>
+                </label>
+                <label style="display: flex; align-items: center; gap: 10px; font-size: 0.88rem; cursor: pointer;">
+                  <input type="checkbox" id="privAllergies" checked style="accent-color: var(--emergency);" />
+                  <span>Share Fatal Drug Allergies (Recommended for golden hour safety)</span>
+                </label>
+                <label style="display: flex; align-items: center; gap: 10px; font-size: 0.88rem; cursor: pointer;">
+                  <input type="checkbox" id="privConditions" checked style="accent-color: var(--gold);" />
+                  <span>Share Chronic Medical Diagnoses</span>
+                </label>
+                <label style="display: flex; align-items: center; gap: 10px; font-size: 0.88rem; cursor: pointer;">
+                  <input type="checkbox" id="privContacts" checked style="accent-color: var(--medical);" />
+                  <span>Share Emergency Family Phone Numbers</span>
+                </label>
               </div>
             </div>
 
-            <!-- STEP 4: Privacy Settings -->
-            <div class="wizard-step hidden" id="wizardStep4">
-              <h2 class="step-heading">Step 4: Privacy & Emergency Sharing</h2>
-              <p class="step-subheading">Control exactly what first responders can see upon scanning your Emergency Passport QR code.</p>
-
-              <div class="privacy-explainer-box glass-card">
-                <div class="privacy-alert-title">🛡️ Emergency Responder Access Policy</div>
-                <p>When an emergency worker scans your physical or digital QR code, they receive read-only clinical access. No banking, location history, or financial data is ever shared.</p>
-              </div>
-
-              <div class="privacy-toggle-list">
-                <label class="privacy-switch-item">
-                  <input type="checkbox" id="privBlood" checked />
-                  <div>
-                    <strong>Share Blood Group & Rh Factor</strong>
-                    <p>Enables instant blood transfusions without testing delays.</p>
-                  </div>
-                </label>
-
-                <label class="privacy-switch-item">
-                  <input type="checkbox" id="privAllergies" checked />
-                  <div>
-                    <strong>Share Severe Allergies</strong>
-                    <p>Alerts paramedics against fatal antibiotic and drug contraindications.</p>
-                  </div>
-                </label>
-
-                <label class="privacy-switch-item">
-                  <input type="checkbox" id="privConditions" checked />
-                  <div>
-                    <strong>Share Chronic Conditions</strong>
-                    <p>Informs hospital triage for specialized department matching (ICU, Cardiology).</p>
-                  </div>
-                </label>
-
-                <label class="privacy-switch-item">
-                  <input type="checkbox" id="privContacts" checked />
-                  <div>
-                    <strong>Share Emergency Contacts</strong>
-                    <p>Allows first responders to notify family with a single tap.</p>
-                  </div>
-                </label>
-              </div>
-
-              <div class="wizard-actions">
-                <button type="button" class="btn btn-ghost prev-step-btn" data-prev="3">← Back</button>
-                <button type="submit" class="btn btn-primary btn-lg" id="finishOnboardingBtn">
-                  🚀 Your Emergency Passport is Ready → Complete Setup
-                </button>
-              </div>
+            <div style="display: flex; justify-content: space-between; margin-top: 32px;">
+              <button type="button" class="btn btn-outline prev-step-btn" data-prev="3">Back</button>
+              <button type="submit" class="btn btn-primary btn-lg" id="finishOnboardingBtn">
+                <span class="crest-star">✦</span>
+                <span>Generate Emergency Passport</span>
+              </button>
             </div>
-          </form>
-        </div>
+          </div>
+        </form>
       </div>
     `;
   },
 
   // ===========================================================================
-  // 6. AUTHENTICATED DASHBOARD (/dashboard)
+  // 6. AUTHENTICATED DASHBOARD (Personal Command Center)
   // ===========================================================================
   renderDashboard(user, passport) {
-    const blood = passport?.bloodGroup || 'O+';
-    const allergies = passport?.allergies || ['None Reported'];
-    const conditions = passport?.conditions || ['None Reported'];
-    const medications = passport?.medications || [];
-    const contacts = passport?.emergencyContacts || [];
+    const p = passport || {};
+    const u = user || {};
 
     return `
-      <div class="dashboard-wrapper">
-        <!-- WELCOME CARD -->
-        <section class="welcome-banner glass-card">
-          <div class="welcome-text-group">
-            <h1 class="welcome-title">Good evening, ${user?.name || 'Traveler'}.</h1>
-            <p class="welcome-status-line">
-              <span class="status-pulse-dot"></span>
-              Your Emergency Passport <strong>${user?.passportId || 'T-1001'}</strong> is active and protected.
-            </p>
+      <div class="dashboard-page-wrap">
+        
+        <!-- Salutation Header -->
+        <header class="dashboard-hero-header">
+          <div>
+            <span class="story-eyebrow">PERSONAL EMERGENCY COMMAND CENTER</span>
+            <h1 class="dash-salutation">Good evening, ${(u.name || 'Elena').split(' ')[0]}.</h1>
+            <p class="dash-subtitle">Your Emergency Passport is verified and active across all global trauma networks.</p>
           </div>
-          <div class="welcome-actions">
-            <a href="#/qr" class="btn btn-primary btn-sm" data-route="/qr">
-              📲 View Emergency QR
+
+          <div class="dash-hero-actions">
+            <a href="#/passport" class="btn btn-sm btn-outline" data-route="/passport">
+              <span class="btn-icon">${UI.icons.fileText}</span>
+              <span>View Passport</span>
             </a>
-            <a href="#/passport" class="btn btn-outline btn-sm" data-route="/passport">
-              💳 Open Medical Passport
+            <a href="#/qr" class="btn btn-sm btn-primary" data-route="/qr">
+              <span class="btn-icon">${UI.icons.qrCode}</span>
+              <span>Emergency QR</span>
             </a>
           </div>
-        </section>
+        </header>
 
-        <!-- STATUS & MEDICAL SUMMARY GRID -->
-        <section class="dashboard-grid">
-          <!-- Passport Status Card -->
-          <div class="dash-card glass-card">
-            <div class="dash-card-header">
-              <span class="dash-card-title">PASSPORT STATUS</span>
-              ${UI.renderStatusBadge('VERIFIED / ACTIVE', true)}
+        <!-- Asymmetrical Core Grid -->
+        <div class="dashboard-core-grid">
+          
+          <!-- Left Main: Central Digital Passport Document -->
+          <div class="dashboard-main-col">
+            ${UI.renderPassportDocument(p, u)}
+
+            <!-- Quick Action Strip -->
+            <div class="quick-action-strip">
+              <a href="#/passport" class="quick-action-pill-card" data-route="/passport">
+                <div class="action-icon-box">${UI.icons.fileText}</div>
+                <div class="action-label-box">
+                  <span class="action-primary-label">Digital Passport</span>
+                  <span class="action-sub-label">Full Clinical Card</span>
+                </div>
+              </a>
+
+              <a href="#/qr" class="quick-action-pill-card" data-route="/qr">
+                <div class="action-icon-box">${UI.icons.qrCode}</div>
+                <div class="action-label-box">
+                  <span class="action-primary-label">Emergency QR</span>
+                  <span class="action-sub-label">Zero-Login Token</span>
+                </div>
+              </a>
+
+              <a href="#/hospitals" class="quick-action-pill-card" data-route="/hospitals">
+                <div class="action-icon-box">${UI.icons.hospital}</div>
+                <div class="action-label-box">
+                  <span class="action-primary-label">Trauma Facilities</span>
+                  <span class="action-sub-label">Map & Bed Inventory</span>
+                </div>
+              </a>
+
+              <a href="#/triage" class="quick-action-pill-card" data-route="/triage">
+                <div class="action-icon-box">${UI.icons.heartPulse}</div>
+                <div class="action-label-box">
+                  <span class="action-primary-label">Triage Workflow</span>
+                  <span class="action-sub-label">Field AI Briefing</span>
+                </div>
+              </a>
+            </div>
+          </div>
+
+          <!-- Right Side: Readiness Score & Audit Activity -->
+          <div class="dashboard-side-col">
+            
+            <!-- Circular Emergency Readiness Gauge -->
+            <div class="readiness-summary-card glass-card">
+              ${UI.renderReadinessGauge(96)}
+              <div class="readiness-details-col">
+                <span class="readiness-title">Emergency Readiness</span>
+                
+                <div>
+                  <div class="readiness-metric-row">
+                    <span>Identity Verification</span>
+                    <span>100%</span>
+                  </div>
+                  <div class="metric-bar-track"><div class="metric-bar-fill" style="width: 100%;"></div></div>
+                </div>
+
+                <div>
+                  <div class="readiness-metric-row">
+                    <span>Clinical Records</span>
+                    <span>100%</span>
+                  </div>
+                  <div class="metric-bar-track"><div class="metric-bar-fill" style="width: 100%;"></div></div>
+                </div>
+
+                <div>
+                  <div class="readiness-metric-row">
+                    <span>Family Contacts</span>
+                    <span>80%</span>
+                  </div>
+                  <div class="metric-bar-track"><div class="metric-bar-fill" style="width: 80%;"></div></div>
+                </div>
+              </div>
             </div>
 
-            <div class="passport-summary-body">
-              <div class="summary-blood-highlight">
-                <span class="blood-label">BLOOD GROUP</span>
-                <span class="blood-value">${blood}</span>
+            <!-- Recent Verified Activity -->
+            <div class="activity-card glass-card">
+              <div class="activity-card-header">
+                <h4 style="font-size: 0.95rem;">Recent Telemetry</h4>
+                <span class="editorial-status-pill verified">ACTIVE</span>
               </div>
 
-              <div class="summary-list-group">
-                <div class="summary-line">
-                  <span class="line-label">Critical Allergies:</span>
-                  <div class="tags-group">
-                    ${allergies.map(a => `<span class="allergy-tag-pill">⛔ ${a}</span>`).join('')}
+              <div class="activity-timeline-list">
+                <div class="activity-item-row">
+                  <span class="timeline-bullet"></span>
+                  <div class="activity-text-wrap">
+                    <span class="activity-main-text">Clinical passport verified & encrypted</span>
+                    <span class="activity-time-stamp">AWS KMS Envelope • Today</span>
                   </div>
                 </div>
 
-                <div class="summary-line">
-                  <span class="line-label">Conditions:</span>
-                  <div class="tags-group">
-                    ${conditions.map(c => `<span class="condition-tag-pill">${c}</span>`).join('')}
+                <div class="activity-item-row">
+                  <span class="timeline-bullet"></span>
+                  <div class="activity-text-wrap">
+                    <span class="activity-main-text">Emergency contacts synchronized</span>
+                    <span class="activity-time-stamp">2 Primary Numbers • Yesterday</span>
                   </div>
                 </div>
 
-                ${medications.length > 0 ? `
-                  <div class="summary-line">
-                    <span class="line-label">Medications:</span>
-                    <span class="meds-text">${medications.join(', ')}</span>
+                <div class="activity-item-row">
+                  <span class="timeline-bullet"></span>
+                  <div class="activity-text-wrap">
+                    <span class="activity-main-text">Regional trauma centers mapped</span>
+                    <span class="activity-time-stamp">4 Facilities • Tokyo Metro Area</span>
                   </div>
-                ` : ''}
-              </div>
-            </div>
-
-            <div class="dash-card-footer">
-              <span class="last-checked">Last Verified: ${passport?.lastVerified ? passport.lastVerified.split('T')[0] : 'Today'}</span>
-              <a href="#/passport/edit" class="edit-link" data-route="/passport/edit">Edit Information →</a>
-            </div>
-          </div>
-
-          <!-- Emergency Contacts Quick Card -->
-          <div class="dash-card glass-card">
-            <div class="dash-card-header">
-              <span class="dash-card-title">PRIMARY EMERGENCY CONTACTS</span>
-              <a href="#/emergency-contacts" class="btn btn-xs btn-ghost" data-route="/emergency-contacts">Manage All</a>
-            </div>
-
-            <div class="dash-contacts-list">
-              ${contacts.slice(0, 3).map(c => UI.renderContactCard(c, false)).join('')}
-            </div>
-
-            <div class="dash-card-footer">
-              <span>First responders can call family with 1-tap</span>
-              <a href="#/emergency-contacts" class="edit-link" data-route="/emergency-contacts">+ Add Contact</a>
-            </div>
-          </div>
-        </section>
-
-        <!-- QUICK ACTIONS GRID -->
-        <section class="quick-actions-section">
-          <h3 class="section-subheading">QUICK ACTIONS</h3>
-          <div class="quick-actions-grid">
-            ${UI.renderQuickAction('💳', 'Open Medical Passport', 'View your emergency card formatted for responders', '/passport')}
-            ${UI.renderQuickAction('📲', 'Show Emergency QR', 'Display lockscreen barcode for instant scanning', '/qr')}
-            ${UI.renderQuickAction('🏥', 'Find Nearby Hospital', 'Check regional facility services and bed capacity', '/hospitals')}
-            ${UI.renderQuickAction('⚡', 'Emergency Triage', 'Test sub-800ms Bedrock AI triage briefing', '/triage')}
-            ${UI.renderQuickAction('✏️', 'Edit Medical Information', 'Update prescriptions, notes, and conditions', '/passport/edit')}
-          </div>
-        </section>
-
-        <!-- RECENT ACTIVITY LOG -->
-        <section class="activity-section glass-card">
-          <h3 class="dash-card-title" style="margin-bottom: 16px;">RECENT SECURITY & PROFILE ACTIVITY</h3>
-          <div class="activity-timeline">
-            ${DEFAULT_ACTIVITIES.map(act => `
-              <div class="timeline-row">
-                <div class="timeline-icon ${act.type}"></div>
-                <div class="timeline-info">
-                  <div class="timeline-title">${act.title}</div>
-                  <div class="timeline-desc">${act.desc}</div>
-                </div>
-                <div class="timeline-time">${act.time}</div>
-              </div>
-            `).join('')}
-          </div>
-        </section>
-      </div>
-    `;
-  },
-
-  // ===========================================================================
-  // 7. USER PROFILE (/profile)
-  // ===========================================================================
-  renderProfile(user, passport) {
-    return `
-      <div class="profile-page-wrapper">
-        <!-- Profile Header -->
-        <section class="profile-header-card glass-card">
-          <div class="profile-avatar-huge">${user?.avatar || 'ER'}</div>
-          <div class="profile-identity-info">
-            <div class="profile-title-row">
-              <h1 class="profile-name">${user?.name || 'Elena Rostova'}</h1>
-              ${UI.renderStatusBadge('VERIFIED', true)}
-            </div>
-            <div class="profile-meta-pills">
-              <span>🆔 Passport ID: <strong>${user?.passportId || 'T-1001'}</strong></span>
-              <span>🌍 ${user?.country || 'United States'}</span>
-              <span>🗣️ ${user?.language || 'English, Russian'}</span>
-              <span>📅 Last Verified: ${passport?.lastVerified ? passport.lastVerified.split('T')[0] : 'Today'}</span>
-            </div>
-          </div>
-        </section>
-
-        <!-- Section Cards -->
-        <div class="profile-cards-grid">
-          <!-- 1. Personal Information -->
-          <div class="profile-subcard glass-card">
-            <div class="subcard-header">
-              <h3>Personal Information</h3>
-              <a href="#/passport/edit" class="btn btn-xs btn-outline">Edit</a>
-            </div>
-            <div class="info-list">
-              <div class="info-item"><span>Full Legal Name:</span> <strong>${user?.name}</strong></div>
-              <div class="info-item"><span>Email Address:</span> <strong>${user?.email}</strong></div>
-              <div class="info-item"><span>Date of Birth:</span> <strong>${user?.dob || '1997-04-12'}</strong></div>
-              <div class="info-item"><span>Nationality:</span> <strong>${user?.country || 'Global'}</strong></div>
-            </div>
-          </div>
-
-          <!-- 2. Medical Information -->
-          <div class="profile-subcard glass-card">
-            <div class="subcard-header">
-              <h3>Medical Information</h3>
-              <a href="#/passport/edit" class="btn btn-xs btn-outline">Edit</a>
-            </div>
-            <div class="info-list">
-              <div class="info-item"><span>Blood Group:</span> <strong class="text-danger">${passport?.bloodGroup || 'O+'}</strong></div>
-              <div class="info-item">
-                <span>Severe Allergies:</span>
-                <div class="tags-group">
-                  ${(passport?.allergies || []).map(a => `<span class="allergy-tag-pill">⛔ ${a}</span>`).join('')}
                 </div>
               </div>
-              <div class="info-item">
-                <span>Conditions:</span>
-                <div class="tags-group">
-                  ${(passport?.conditions || []).map(c => `<span class="condition-tag-pill">${c}</span>`).join('')}
-                </div>
-              </div>
-              <div class="info-item"><span>Medications:</span> <strong>${(passport?.medications || []).join(', ') || 'None'}</strong></div>
             </div>
-          </div>
 
-          <!-- 3. Emergency Contacts -->
-          <div class="profile-subcard glass-card">
-            <div class="subcard-header">
-              <h3>Emergency Contacts</h3>
-              <a href="#/emergency-contacts" class="btn btn-xs btn-outline">Manage</a>
-            </div>
-            <div class="contacts-mini-list">
-              ${(passport?.emergencyContacts || []).map(c => `
-                <div class="contact-mini-row">
-                  <div>
-                    <strong>${c.name}</strong> (${c.relationship})
-                    <div style="font-size:0.8rem; color:var(--text-muted);">${c.phone}</div>
-                  </div>
-                  <a href="tel:${c.phone}" class="btn btn-xs btn-call-primary">Call</a>
-                </div>
-              `).join('')}
-            </div>
-          </div>
-
-          <!-- 4. Privacy & Sharing -->
-          <div class="profile-subcard glass-card">
-            <div class="subcard-header">
-              <h3>Privacy & Sharing</h3>
-              <a href="#/settings" class="btn btn-xs btn-outline">Settings</a>
-            </div>
-            <div class="privacy-status-lines">
-              <div class="p-status-line"><span>Emergency QR Access:</span> <strong class="text-success">ENABLED</strong></div>
-              <div class="p-status-line"><span>Blood Group Sharing:</span> <strong>YES</strong></div>
-              <div class="p-status-line"><span>Fatal Allergies Sharing:</span> <strong>YES</strong></div>
-              <div class="p-status-line"><span>Pre-existing Conditions:</span> <strong>YES</strong></div>
-            </div>
           </div>
         </div>
+
       </div>
     `;
   },
 
   // ===========================================================================
-  // 8. DIGITAL MEDICAL PASSPORT (/passport)
+  // 7. DIGITAL MEDICAL PASSPORT PAGE
   // ===========================================================================
   renderPassport(user, passport) {
-    const blood = passport?.bloodGroup || 'O+';
-    const allergies = passport?.allergies || ['None Reported'];
-    const conditions = passport?.conditions || ['None Reported'];
-    const medications = passport?.medications || [];
-    const contacts = passport?.emergencyContacts || [];
-
     return `
-      <div class="passport-page-wrapper">
-        <div class="passport-container">
-          <!-- Physical Card Canvas (Optimized for First Responders) -->
-          <div class="premium-passport-card glass-card" id="digitalPassportCard">
-            <div class="passport-top-header">
-              <div class="header-logo-group">
-                <span class="red-cross-symbol">✚</span>
-                <div>
-                  <div class="doc-title">EMERGENCY MEDICAL PASSPORT</div>
-                  <div class="doc-sub">INTERNATIONAL GOLDEN HOUR RECORD</div>
-                </div>
-              </div>
-              <div class="passport-id-badge">${passport?.passportId || 'T-1001'}</div>
-            </div>
-
-            <div class="passport-hero-row">
-              <div class="patient-profile-photo-circle">${user?.avatar || 'ER'}</div>
-              <div class="patient-main-bio">
-                <h1 class="passport-patient-name">${user?.name || 'Elena Rostova'}</h1>
-                <div class="passport-meta-line">
-                  <span>DOB: ${user?.dob || '1997-04-12'}</span> • 
-                  <span>LANG: ${user?.language || 'English, Russian'}</span> • 
-                  <span>NAT: ${user?.country || 'USA / Russia'}</span>
-                </div>
-              </div>
-              <div class="passport-blood-large">
-                <span class="p-blood-lbl">BLOOD</span>
-                <span class="p-blood-val">${blood}</span>
-              </div>
-            </div>
-
-            <!-- Prominent Critical Allergies Box -->
-            <div class="passport-allergy-alert-banner">
-              <div class="alert-banner-head">
-                <span class="alert-icon">⚠️</span>
-                <strong>CRITICAL ALLERGIES — DO NOT ADMINISTER:</strong>
-              </div>
-              <div class="allergy-tags-wrap">
-                ${allergies.map(a => `<span class="allergy-badge-prominent">⛔ ${a}</span>`).join('')}
-              </div>
-            </div>
-
-            <!-- Medical Conditions -->
-            <div class="passport-section-row">
-              <span class="p-sec-label">CHRONIC CONDITIONS:</span>
-              <div class="tags-group">
-                ${conditions.map(c => `<span class="condition-tag-pill">${c}</span>`).join('')}
-              </div>
-            </div>
-
-            <!-- Current Medications -->
-            ${medications.length > 0 ? `
-              <div class="passport-section-row">
-                <span class="p-sec-label">CURRENT MEDICATIONS:</span>
-                <span class="p-sec-value">${medications.join(', ')}</span>
-              </div>
-            ` : ''}
-
-            <!-- Emergency Contacts -->
-            <div class="passport-section-row">
-              <span class="p-sec-label">PRIMARY EMERGENCY CONTACTS:</span>
-              <div class="contacts-grid">
-                ${contacts.map(c => `
-                  <div class="p-contact-chip">
-                    <span>📞 ${c.name} (${c.relationship}): <strong>${c.phone}</strong></span>
-                    <a href="tel:${c.phone}" class="btn btn-xs btn-call-primary">Call</a>
-                  </div>
-                `).join('')}
-              </div>
-            </div>
-
-            <!-- Emergency Notes -->
-            ${passport?.emergencyNotes ? `
-              <div class="passport-section-row">
-                <span class="p-sec-label">CLINICAL & RESCUE NOTES:</span>
-                <div class="p-notes-box">${passport.emergencyNotes}</div>
-              </div>
-            ` : ''}
-
-            <div class="passport-card-bottom-bar">
-              <span>SECURED VIA AMAZON DYNAMODB • VERIFIED RECORD</span>
-              <span>LAST VERIFIED: ${passport?.lastVerified ? passport.lastVerified.split('T')[0] : 'TODAY'}</span>
-            </div>
+      <div class="qr-page-wrap" style="max-width: 860px;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+          <div>
+            <span class="story-eyebrow">DIGITAL MEDICAL IDENTITY SPECIFICATION</span>
+            <h1 style="font-size: 2rem;">Emergency Medical Passport</h1>
           </div>
-
-          <!-- Bottom Action Buttons -->
-          <div class="passport-actions-bar">
-            <a href="#/qr" class="btn btn-primary btn-lg" data-route="/qr">
-              📲 SHOW EMERGENCY QR
-            </a>
-            <button class="btn btn-outline btn-lg" id="printPassportCardBtn">
-              🖨️ PRINT MEDICAL CARD
+          <div style="display: flex; gap: 10px;">
+            <button class="btn btn-sm btn-outline" id="printPassportCardBtn">
+              <span class="btn-icon">${UI.icons.download}</span>
+              <span>Print Medical Card</span>
             </button>
-            <a href="#/passport/edit" class="btn btn-ghost btn-lg" data-route="/passport/edit">
-              ✏️ Edit Passport
+            <a href="#/passport/edit" class="btn btn-sm btn-primary" data-route="/passport/edit">
+              <span class="btn-icon">${UI.icons.edit}</span>
+              <span>Edit Records</span>
             </a>
           </div>
+        </div>
+
+        ${UI.renderPassportDocument(passport, user)}
+
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 16px;">
+          <a href="#/qr" class="btn btn-outline" data-route="/qr">
+            <span class="btn-icon">${UI.icons.qrCode}</span>
+            <span>View Scannable QR</span>
+          </a>
+          <span style="font-family: var(--font-mono); font-size: 0.72rem; color: var(--text-muted);">
+            OPTIMIZED FOR FIRST RESPONDERS & PARALEDICAL TEAMS
+          </span>
         </div>
       </div>
     `;
   },
 
   // ===========================================================================
-  // 9. EDIT MEDICAL PASSPORT (/passport/edit)
+  // 8. PASSPORT EDIT
   // ===========================================================================
   renderPassportEdit(user, passport) {
+    const p = passport || {};
     return `
-      <div class="edit-page-container">
-        <div class="edit-card glass-card">
-          <div class="edit-header">
-            <h2>Edit Medical Information</h2>
-            <p>Update your emergency profile. Changes are synchronized immediately to the database and your QR code.</p>
-          </div>
+      <div class="auth-editorial-viewport" style="max-width: 720px; grid-template-columns: 1fr;">
+        <div class="auth-form-pane">
+          <span class="story-eyebrow">DOCUMENT MODIFICATION</span>
+          <h2 style="font-size: 1.8rem; margin-bottom: 6px;">Edit Medical Information</h2>
+          <p style="font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 24px;">
+            Update your clinical contraindications, blood group, and daily medications.
+          </p>
 
-          <form id="editPassportForm" class="edit-form">
-            <div class="form-row">
-              <div class="form-field col-6">
-                <label for="editBloodGroup">Blood Group</label>
-                <select id="editBloodGroup">
-                  <option value="O+" ${passport?.bloodGroup === 'O+' ? 'selected' : ''}>O+</option>
-                  <option value="O-" ${passport?.bloodGroup === 'O-' ? 'selected' : ''}>O-</option>
-                  <option value="A+" ${passport?.bloodGroup === 'A+' ? 'selected' : ''}>A+</option>
-                  <option value="A-" ${passport?.bloodGroup === 'A-' ? 'selected' : ''}>A-</option>
-                  <option value="B+" ${passport?.bloodGroup === 'B+' ? 'selected' : ''}>B+</option>
-                  <option value="B-" ${passport?.bloodGroup === 'B-' ? 'selected' : ''}>B-</option>
-                  <option value="AB+" ${passport?.bloodGroup === 'AB+' ? 'selected' : ''}>AB+</option>
-                  <option value="AB-" ${passport?.bloodGroup === 'AB-' ? 'selected' : ''}>AB-</option>
-                  <option value="Unknown" ${passport?.bloodGroup === 'Unknown' ? 'selected' : ''}>Unknown</option>
-                </select>
-              </div>
-              <div class="form-field col-6">
-                <label for="editAllergies">Severe Allergies (comma separated)</label>
-                <input type="text" id="editAllergies" value="${(passport?.allergies || []).join(', ')}" />
-              </div>
+          <form id="editPassportForm" class="auth-form">
+            <div class="editorial-field">
+              <label class="editorial-label">Blood Group</label>
+              <select id="editBloodGroup" class="editorial-input">
+                <option value="O+" ${p.bloodGroup === 'O+' ? 'selected' : ''}>O+ (Rh Positive)</option>
+                <option value="O-" ${p.bloodGroup === 'O-' ? 'selected' : ''}>O- (Universal Donor)</option>
+                <option value="A+" ${p.bloodGroup === 'A+' ? 'selected' : ''}>A+</option>
+                <option value="A-" ${p.bloodGroup === 'A-' ? 'selected' : ''}>A-</option>
+                <option value="B+" ${p.bloodGroup === 'B+' ? 'selected' : ''}>B+</option>
+                <option value="B-" ${p.bloodGroup === 'B-' ? 'selected' : ''}>B-</option>
+                <option value="AB+" ${p.bloodGroup === 'AB+' ? 'selected' : ''}>AB+</option>
+                <option value="AB-" ${p.bloodGroup === 'AB-' ? 'selected' : ''}>AB-</option>
+              </select>
             </div>
 
-            <div class="form-field">
-              <label for="editConditions">Pre-existing Conditions (comma separated)</label>
-              <input type="text" id="editConditions" value="${(passport?.conditions || []).join(', ')}" />
+            <div class="editorial-field">
+              <label class="editorial-label" style="color: var(--emergency);">Critical Drug Allergies (Comma-separated)</label>
+              <input type="text" id="editAllergies" class="editorial-input" value="${(p.allergies || []).join(', ')}" />
             </div>
 
-            <div class="form-field">
-              <label for="editMedications">Current Medications (comma separated)</label>
-              <input type="text" id="editMedications" value="${(passport?.medications || []).join(', ')}" />
+            <div class="editorial-field">
+              <label class="editorial-label">Chronic Conditions (Comma-separated)</label>
+              <input type="text" id="editConditions" class="editorial-input" value="${(p.conditions || []).join(', ')}" />
             </div>
 
-            <div class="form-field">
-              <label for="editNotes">Clinical & Rescue Notes</label>
-              <textarea id="editNotes" rows="3">${passport?.emergencyNotes || ''}</textarea>
+            <div class="editorial-field">
+              <label class="editorial-label">Current Medications</label>
+              <input type="text" id="editMedications" class="editorial-input" value="${(p.medications || []).join(', ')}" />
             </div>
 
-            <div class="form-actions">
-              <button type="submit" class="btn btn-primary btn-lg">
-                💾 Save Changes
-              </button>
-              <a href="#/passport" class="btn btn-ghost btn-lg" data-route="/passport">
-                Cancel
-              </a>
+            <div class="editorial-field">
+              <label class="editorial-label">Clinical Emergency Notes</label>
+              <textarea id="editNotes" class="editorial-input" rows="3">${p.emergencyNotes || ''}</textarea>
+            </div>
+
+            <div style="display: flex; justify-content: flex-end; gap: 12px; margin-top: 16px;">
+              <a href="#/passport" class="btn btn-outline" data-route="/passport">Cancel</a>
+              <button type="submit" class="btn btn-primary">Save Changes</button>
             </div>
           </form>
         </div>
@@ -911,100 +801,72 @@ const Views = {
   },
 
   // ===========================================================================
-  // 10. EMERGENCY CONTACTS PAGE (/emergency-contacts)
-  // ===========================================================================
-  renderEmergencyContacts(user, passport) {
-    const contacts = passport?.emergencyContacts || [];
-
-    return `
-      <div class="contacts-page-wrapper">
-        <div class="contacts-header-row">
-          <div>
-            <h1>Emergency Family Contacts</h1>
-            <p>Paramedics and hospital dispatch teams will call these numbers first.</p>
-          </div>
-          <button class="btn btn-primary btn-sm" id="openAddContactModalBtn">
-            + Add New Contact
-          </button>
-        </div>
-
-        <div class="contacts-grid-cards">
-          ${contacts.length > 0 
-            ? contacts.map(c => UI.renderContactCard(c, true)).join('')
-            : UI.renderEmptyState('No Emergency Contacts Registered', 'Add at least 1 emergency contact so first responders can notify your family.', 'Add Contact', null)
-          }
-        </div>
-      </div>
-    `;
-  },
-
-  // ===========================================================================
-  // 11. EMERGENCY QR CODE PAGE (/qr)
+  // 9. EMERGENCY QR PAGE
   // ===========================================================================
   renderQR(user, passport) {
-    const pid = passport?.passportId || user?.passportId || 'T-1001';
+    const p = passport || {};
+    const u = user || {};
 
     return `
-      <div class="qr-page-wrapper">
-        <div class="qr-card glass-card">
-          <div class="qr-card-header">
-            <h1 class="qr-main-title">Emergency Identity QR</h1>
-            <p class="qr-sub-title">Scan this code with any camera to access verified emergency information in &lt;800ms.</p>
+      <div class="qr-page-wrap">
+        <div class="qr-editorial-card glass-card">
+          <span class="story-eyebrow">UNIVERSAL IDENTITY TOKEN</span>
+          <h1 style="font-size: 2.2rem; margin-top: 6px;">Emergency Identity QR</h1>
+          <p style="font-size: 0.95rem; color: var(--text-secondary); max-width: 480px;">
+            Scan this code to access verified emergency medical contraindications without requiring an application install or account login.
+          </p>
+
+          <!-- QR Code Vector Container with Subtle Scan Line -->
+          <div class="qr-display-container" id="largeQrHolder">
+            <div class="qr-scan-line"></div>
           </div>
 
-          <!-- Large QR Display in Center -->
-          <div class="qr-center-box">
-            <div class="qr-svg-holder" id="largeQrHolder">
-              <!-- SVG inserted dynamically -->
-            </div>
-            <div class="qr-pulse-ring"></div>
-          </div>
-
-          <!-- Identity Details Below QR -->
           <div class="qr-meta-block">
-            <div class="qr-meta-item">
-              <span>Passport ID:</span> <strong>${pid}</strong>
-            </div>
-            <div class="qr-meta-item">
-              <span>Status:</span> ${UI.renderStatusBadge('ACTIVE / VERIFIED', true)}
-            </div>
-            <div class="qr-meta-item">
-              <span>Last Verified:</span> <strong>${passport?.lastVerified ? passport.lastVerified.split('T')[0] : 'Today'}</strong>
-            </div>
+            <span style="font-family: var(--font-mono); font-size: 1.1rem; font-weight: 700; color: var(--gold);">
+              PASSPORT ID: ${u.passportId || 'T-1001'}
+            </span>
+            <span class="editorial-status-pill verified">STATUS: VERIFIED & ACTIVE</span>
           </div>
 
-          <!-- Privacy Control Box -->
-          <div class="qr-privacy-control-box">
-            <div class="privacy-switch-header">
-              <div class="p-title-wrap">
-                <strong>Emergency Public Access</strong>
-                <span class="access-pill">ON</span>
-              </div>
-              <p>Allow first responders to scan and view authorized clinical contraindications:</p>
+          <!-- Privacy Sharing Checklist -->
+          <div class="privacy-disclosure-box">
+            <div class="privacy-head-row">
+              <span style="font-family: var(--font-mono); font-size: 0.72rem; font-weight: 700; color: var(--gold);">EMERGENCY ACCESS CONTROLS</span>
+              <span class="primary-gold-badge">ACTIVE ON QR</span>
             </div>
 
-            <div class="privacy-checklist">
-              <div class="check-line">✓ Verified Blood Group (${passport?.bloodGroup || 'O+'})</div>
-              <div class="check-line">✓ Critical Allergies (${(passport?.allergies || []).join(', ')})</div>
-              <div class="check-line">✓ Medical Conditions</div>
-              <div class="check-line">✓ Primary Emergency Contacts</div>
-              <div class="check-line">✓ Current Prescription Medications</div>
-            </div>
-            <div class="privacy-notice">
-              🛡️ Zero unnecessary personal or financial data is exposed.
+            <div class="disclosure-checklist">
+              <div class="check-item">
+                <span class="icon-inline">${UI.icons.check}</span>
+                <span>Blood Group & Rh Factor</span>
+              </div>
+              <div class="check-item">
+                <span class="icon-inline">${UI.icons.check}</span>
+                <span>Critical Drug Allergies</span>
+              </div>
+              <div class="check-item">
+                <span class="icon-inline">${UI.icons.check}</span>
+                <span>Chronic Conditions</span>
+              </div>
+              <div class="check-item">
+                <span class="icon-inline">${UI.icons.check}</span>
+                <span>Emergency Family Contacts</span>
+              </div>
             </div>
           </div>
 
           <!-- Action Buttons -->
-          <div class="qr-action-buttons">
+          <div class="qr-actions-row">
             <button class="btn btn-outline" id="regenerateQrBtn">
-              🔄 Regenerate QR
+              <span class="btn-icon">${UI.icons.refresh}</span>
+              <span>Regenerate Token</span>
             </button>
             <button class="btn btn-primary" id="downloadQrImageBtn">
-              📥 Download QR Code
+              <span class="btn-icon">${UI.icons.download}</span>
+              <span>Download / Print QR</span>
             </button>
             <a href="#/passport" class="btn btn-ghost" data-route="/passport">
-              💳 Show Emergency Card
+              <span>Show Passport Document</span>
             </a>
           </div>
         </div>
@@ -1013,202 +875,293 @@ const Views = {
   },
 
   // ===========================================================================
-  // 12. HOSPITALS DIRECTORY (/hospitals)
+  // 10. HOSPITALS DIRECTORY & MAP FIRST SPLIT EXPERIENCE
   // ===========================================================================
   renderHospitals(hospitals = []) {
     return `
-      <div class="hospitals-page-wrapper">
-        <div class="hospitals-head-row">
-          <div>
-            <h1>Regional Emergency Hospitals Directory</h1>
-            <p>Real-time regional capacity, trauma centers, and specialized department directory.</p>
-          </div>
-          <div class="hospitals-filter">
-            <select id="facilityFilterSelect" class="styled-select">
-              <option value="all">All Regional Facilities</option>
+      <div class="hospitals-split-viewport">
+        
+        <!-- Left: Hospital Directory & Filtering -->
+        <div class="hospitals-directory-col">
+          <div class="directory-filter-bar">
+            <div>
+              <span class="story-eyebrow">REGIONAL TRAUMA NETWORK</span>
+              <h2 style="font-size: 1.6rem;">Emergency Hospitals</h2>
+              <p style="font-size: 0.84rem; color: var(--text-secondary);">Real-time ICU capacity, specialty departments, and ambulance drive times.</p>
+            </div>
+
+            <select id="facilityFilterSelect" class="editorial-input" style="cursor: pointer;">
+              <option value="all">All Trauma Facilities</option>
               <option value="ICU">Intensive Care Unit (ICU)</option>
-              <option value="Trauma Center Level 1">Trauma Center Level 1</option>
-              <option value="Cardiology">Cardiology Unit</option>
-              <option value="Air Ambulance">Air Ambulance / Helipad</option>
-              <option value="Hyperbaric Medicine">Hyperbaric Medicine</option>
+              <option value="Emergency Surgery">Emergency Surgery</option>
+              <option value="Stroke Care">Stroke Care Unit</option>
+              <option value="Cardiology">Cardiology</option>
+              <option value="Burn Unit">Burn Center</option>
             </select>
+          </div>
+
+          <div class="directory-scroll-list" id="facilitiesGrid">
+            ${hospitals.map(h => UI.renderHospitalCard(h)).join('')}
           </div>
         </div>
 
-        <div class="hospitals-grid-list" id="facilitiesGrid">
-          ${hospitals.map(h => UI.renderHospitalCard(h)).join('')}
+        <!-- Right: Real Interactive Leaflet Emergency Map -->
+        <div class="hospitals-map-col">
+          <div id="facilitiesMapMount"></div>
+        </div>
+
+      </div>
+    `;
+  },
+
+  // ===========================================================================
+  // 11. FOCUSED 4-STEP EMERGENCY TRIAGE EXPERIENCE
+  // ===========================================================================
+  renderTriageExperience(defaultId = 'T-1001') {
+    return `
+      <div class="triage-workflow-viewport">
+        <header style="display: flex; justify-content: space-between; align-items: flex-end;">
+          <div>
+            <span class="story-eyebrow">EMERGENCY FIRST RESPONDER PROTOCOL</span>
+            <h1 style="font-size: 2rem;">Golden Hour Clinical Triage</h1>
+            <p style="font-size: 0.9rem; color: var(--text-secondary);">Sub-800ms identity decoding & Amazon Bedrock Claude 3 field assessment.</p>
+          </div>
+
+          <div style="display: flex; gap: 8px;">
+            <input type="text" id="triageSearchInput" class="editorial-input" style="width: 140px; padding: 6px 12px; font-family: var(--font-mono);" value="${defaultId}" />
+            <button class="btn btn-sm btn-primary" id="triageExecuteBtn">Decode</button>
+          </div>
+        </header>
+
+        <!-- Active Triage Workspace Mount -->
+        <div id="triageActiveDisplay">
+          <!-- Populated by fetchEmergencyTriage -->
         </div>
       </div>
     `;
   },
 
   // ===========================================================================
-  // 13. SETTINGS PAGE (/settings)
+  // 12. EMERGENCY CONTACTS PAGE
+  // ===========================================================================
+  renderEmergencyContacts(user, passport) {
+    const contacts = passport?.emergencyContacts || [
+      { id: 'c-1', name: 'Mark Rostova', relationship: 'Spouse', phone: '+1 (555) 019-2834', isPrimary: true },
+      { id: 'c-2', name: 'Dr. Viktor Rostov', relationship: 'Father · Physician', phone: '+1 (555) 018-9921', isPrimary: false }
+    ];
+
+    return `
+      <div class="qr-page-wrap" style="max-width: 820px;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+          <div>
+            <span class="story-eyebrow">FAMILY & NOTIFICATION NETWORK</span>
+            <h1 style="font-size: 2rem;">Emergency Contacts</h1>
+            <p style="font-size: 0.9rem; color: var(--text-secondary);">Direct phone contacts notified during immediate emergency admissions.</p>
+          </div>
+
+          <button class="btn btn-primary" id="openAddContactModalBtn">
+            <span class="btn-icon">${UI.icons.plus}</span>
+            <span>Add Contact</span>
+          </button>
+        </div>
+
+        <div style="display: flex; flex-direction: column; gap: 14px;">
+          ${contacts.map(c => UI.renderContactCard(c, true)).join('')}
+        </div>
+      </div>
+    `;
+  },
+
+  // ===========================================================================
+  // 13. USER PROFILE (High-Contrast Editable Rows)
+  // ===========================================================================
+  renderProfile(user, passport) {
+    const u = user || {};
+    const p = passport || {};
+
+    return `
+      <div class="qr-page-wrap" style="max-width: 820px;">
+        <span class="story-eyebrow">IDENTITY & RECORDS</span>
+        <h1 style="font-size: 2rem; margin-bottom: 24px;">Personal Clinical Profile</h1>
+
+        <div class="glass-card" style="padding: 28px; display: flex; flex-direction: column; gap: 24px;">
+          
+          <!-- Identity Row -->
+          <div style="display: flex; justify-content: space-between; align-items: center; padding-bottom: 20px; border-bottom: 1px solid var(--border);">
+            <div>
+              <span class="story-eyebrow">NAME & IDENTIFIER</span>
+              <h3 style="font-size: 1.3rem;">${u.name || 'Elena Rostova'}</h3>
+              <span style="font-family: var(--font-mono); font-size: 0.8rem; color: var(--gold);">${u.passportId || 'T-1001'} • ${u.email}</span>
+            </div>
+            <a href="#/passport/edit" class="btn btn-sm btn-outline" data-route="/passport/edit">Edit Details</a>
+          </div>
+
+          <!-- Clinical Rows -->
+          <div style="display: flex; justify-content: space-between; align-items: center; padding-bottom: 16px; border-bottom: 1px solid var(--border-subtle);">
+            <div>
+              <span style="font-size: 0.8rem; color: var(--text-secondary);">Blood Group</span>
+              <div style="font-family: var(--font-mono); font-size: 1.1rem; font-weight: 700; color: var(--medical);">${p.bloodGroup || 'O+'}</div>
+            </div>
+            <a href="#/passport/edit" class="btn btn-sm btn-ghost" data-route="/passport/edit">Edit →</a>
+          </div>
+
+          <div style="display: flex; justify-content: space-between; align-items: center; padding-bottom: 16px; border-bottom: 1px solid var(--border-subtle);">
+            <div>
+              <span style="font-size: 0.8rem; color: var(--emergency);">Critical Drug Allergies</span>
+              <div style="font-weight: 600; color: var(--emergency);">${(p.allergies || []).join(', ') || 'None Recorded'}</div>
+            </div>
+            <a href="#/passport/edit" class="btn btn-sm btn-ghost" data-route="/passport/edit">Edit →</a>
+          </div>
+
+          <div style="display: flex; justify-content: space-between; align-items: center; padding-bottom: 16px; border-bottom: 1px solid var(--border-subtle);">
+            <div>
+              <span style="font-size: 0.8rem; color: var(--text-secondary);">Chronic Diagnoses</span>
+              <div style="font-weight: 600;">${(p.conditions || []).join(', ') || 'None Recorded'}</div>
+            </div>
+            <a href="#/passport/edit" class="btn btn-sm btn-ghost" data-route="/passport/edit">Edit →</a>
+          </div>
+
+          <div style="display: flex; justify-content: space-between; align-items: center;">
+            <div>
+              <span style="font-size: 0.8rem; color: var(--text-secondary);">Encryption & Compliance</span>
+              <div style="font-family: var(--font-mono); font-size: 0.75rem; color: var(--text-muted);">AWS KMS Envelope 256-Bit • Last Verified: ${p.lastVerified || 'Today'}</div>
+            </div>
+            <span class="editorial-status-pill verified">VERIFIED</span>
+          </div>
+
+        </div>
+      </div>
+    `;
+  },
+
+  // ===========================================================================
+  // 14. SETTINGS & PREFERENCES
   // ===========================================================================
   renderSettings(user, passport) {
     return `
-      <div class="settings-page-wrapper">
-        <div class="settings-card glass-card">
-          <h1>Settings & Preferences</h1>
-          <p class="settings-sub">Manage your security, appearance, language, and emergency response settings.</p>
+      <div class="qr-page-wrap" style="max-width: 820px;">
+        <span class="story-eyebrow">PREFERENCES & ACCESS</span>
+        <h1 style="font-size: 2rem; margin-bottom: 24px;">Settings</h1>
 
-          <div class="settings-group">
-            <h3>Appearance & Interface</h3>
-            <div class="settings-row">
-              <div>
-                <strong>Theme Display Mode</strong>
-                <p>Toggle between dark command center and light clinical day mode</p>
-              </div>
-              <button class="btn btn-sm btn-outline" id="settingsThemeBtn">Customize Theme</button>
+        <div class="glass-card" style="padding: 28px; display: flex; flex-direction: column; gap: 24px;">
+          
+          <div style="display: flex; justify-content: space-between; align-items: center; padding-bottom: 18px; border-bottom: 1px solid var(--border);">
+            <div>
+              <strong>Visual Atmosphere</strong>
+              <p style="font-size: 0.82rem; color: var(--text-secondary);">Switch between Quiet Obsidian and Warm Ivory</p>
             </div>
+            <button class="btn btn-sm btn-outline" id="settingsThemeBtn">Tailor Palette</button>
           </div>
 
-          <div class="settings-group">
-            <h3>Language & Localization</h3>
-            <div class="settings-row">
-              <div>
-                <strong>Application Language</strong>
-                <p>Available in all 22 officially scheduled Indian languages + English</p>
-              </div>
-              <button class="btn btn-sm btn-outline" id="settingsLangBtn">Change Language (22 Languages)</button>
+          <div style="display: flex; justify-content: space-between; align-items: center; padding-bottom: 18px; border-bottom: 1px solid var(--border);">
+            <div>
+              <strong>Localization (22 Indian Languages + English)</strong>
+              <p style="font-size: 0.82rem; color: var(--text-secondary);">Current: ${localStorage.getItem('emergency_lang') || 'en'}</p>
             </div>
+            <button class="btn btn-sm btn-outline" id="settingsLangBtn">Change Language</button>
           </div>
 
-          <div class="settings-group">
-            <h3>Account & Security</h3>
-            <div class="settings-row">
-              <div>
-                <strong>Password</strong>
-                <p>Last changed 2 months ago</p>
-              </div>
-              <a href="#/forgot-password" class="btn btn-sm btn-outline" data-route="/forgot-password">Change Password</a>
+          <div style="display: flex; justify-content: space-between; align-items: center; padding-bottom: 18px; border-bottom: 1px solid var(--border);">
+            <div>
+              <strong>Emergency Paramedic Access</strong>
+              <p style="font-size: 0.82rem; color: var(--text-secondary);">Zero-login token resolution for first responders</p>
             </div>
-            <div class="settings-row">
-              <div>
-                <strong>Active Session</strong>
-                <p>Logged in as ${user?.email || 'elena@rescue.io'}</p>
-              </div>
-              <button class="btn btn-sm btn-outline-danger" id="settingsLogoutBtn">Log Out</button>
-            </div>
+            <span class="editorial-status-pill verified">ENABLED</span>
           </div>
+
+          <div style="display: flex; justify-content: space-between; align-items: center;">
+            <div>
+              <strong>Active Session</strong>
+              <p style="font-size: 0.82rem; color: var(--text-secondary);">Logged in as ${user?.email || 'elena@rescue.io'}</p>
+            </div>
+            <button class="btn btn-sm btn-outline" style="color: var(--emergency); border-color: var(--emergency);" id="settingsLogoutBtn">
+              <span>Sign Out</span>
+            </button>
+          </div>
+
         </div>
       </div>
     `;
   },
 
   // ===========================================================================
-  // 14. RESPONDER HUD (ROLE 2: PARAMEDIC)
+  // 15. RESPONDER HUD & HOSPITAL ADMIN COMMAND
   // ===========================================================================
   renderResponderHUD(user) {
     return `
-      <div class="responder-hud-wrapper">
-        <div class="responder-banner glass-card">
+      <div class="triage-workflow-viewport">
+        <header style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px;">
           <div>
-            <div class="hud-badge">🚑 FIRST RESPONDER TERMINAL</div>
-            <h1>Paramedic Field Command</h1>
-            <p>Logged in as <strong>${user?.name}</strong> • Station: Central EMS Battalion 4</p>
+            <span class="story-eyebrow">FIRST RESPONDER TERMINAL</span>
+            <h1 style="font-size: 2rem;">Paramedic Dispatch HUD</h1>
+            <p style="font-size: 0.9rem; color: var(--text-secondary);">Unit: EMS Battalion 4 • First Responder: <strong>${user?.name || 'Marcus Vance'}</strong></p>
           </div>
           <a href="#/triage" class="btn btn-primary btn-lg" data-route="/triage">
-            📷 SCAN NEW EMERGENCY QR
+            <span class="btn-icon">${UI.icons.qrCode}</span>
+            <span>Scan Emergency QR</span>
           </a>
-        </div>
+        </header>
 
-        <h3 class="section-subheading">ACTIVE EMERGENCY DISPATCH CASES</h3>
-        <div class="cases-grid">
-          ${DEFAULT_EMERGENCY_CASES.map(c => `
-            <div class="case-card glass-card">
-              <div class="case-header">
-                <span class="case-id">${c.id}</span>
-                <span class="case-severity ${c.severity === 'CRITICAL' ? 'critical' : 'high'}">${c.severity}</span>
-              </div>
-              <div class="case-patient-name">${c.patientName} (${c.age} y/o, Blood: ${c.bloodType})</div>
-              <div class="case-alert-text">⚠️ Critical Allergy: ${c.criticalAllergy}</div>
-              <div class="case-meta">
-                <span>📍 ${c.location}</span>
-                <span>⏱️ ETA: ${c.eta}</span>
-                <span>🏥 Assigned: ${c.assignedHospital}</span>
-              </div>
-              <div class="case-actions">
-                <a href="#/triage?id=${c.touristId}" class="btn btn-sm btn-primary">Open Clinical Brief</a>
-                <a href="tel:911" class="btn btn-sm btn-outline">Call Ambulance Dispatch</a>
-              </div>
+        <h3 style="font-size: 1.1rem; margin-bottom: 16px;">Active Trauma Cases</h3>
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
+          <div class="glass-card" style="padding: 24px;">
+            <div style="display: flex; justify-content: space-between; margin-bottom: 10px;">
+              <span style="font-family: var(--font-mono); font-weight: 700; color: var(--gold);">CASE-8841</span>
+              <span class="editorial-status-pill" style="color: var(--emergency); border-color: var(--emergency); background: var(--emergency-subtle);">CRITICAL</span>
             </div>
-          `).join('')}
+            <h4 style="font-size: 1.1rem;">Elena Rostova (29 y/o, Blood: O+)</h4>
+            <div style="font-size: 0.82rem; color: var(--emergency); margin: 8px 0; font-weight: 600;">⛔ ALLERGY: Penicillin, Peanuts</div>
+            <div style="font-size: 0.78rem; color: var(--text-secondary); margin-bottom: 16px;">📍 Tokyo Shinjuku Terminal • ETA 6 mins</div>
+            <a href="#/triage?id=T-1001" class="btn btn-sm btn-primary">Open Clinical Brief</a>
+          </div>
+
+          <div class="glass-card" style="padding: 24px;">
+            <div style="display: flex; justify-content: space-between; margin-bottom: 10px;">
+              <span style="font-family: var(--font-mono); font-weight: 700; color: var(--gold);">CASE-8842</span>
+              <span class="editorial-status-pill verified">STABLE</span>
+            </div>
+            <h4 style="font-size: 1.1rem;">Kenji Sato (34 y/o, Blood: A-)</h4>
+            <div style="font-size: 0.82rem; color: var(--emergency); margin: 8px 0; font-weight: 600;">⛔ ALLERGY: Latex, Sulfa Drugs</div>
+            <div style="font-size: 0.78rem; color: var(--text-secondary); margin-bottom: 16px;">📍 Roppongi Hills • ETA 11 mins</div>
+            <a href="#/triage?id=T-1002" class="btn btn-sm btn-primary">Open Clinical Brief</a>
+          </div>
         </div>
       </div>
     `;
   },
 
-  // ===========================================================================
-  // 15. HOSPITAL ADMIN DASHBOARD (ROLE 3: ADMIN)
-  // ===========================================================================
   renderHospitalAdmin(user) {
     return `
-      <div class="admin-dashboard-wrapper">
-        <div class="admin-banner glass-card">
+      <div class="triage-workflow-viewport">
+        <header style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px;">
           <div>
-            <div class="admin-badge">🏥 HOSPITAL EMERGENCY COMMAND</div>
-            <h1>${user?.hospitalName || 'City General ICU & Cardiology Center'}</h1>
-            <p>Admin: <strong>${user?.name}</strong> • Real-time Bed Management & Incoming Trauma Routing</p>
+            <span class="story-eyebrow">HOSPITAL ADMISSIONS COMMAND</span>
+            <h1 style="font-size: 2rem;">City General Trauma Center</h1>
+            <p style="font-size: 0.9rem; color: var(--text-secondary);">Chief of Emergency Medicine: <strong>${user?.name || 'Dr. Alistair Chen'}</strong></p>
           </div>
-          <button class="btn btn-outline btn-sm" id="syncCapacityBtn">🔄 Refresh Bed Inventory</button>
-        </div>
+          <button class="btn btn-outline btn-sm">Refresh Inventory</button>
+        </header>
 
-        <div class="admin-metrics-grid">
-          <div class="metric-card glass-card">
-            <span class="metric-label">TOTAL ICU CAPACITY</span>
-            <span class="metric-num">420</span>
-            <span class="metric-sub">82 Beds Available Now</span>
+        <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-bottom: 28px;">
+          <div class="glass-card" style="padding: 20px;">
+            <span style="font-family: var(--font-mono); font-size: 0.68rem; color: var(--text-muted);">ICU CAPACITY</span>
+            <div style="font-size: 2rem; font-weight: 800; color: var(--text-primary);">420</div>
+            <span style="font-size: 0.8rem; color: var(--medical);">82 Beds Available Now</span>
           </div>
-          <div class="metric-card glass-card">
-            <span class="metric-label">TRAUMA LEVEL 1 STATUS</span>
-            <span class="metric-num text-success">ONLINE</span>
-            <span class="metric-sub">2 Surgical Theaters Open</span>
-          </div>
-          <div class="metric-card glass-card">
-            <span class="metric-label">INCOMING AMBULANCES</span>
-            <span class="metric-num text-danger">2</span>
-            <span class="metric-sub">ETA 6 mins & 12 mins</span>
-          </div>
-        </div>
 
-        <h3 class="section-subheading">INCOMING TRIAGE ADMISSIONS</h3>
-        <div class="incoming-table-wrap glass-card">
-          <table class="styled-table">
-            <thead>
-              <tr>
-                <th>Case ID</th>
-                <th>Patient</th>
-                <th>Blood</th>
-                <th>Critical Contraindication</th>
-                <th>Required Unit</th>
-                <th>ETA</th>
-                <th>Action</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr>
-                <td>CASE-8841</td>
-                <td><strong>Elena Rostova</strong> (29 y/o)</td>
-                <td><span class="blood-pill">O+</span></td>
-                <td><span class="allergy-pill">⛔ Penicillin, Peanuts</span></td>
-                <td>ICU / Respiratory</td>
-                <td>~6 mins</td>
-                <td><a href="#/triage?id=T-1001" class="btn btn-xs btn-primary">Prep Triage</a></td>
-              </tr>
-              <tr>
-                <td>CASE-8842</td>
-                <td><strong>Kenji Sato</strong> (34 y/o)</td>
-                <td><span class="blood-pill">A-</span></td>
-                <td><span class="allergy-pill">⛔ Latex Allergy</span></td>
-                <td>ICU / Endocrine</td>
-                <td>~12 mins</td>
-                <td><a href="#/triage?id=T-1002" class="btn btn-xs btn-primary">Prep Triage</a></td>
-              </tr>
-            </tbody>
-          </table>
+          <div class="glass-card" style="padding: 20px;">
+            <span style="font-family: var(--font-mono); font-size: 0.68rem; color: var(--text-muted);">TRAUMA CENTER LEVEL 1</span>
+            <div style="font-size: 2rem; font-weight: 800; color: var(--medical);">ONLINE</div>
+            <span style="font-size: 0.8rem; color: var(--text-secondary);">2 Surgical Theaters Open</span>
+          </div>
+
+          <div class="glass-card" style="padding: 20px;">
+            <span style="font-family: var(--font-mono); font-size: 0.68rem; color: var(--text-muted);">INCOMING AMBULANCES</span>
+            <div style="font-size: 2rem; font-weight: 800; color: var(--emergency);">2</div>
+            <span style="font-size: 0.8rem; color: var(--emergency);">ETA 6 mins & 11 mins</span>
+          </div>
         </div>
       </div>
     `;
-  },
+  }
 };

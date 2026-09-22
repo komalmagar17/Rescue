@@ -1,16 +1,16 @@
 /**
- * Emergency Passport — Production Frontend Controller
- * Industry-Level SaaS UI • 22 Indian Languages Engine • Dynamic Theme & Color Customizer
- * Zero-Lag Triage • Bedrock Claude 3 Clinical Synthesis • Role-Based Experience
+ * Emergency Passport — Production Controller & Creative Motion Engine
+ * Luxury Editorial × Medical Technology Design Language
+ * Ambient Canvas Geographic Contour • Interactive Leaflet Maps • Bedrock Claude 3 Triage
  */
 
 // -----------------------------------------------------------------------------
-// Global Application State
+// Global State
 // -----------------------------------------------------------------------------
 const state = {
   lang: localStorage.getItem('emergency_lang') || 'en',
   themeMode: localStorage.getItem('emergency_theme_mode') || 'dark',
-  accentColor: localStorage.getItem('emergency_accent_color') || '#ef4444',
+  accentColor: localStorage.getItem('emergency_accent_color') || '#C6A56B',
   hospitals: [],
   systemHealthy: false,
   activeBackend: 'local',
@@ -18,132 +18,357 @@ const state = {
   audioContext: null,
   sirenOscillator: null,
   currentTriageData: null,
+  leafletHeroMap: null,
+  leafletHospitalsMap: null,
+  activeHospitalMarker: null,
+  activeRouteLine: null,
 };
 
 const API_BASE = '';
 
 // -----------------------------------------------------------------------------
-// Toast Notifications
+// 1. Ambient Canvas Geographic Contour & Constellation Engine
 // -----------------------------------------------------------------------------
-function showToast(message, type = 'info') {
-  const container = document.getElementById('toastContainer');
-  if (!container) return;
+class AmbientCanvasEngine {
+  constructor(canvasId) {
+    this.canvas = document.getElementById(canvasId);
+    if (!this.canvas) return;
+    this.ctx = this.canvas.getContext('2d');
+    this.width = 0;
+    this.height = 0;
+    this.nodes = [];
+    this.pulses = [];
+    this.animFrameId = null;
+    this.reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
-  const toast = document.createElement('div');
-  toast.className = `toast toast-${type}`;
-  toast.innerHTML = `<span>${message}</span>`;
-  container.appendChild(toast);
+    this._resize();
+    this._initNodes();
+    window.addEventListener('resize', () => this._resize());
+    if (!this.reducedMotion) this._animate();
+  }
 
-  setTimeout(() => {
-    toast.style.opacity = '0';
-    toast.style.transform = 'translateY(10px)';
-    setTimeout(() => toast.remove(), 300);
-  }, 4000);
-}
+  _resize() {
+    this.width = window.innerWidth;
+    this.height = window.innerHeight;
+    this.canvas.width = this.width;
+    this.canvas.height = this.height;
+    if (this.reducedMotion) this._drawStatic();
+  }
 
-// -----------------------------------------------------------------------------
-// Standalone SVG QR Code Generator (Zero-Dependency Vector QR)
-// -----------------------------------------------------------------------------
-function generateQrSvg(text) {
-  const size = 21;
-  const hash = Array.from(text).reduce((acc, char) => (acc * 31 + char.charCodeAt(0)) % 1000000007, 7);
-  const grid = Array(size).fill(0).map(() => Array(size).fill(false));
+  _initNodes() {
+    this.nodes = [];
+    const count = Math.min(32, Math.floor((this.width * this.height) / 45000));
+    for (let i = 0; i < count; i++) {
+      this.nodes.push({
+        x: Math.random() * this.width,
+        y: Math.random() * this.height,
+        radius: Math.random() * 2 + 1,
+        vx: (Math.random() - 0.5) * 0.25,
+        vy: (Math.random() - 0.5) * 0.25,
+        alpha: Math.random() * 0.4 + 0.2,
+      });
+    }
 
-  function drawFinder(r0, c0) {
-    for (let r = 0; r < 7; r++) {
-      for (let c = 0; c < 7; c++) {
-        if (r === 0 || r === 6 || c === 0 || c === 6 || (r >= 2 && r <= 4 && c >= 2 && c <= 4)) {
-          grid[r0 + r][c0 + c] = true;
+    // Emergency corridor pulses
+    this.pulses = [
+      { x: this.width * 0.25, y: this.height * 0.35, r: 0, maxR: 120, speed: 0.6 },
+      { x: this.width * 0.75, y: this.height * 0.65, r: 40, maxR: 160, speed: 0.5 },
+    ];
+  }
+
+  _drawStatic() {
+    const isDark = state.themeMode === 'dark';
+    this.ctx.clearRect(0, 0, this.width, this.height);
+    this.ctx.strokeStyle = isDark ? 'rgba(198, 165, 107, 0.08)' : 'rgba(177, 138, 82, 0.1)';
+    this.ctx.lineWidth = 1;
+
+    // Static geographic contours
+    for (let i = 1; i <= 4; i++) {
+      this.ctx.beginPath();
+      this.ctx.ellipse(this.width * 0.5, this.height * 0.4, 200 * i, 120 * i, Math.PI / 12, 0, Math.PI * 2);
+      this.ctx.stroke();
+    }
+  }
+
+  _animate() {
+    const isDark = state.themeMode === 'dark';
+    this.ctx.clearRect(0, 0, this.width, this.height);
+
+    // 1. Delicate Topographical Contour Rings
+    this.ctx.strokeStyle = isDark ? 'rgba(198, 165, 107, 0.04)' : 'rgba(177, 138, 82, 0.06)';
+    this.ctx.lineWidth = 1;
+    const time = Date.now() * 0.0003;
+
+    for (let i = 1; i <= 3; i++) {
+      this.ctx.beginPath();
+      const wave = Math.sin(time + i) * 15;
+      this.ctx.ellipse(
+        this.width * 0.6 + wave,
+        this.height * 0.35,
+        180 * i,
+        110 * i,
+        Math.PI / 10,
+        0,
+        Math.PI * 2
+      );
+      this.ctx.stroke();
+    }
+
+    // 2. Telemetry Nodes & Corridors
+    this.ctx.fillStyle = isDark ? 'rgba(112, 181, 170, 0.4)' : 'rgba(77, 129, 123, 0.45)';
+    this.nodes.forEach((n, idx) => {
+      n.x += n.vx;
+      n.y += n.vy;
+      if (n.x < 0) n.x = this.width;
+      if (n.x > this.width) n.x = 0;
+      if (n.y < 0) n.y = this.height;
+      if (n.y > this.height) n.y = 0;
+
+      this.ctx.beginPath();
+      this.ctx.arc(n.x, n.y, n.radius, 0, Math.PI * 2);
+      this.ctx.fill();
+
+      // Connect close neighbors with hairline corridors
+      for (let j = idx + 1; j < this.nodes.length; j++) {
+        const m = this.nodes[j];
+        const dist = Math.hypot(n.x - m.x, n.y - m.y);
+        if (dist < 130) {
+          this.ctx.strokeStyle = isDark 
+            ? `rgba(198, 165, 107, ${(1 - dist / 130) * 0.08})`
+            : `rgba(177, 138, 82, ${(1 - dist / 130) * 0.09})`;
+          this.ctx.beginPath();
+          this.ctx.moveTo(n.x, n.y);
+          this.ctx.lineTo(m.x, m.y);
+          this.ctx.stroke();
         }
       }
-    }
-  }
-  drawFinder(0, 0);
-  drawFinder(0, size - 7);
-  drawFinder(size - 7, 0);
+    });
 
-  for (let r = 0; r < size; r++) {
-    for (let c = 0; c < size; c++) {
-      if ((r < 8 && c < 8) || (r < 8 && c >= size - 8) || (r >= size - 8 && c < 8)) continue;
-      grid[r][c] = ((hash ^ (r * 37 + c * 43)) % 3) === 0;
-    }
-  }
+    // 3. Pulse Waves
+    this.pulses.forEach(p => {
+      p.r += p.speed;
+      if (p.r > p.maxR) p.r = 0;
+      const alpha = (1 - p.r / p.maxR) * 0.15;
+      this.ctx.strokeStyle = isDark ? `rgba(112, 181, 170, ${alpha})` : `rgba(77, 129, 123, ${alpha})`;
+      this.ctx.beginPath();
+      this.ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+      this.ctx.stroke();
+    });
 
-  const rects = [];
-  for (let r = 0; r < size; r++) {
-    for (let c = 0; c < size; c++) {
-      if (grid[r][c]) {
-        rects.push(`<rect x="${c * 5}" y="${r * 5}" width="5" height="5" fill="#000000" />`);
-      }
-    }
+    this.animFrameId = requestAnimationFrame(() => this._animate());
   }
-
-  return `
-    <svg viewBox="0 0 ${size * 5} ${size * 5}" xmlns="http://www.w3.org/2000/svg" width="100%" height="100%">
-      <rect width="${size * 5}" height="${size * 5}" fill="#ffffff" />
-      ${rects.join('')}
-    </svg>
-  `;
 }
 
 // -----------------------------------------------------------------------------
-// Dynamic Theme & Custom Color Customizer
+// 2. Interactive Real Map Engine (Leaflet + CartoDB Warm/Dark Tiles)
 // -----------------------------------------------------------------------------
-function hexToRgba(hex, alpha) {
-  let r = 0, g = 0, b = 0;
-  if (hex.length === 4) {
-    r = parseInt(hex[1] + hex[1], 16);
-    g = parseInt(hex[2] + hex[2], 16);
-    b = parseInt(hex[3] + hex[3], 16);
-  } else if (hex.length === 7) {
-    r = parseInt(hex.slice(1, 3), 16);
-    g = parseInt(hex.slice(3, 5), 16);
-    b = parseInt(hex.slice(5, 7), 16);
-  }
-  return `rgba(${r}, ${g}, ${b}, ${alpha})`;
+function getMapTileUrl() {
+  return state.themeMode === 'light'
+    ? 'https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png'
+    : 'https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png';
 }
 
+function initHeroMap() {
+  const container = document.getElementById('heroInteractiveMap');
+  if (!container || typeof L === 'undefined') return;
+
+  if (state.leafletHeroMap) {
+    try { state.leafletHeroMap.remove(); } catch (e) {}
+    state.leafletHeroMap = null;
+  }
+
+  // Tokyo Shinjuku Center
+  const tokyoCenter = [35.6895, 139.6917];
+  const map = L.map(container, {
+    center: tokyoCenter,
+    zoom: 13,
+    zoomControl: false,
+    scrollWheelZoom: false,
+    doubleClickZoom: false,
+    dragging: true,
+    attributionControl: false,
+  });
+
+  L.tileLayer(getMapTileUrl(), { maxZoom: 19 }).addTo(map);
+
+  // User location marker (Gold beacon)
+  const userIcon = L.divIcon({
+    className: 'custom-map-beacon beacon-user',
+    html: `<span class="beacon-radar-ring"></span><span>✦</span>`,
+    iconSize: [28, 28],
+    iconAnchor: [14, 14],
+  });
+  L.marker(tokyoCenter, { icon: userIcon }).addTo(map);
+
+  // Surrounding Hospital Beacons
+  const hospitalPoints = [
+    { coords: [35.6980, 139.7000], name: 'St. Jude Emergency Center' },
+    { coords: [35.6750, 139.7120], name: 'City General ICU & Trauma' },
+    { coords: [35.6920, 139.6750], name: 'Metro Cardiology Pavilion' },
+  ];
+
+  const hospIcon = L.divIcon({
+    className: 'custom-map-beacon beacon-hospital',
+    html: `<span class="beacon-radar-ring"></span><span>✚</span>`,
+    iconSize: [26, 26],
+    iconAnchor: [13, 13],
+  });
+
+  hospitalPoints.forEach(h => {
+    L.marker(h.coords, { icon: hospIcon }).addTo(map);
+  });
+
+  state.leafletHeroMap = map;
+
+  // Subtle ambient camera drift
+  let driftAngle = 0;
+  setInterval(() => {
+    if (state.leafletHeroMap && document.getElementById('heroInteractiveMap')) {
+      driftAngle += 0.002;
+      state.leafletHeroMap.panBy([Math.cos(driftAngle) * 0.4, Math.sin(driftAngle) * 0.3], { animate: false });
+    }
+  }, 100);
+}
+
+function initHospitalsMap(hospitals = []) {
+  const container = document.getElementById('facilitiesMapMount');
+  if (!container || typeof L === 'undefined') return;
+
+  if (state.leafletHospitalsMap) {
+    try { state.leafletHospitalsMap.remove(); } catch (e) {}
+    state.leafletHospitalsMap = null;
+  }
+
+  const userCoords = [35.6895, 139.6917];
+  const map = L.map(container, {
+    center: userCoords,
+    zoom: 13,
+    zoomControl: true,
+    scrollWheelZoom: true,
+    attributionControl: false,
+  });
+
+  L.tileLayer(getMapTileUrl(), { maxZoom: 19 }).addTo(map);
+
+  // User Marker
+  const userIcon = L.divIcon({
+    className: 'custom-map-beacon beacon-user',
+    html: `<span class="beacon-radar-ring"></span><span>✦</span>`,
+    iconSize: [28, 28],
+    iconAnchor: [14, 14],
+  });
+  L.marker(userCoords, { icon: userIcon })
+    .bindPopup('<strong>Your Current Position</strong><br>GPS: Tokyo Metro Core')
+    .addTo(map);
+
+  // Hospitals Markers
+  const hospIcon = L.divIcon({
+    className: 'custom-map-beacon beacon-hospital',
+    html: `<span class="beacon-radar-ring"></span><span>✚</span>`,
+    iconSize: [28, 28],
+    iconAnchor: [14, 14],
+  });
+
+  const markers = {};
+  hospitals.forEach(h => {
+    const lat = h.Latitude || 35.6895 + (Math.random() - 0.5) * 0.04;
+    const lon = h.Longitude || 139.6917 + (Math.random() - 0.5) * 0.04;
+    const marker = L.marker([lat, lon], { icon: hospIcon }).addTo(map);
+
+    const popupHtml = `
+      <div style="padding: 4px; font-family: var(--font-sans);">
+        <strong style="font-size: 0.95rem;">${h.Name}</strong><br>
+        <span style="font-size: 0.78rem; color: var(--text-secondary);">Available: ${h.Capacity || 100} Beds • ${h.DistanceKm || 4.2} km</span><br>
+        <div style="margin-top: 8px;">
+          <a href="tel:${(h.ContactInfo || '').replace(/[^\d+]/g, '')}" class="btn btn-sm btn-primary" style="text-decoration: none; padding: 4px 10px; font-size: 0.75rem;">
+            Call Admissions
+          </a>
+        </div>
+      </div>
+    `;
+    marker.bindPopup(popupHtml);
+    markers[h.HospitalID] = { marker, coords: [lat, lon], data: h };
+  });
+
+  state.leafletHospitalsMap = map;
+  state.hospitalMarkers = markers;
+}
+
+function focusHospitalOnMap(hospitalId) {
+  if (!state.leafletHospitalsMap || !state.hospitalMarkers) return;
+  const entry = state.hospitalMarkers[hospitalId];
+  if (!entry) return;
+
+  const map = state.leafletHospitalsMap;
+  map.flyTo(entry.coords, 14, { duration: 1.2 });
+  entry.marker.openPopup();
+
+  // Draw emergency route polyline
+  if (state.activeRouteLine) {
+    map.removeLayer(state.activeRouteLine);
+  }
+
+  const userCoords = [35.6895, 139.6917];
+  state.activeRouteLine = L.polyline([userCoords, entry.coords], {
+    color: state.themeMode === 'light' ? '#B18A52' : '#C6A56B',
+    weight: 3.5,
+    opacity: 0.85,
+    dashArray: '6, 8',
+  }).addTo(map);
+
+  showToast(`Ambulance route traced to ${entry.data.Name} (ETA ~${entry.data.EstimatedDriveMinutes || 8} min)`, 'info');
+}
+
+// -----------------------------------------------------------------------------
+// 3. Theme & Atmosphere Engine
+// -----------------------------------------------------------------------------
 function applyCurrentTheme() {
   document.documentElement.setAttribute('data-theme', state.themeMode);
 
-  const root = document.documentElement;
-  const hex = state.accentColor;
-  root.style.setProperty('--accent-primary', hex);
-  root.style.setProperty('--accent-hover', hex);
-  root.style.setProperty('--accent-glow', hexToRgba(hex, 0.35));
-  root.style.setProperty('--accent-bg-subtle', hexToRgba(hex, 0.08));
+  // Sync Sun / Moon icon
+  const sunIcon = document.querySelector('.theme-sun-icon');
+  const moonIcon = document.querySelector('.theme-moon-icon');
+  if (sunIcon && moonIcon) {
+    sunIcon.classList.toggle('hidden', state.themeMode === 'dark');
+    moonIcon.classList.toggle('hidden', state.themeMode === 'light');
+  }
 
-  // Update modal buttons if present
+  // Update theme modal toggles
   const btnDark = document.getElementById('btnModeDark');
   const btnLight = document.getElementById('btnModeLight');
   if (btnDark) btnDark.classList.toggle('active', state.themeMode === 'dark');
   if (btnLight) btnLight.classList.toggle('active', state.themeMode === 'light');
 
-  const customInput = document.getElementById('customColorInput');
-  const customHex = document.getElementById('customColorHex');
-  if (customInput) customInput.value = hex;
-  if (customHex) customHex.value = hex;
-
-  document.querySelectorAll('.preset-color-chip').forEach(chip => {
-    chip.classList.toggle('active', (chip.dataset.color || '').toLowerCase() === hex.toLowerCase());
-  });
+  // Update Leaflet tile layers if map exists
+  if (state.leafletHeroMap) {
+    state.leafletHeroMap.eachLayer(layer => {
+      if (layer instanceof L.TileLayer) layer.setUrl(getMapTileUrl());
+    });
+  }
+  if (state.leafletHospitalsMap) {
+    state.leafletHospitalsMap.eachLayer(layer => {
+      if (layer instanceof L.TileLayer) layer.setUrl(getMapTileUrl());
+    });
+  }
 }
 
 function setDisplayMode(mode) {
   state.themeMode = mode;
   localStorage.setItem('emergency_theme_mode', mode);
   applyCurrentTheme();
+  showToast(`Atmosphere switched to ${mode === 'dark' ? 'Quiet Obsidian' : 'Warm Ivory'}`, 'info');
 }
 
 function setAccentColor(colorHex) {
   if (!/^#[0-9A-Fa-f]{6}$/.test(colorHex)) return;
   state.accentColor = colorHex;
   localStorage.setItem('emergency_accent_color', colorHex);
-  applyCurrentTheme();
+  document.documentElement.style.setProperty('--gold', colorHex);
+  document.documentElement.style.setProperty('--border-focus', colorHex);
 }
 
 // -----------------------------------------------------------------------------
-// 22 Indian Languages Internationalization Engine
+// 4. 22 Indian Languages Internationalization Engine
 // -----------------------------------------------------------------------------
 function applyCurrentLanguage() {
   const langObj = (typeof LANGUAGES !== 'undefined' && LANGUAGES.find(l => l.code === state.lang)) || { native: 'English', name: 'English' };
@@ -204,8 +429,24 @@ function renderLanguageList(filterText = '') {
 }
 
 // -----------------------------------------------------------------------------
-// Emergency Audio Synthesizer (Web Audio API)
+// 5. Toast Notifications & Siren Chime
 // -----------------------------------------------------------------------------
+function showToast(message, type = 'info') {
+  const container = document.getElementById('toastContainer');
+  if (!container) return;
+
+  const toast = document.createElement('div');
+  toast.className = `toast toast-${type}`;
+  toast.innerHTML = `<span>${message}</span>`;
+  container.appendChild(toast);
+
+  setTimeout(() => {
+    toast.style.opacity = '0';
+    toast.style.transform = 'translateY(10px)';
+    setTimeout(() => toast.remove(), 300);
+  }, 3800);
+}
+
 function toggleEmergencySiren() {
   if (state.sirenActive) {
     stopSiren();
@@ -243,7 +484,7 @@ function startSiren() {
 
     const sirenBtn = document.getElementById('navSirenBtn');
     if (sirenBtn) sirenBtn.classList.add('active');
-    showToast('🚨 Emergency alert chime active', 'error');
+    showToast('🚨 Emergency alert chime activated', 'emergency');
   } catch (e) {
     console.warn('Audio note:', e);
   }
@@ -263,7 +504,173 @@ function stopSiren() {
 }
 
 // -----------------------------------------------------------------------------
-// API Communications & Health
+// 6. Standalone Vector SVG QR Generator
+// -----------------------------------------------------------------------------
+function generateQrSvg(text) {
+  const size = 21;
+  const hash = Array.from(text).reduce((acc, char) => (acc * 31 + char.charCodeAt(0)) % 1000000007, 7);
+  const grid = Array(size).fill(0).map(() => Array(size).fill(false));
+
+  function drawFinder(r0, c0) {
+    for (let r = 0; r < 7; r++) {
+      for (let c = 0; c < 7; c++) {
+        if (r === 0 || r === 6 || c === 0 || c === 6 || (r >= 2 && r <= 4 && c >= 2 && c <= 4)) {
+          grid[r0 + r][c0 + c] = true;
+        }
+      }
+    }
+  }
+  drawFinder(0, 0);
+  drawFinder(0, size - 7);
+  drawFinder(size - 7, 0);
+
+  for (let r = 0; r < size; r++) {
+    for (let c = 0; c < size; c++) {
+      if ((r < 8 && c < 8) || (r < 8 && c >= size - 8) || (r >= size - 8 && c < 8)) continue;
+      grid[r][c] = ((hash ^ (r * 37 + c * 43)) % 3) === 0;
+    }
+  }
+
+  const rects = [];
+  for (let r = 0; r < size; r++) {
+    for (let c = 0; c < size; c++) {
+      if (grid[r][c]) {
+        rects.push(`<rect x="${c * 5}" y="${r * 5}" width="5" height="5" fill="#121614" />`);
+      }
+    }
+  }
+
+  return `
+    <svg viewBox="0 0 ${size * 5} ${size * 5}" xmlns="http://www.w3.org/2000/svg" width="100%" height="100%">
+      <rect width="${size * 5}" height="${size * 5}" fill="#FFFFFF" />
+      ${rects.join('')}
+    </svg>
+  `;
+}
+
+// -----------------------------------------------------------------------------
+// 7. Emergency Triage Engine & Bedrock Claude 3 Integration
+// -----------------------------------------------------------------------------
+async function fetchEmergencyTriage(touristId, location = 'Tokyo Central Station', lat = null, lon = null) {
+  const displayContainer = document.getElementById('triageActiveDisplay');
+  if (displayContainer) {
+    displayContainer.innerHTML = `
+      <div class="glass-card" style="padding: 48px; text-align: center;">
+        <div class="status-indicator-dot" style="margin: 0 auto 16px auto; width: 12px; height: 12px;"></div>
+        <h3 style="font-size: 1.4rem;">DECODING EMERGENCY IDENTITY (${touristId})</h3>
+        <p style="color: var(--text-secondary); font-size: 0.9rem; margin-top: 6px;">Querying Amazon DynamoDB & synthesising Amazon Bedrock Claude 3 clinical briefing...</p>
+      </div>
+    `;
+  }
+
+  try {
+    let url = `${API_BASE}/emergency?tourist_id=${encodeURIComponent(touristId)}&location=${encodeURIComponent(location)}`;
+    if (lat && lon) url += `&latitude=${lat}&longitude=${lon}`;
+
+    const res = await fetch(url);
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.error || `Triage query failed (${res.status})`);
+
+    state.currentTriageData = data;
+    renderTriageViewContent(data);
+    showToast(`Emergency Passport for ${data.profile.Name} decoded!`, 'success');
+  } catch (err) {
+    if (displayContainer) {
+      displayContainer.innerHTML = `
+        <div class="glass-card" style="padding: 40px; text-align: center;">
+          <h3 style="color: var(--emergency);">Emergency Record Lookup Failed</h3>
+          <p style="color: var(--text-secondary); margin: 8px 0 20px 0;">${err.message}</p>
+          <button class="btn btn-primary" onclick="fetchEmergencyTriage('T-1001')">Load Default (Elena Rostova)</button>
+        </div>
+      `;
+    }
+    showToast(err.message, 'emergency');
+  }
+}
+
+function renderTriageViewContent(data) {
+  const container = document.getElementById('triageActiveDisplay');
+  if (!container) return;
+
+  const profile = data.profile;
+  const hospital = data.recommended_hospital;
+  const summary = data.ai_summary;
+
+  const allergies = Array.isArray(profile.Allergies) ? profile.Allergies : Array.from(profile.Allergies || []);
+  const conditions = Array.isArray(profile.Conditions) ? profile.Conditions : Array.from(profile.Conditions || []);
+  const contacts = Array.isArray(profile.EmergencyContacts) ? profile.EmergencyContacts : Array.from(profile.EmergencyContacts || []);
+
+  container.innerHTML = `
+    <div style="display: flex; flex-direction: column; gap: 32px; animation: fadeIn 0.3s var(--ease-out);">
+      
+      <!-- Central Document Presentation -->
+      ${UI.renderPassportDocument({
+        bloodGroup: profile.BloodType,
+        allergies: allergies,
+        conditions: conditions,
+        emergencyContacts: contacts.map((c, i) => ({ name: c, relationship: 'Contact', phone: c })),
+        lastVerified: profile.LastUpdated ? profile.LastUpdated.split('T')[0] : 'Today'
+      }, {
+        name: profile.Name,
+        passportId: profile.TouristID,
+        avatar: (profile.Name || 'U').slice(0, 2).toUpperCase(),
+        country: 'Verified Citizen',
+        language: profile.Language,
+        dob: `${profile.Age || 29} Years Old`
+      })}
+
+      <!-- Authoritative Amazon Bedrock Claude 3 Clinical Field Briefing Document -->
+      <div class="field-briefing-sheet glass-card">
+        <div class="briefing-header-row">
+          <div>
+            <span class="briefing-claude-badge">AMAZON BEDROCK CLAUDE 3 • FIELD BRIEFING SPECIFICATION</span>
+            <h3 style="font-size: 1.3rem; margin-top: 4px;">Urgent Clinical Field Briefing</h3>
+          </div>
+          <button class="btn btn-sm btn-outline" onclick="navigator.clipboard.writeText(\`${(summary || '').replace(/`/g, '\\`')}\`); showToast('Briefing copied to EMS radio buffer', 'success');">
+            <span class="btn-icon">${UI.icons.copy}</span>
+            <span>Copy for Radio</span>
+          </button>
+        </div>
+
+        <div class="briefing-body-content">
+          ${summary || 'Generating concise clinical briefing...'}
+        </div>
+
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 24px; padding-top: 14px; border-top: 1px solid var(--border-subtle); font-family: var(--font-mono); font-size: 0.7rem; color: var(--text-muted);">
+          <span>LATENCY: 680MS • ENVELOPE ENCRYPTED</span>
+          <span style="color: var(--gold);">GOLDEN HOUR DIRECT ROUTE</span>
+        </div>
+      </div>
+
+      <!-- Recommended Trauma Center -->
+      ${hospital ? `
+        <div class="glass-card" style="padding: 28px;">
+          <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 16px;">
+            <div>
+              <span class="story-eyebrow">OPTIMAL TRAUMA CENTER MATCH</span>
+              <h3 style="font-size: 1.4rem;">${hospital.Name}</h3>
+              <p style="font-size: 0.84rem; color: var(--text-secondary); margin-top: 2px;">
+                Direct trauma dispatch verified • Available Beds: <strong>${hospital.Capacity || 82}</strong> • Drive ETA: <strong>~${hospital.EstimatedDriveMinutes || 8} min</strong>
+              </p>
+            </div>
+            <a href="tel:${(hospital.ContactInfo || '').replace(/[^\d+]/g, '')}" class="btn btn-primary btn-lg">
+              <span class="btn-icon">${UI.icons.phone}</span>
+              <span>Call Trauma Admissions</span>
+            </a>
+          </div>
+
+          <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+            ${(Array.isArray(hospital.Services) ? hospital.Services : []).map(s => `<span class="service-pill">${s}</span>`).join('')}
+          </div>
+        </div>
+      ` : ''}
+
+    </div>
+  `;
+}
+
+// -----------------------------------------------------------------------------
+// 8. API Communications & Health Check
 // -----------------------------------------------------------------------------
 async function checkHealth() {
   try {
@@ -274,7 +681,6 @@ async function checkHealth() {
     state.activeBackend = data.database?.active_backend || 'local';
   } catch (err) {
     state.systemHealthy = false;
-    console.warn('Health check note:', err);
   }
 }
 
@@ -290,234 +696,19 @@ async function fetchHospitals() {
   }
 }
 
-async function saveTouristProfile(payload) {
-  const isUpdate = Boolean(payload.TouristID);
-  const url = isUpdate ? `${API_BASE}/tourists/${encodeURIComponent(payload.TouristID)}` : `${API_BASE}/tourists`;
-  const method = isUpdate ? 'PUT' : 'POST';
-
-  const res = await fetch(url, {
-    method,
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(payload),
-  });
-
-  const data = await res.json();
-  if (!res.ok) {
-    throw new Error(data.error || 'Failed to save profile');
-  }
-  return data.tourist;
-}
-
 // -----------------------------------------------------------------------------
-// Emergency Triage Engine
-// -----------------------------------------------------------------------------
-async function fetchEmergencyTriage(touristId, location = 'Incident Location', lat = null, lon = null) {
-  const displayContainer = document.getElementById('triageActiveDisplay');
-  if (displayContainer) {
-    displayContainer.innerHTML = `
-      <div class="triage-loading-card glass-card">
-        <div class="loading-spinner-large"></div>
-        <div class="loading-text">
-          <h3>DECODING EMERGENCY IDENTITY (${touristId})</h3>
-          <p>Querying Amazon DynamoDB & synthesising Amazon Bedrock Claude 3 clinical briefing...</p>
-        </div>
-      </div>
-    `;
-  }
-
-  try {
-    let url = `${API_BASE}/emergency?tourist_id=${encodeURIComponent(touristId)}&location=${encodeURIComponent(location)}`;
-    if (lat && lon) url += `&latitude=${lat}&longitude=${lon}`;
-
-    const res = await fetch(url);
-    const data = await res.json();
-
-    if (!res.ok) throw new Error(data.error || `Triage query failed (${res.status})`);
-
-    state.currentTriageData = data;
-    renderTriageViewContent(data);
-    showToast(`Emergency Passport for ${data.profile.Name} decoded!`, 'success');
-  } catch (err) {
-    if (displayContainer) {
-      displayContainer.innerHTML = `
-        <div class="triage-error-card glass-card">
-          <div class="error-icon">⚠️</div>
-          <h3>Emergency Record Lookup Failed</h3>
-          <p>${err.message}</p>
-          <button class="btn btn-primary" onclick="fetchEmergencyTriage('T-1001')">Load Default (Elena Rostova)</button>
-        </div>
-      `;
-    }
-    showToast(err.message, 'error');
-  }
-}
-
-function renderTriageViewContent(data) {
-  const container = document.getElementById('triageActiveDisplay');
-  if (!container) return;
-
-  const profile = data.profile;
-  const hospital = data.recommended_hospital;
-  const summary = data.ai_summary;
-
-  const allergies = Array.isArray(profile.Allergies) ? profile.Allergies : Array.from(profile.Allergies || []);
-  const conditions = Array.isArray(profile.Conditions) ? profile.Conditions : Array.from(profile.Conditions || []);
-  const contacts = Array.isArray(profile.EmergencyContacts) ? profile.EmergencyContacts : Array.from(profile.EmergencyContacts || []);
-  const services = hospital ? (Array.isArray(hospital.Services) ? hospital.Services : Array.from(hospital.Services || [])) : [];
-
-  container.innerHTML = `
-    <div class="triage-results-grid">
-      <!-- 1. Patient Emergency Digital Identity Card -->
-      <div class="glass-card triage-patient-card">
-        <div class="triage-card-header">
-          <div class="patient-id-badge">
-            <span class="pulse-dot"></span>
-            <strong>${profile.TouristID}</strong>
-          </div>
-          <span class="status-pill-badge verified">VERIFIED RECORD</span>
-        </div>
-
-        <div class="triage-identity-row">
-          <div class="patient-avatar-circle">
-            ${(profile.Name || 'U').slice(0, 2).toUpperCase()}
-          </div>
-          <div class="patient-meta-text">
-            <h2>${profile.Name}</h2>
-            <div class="patient-submeta">
-              <span>${profile.Age} Years Old</span>
-              <span>•</span>
-              <span>Language: ${profile.Language}</span>
-            </div>
-          </div>
-          <div class="patient-blood-badge">
-            <span class="blood-label">BLOOD TYPE</span>
-            <span class="blood-type-val">${profile.BloodType}</span>
-          </div>
-        </div>
-
-        <!-- Critical Allergies Alert (Emergency Red) -->
-        <div class="triage-alert-section">
-          <div class="triage-section-label">
-            <span class="warning-icon">⛔</span>
-            <strong>CRITICAL ALLERGIES & CONTRAINDICATIONS</strong>
-          </div>
-          <div class="triage-tags-row">
-            ${allergies.length > 0 && allergies[0] !== 'None Reported'
-              ? allergies.map(a => `<span class="tag-badge allergy">⛔ ${a}</span>`).join('')
-              : '<span class="tag-badge safe">✓ No Known Fatal Drug Allergies</span>'}
-          </div>
-        </div>
-
-        <!-- Chronic Conditions -->
-        <div class="triage-conditions-section">
-          <div class="triage-section-label">CHRONIC MEDICAL CONDITIONS</div>
-          <div class="triage-tags-row">
-            ${conditions.length > 0
-              ? conditions.map(c => `<span class="tag-badge condition">${c}</span>`).join('')
-              : '<span class="tag-badge">None Reported</span>'}
-          </div>
-        </div>
-
-        <!-- Important Notes -->
-        ${profile.Notes ? `
-          <div class="triage-notes-section">
-            <div class="triage-section-label">CLINICAL EMERGENCY NOTES</div>
-            <p class="triage-notes-body">${profile.Notes}</p>
-          </div>
-        ` : ''}
-
-        <!-- Emergency Contacts -->
-        <div class="triage-contacts-section">
-          <div class="triage-section-label">EMERGENCY FAMILY CONTACTS</div>
-          <div class="triage-contacts-list">
-            ${contacts.map(c => {
-              const phoneMatch = c.match(/(\+?[\d\s\-]{7,})/);
-              const phone = phoneMatch ? phoneMatch[1].trim() : '';
-              return `
-                <div class="triage-contact-item">
-                  <span>📞 ${c}</span>
-                  ${phone ? `<a href="tel:${phone}" class="btn-dial">CALL NOW</a>` : ''}
-                </div>
-              `;
-            }).join('')}
-          </div>
-        </div>
-      </div>
-
-      <!-- 2. Amazon Bedrock Claude 3 AI Clinical Briefing (Purple) -->
-      <div class="glass-card triage-ai-card">
-        <div class="triage-card-header">
-          <div class="ai-brand-badge">
-            <span>🧠</span>
-            <strong>AMAZON BEDROCK CLAUDE 3</strong>
-          </div>
-          <span class="ai-mode-pill">CLINICAL BRIEFING</span>
-        </div>
-
-        <div class="ai-briefing-body">
-          <p class="ai-synthesis-text">${summary || 'Synthesizing urgent clinical assessment...'}</p>
-        </div>
-
-        <div class="ai-card-footer">
-          <button class="btn btn-sm btn-outline" onclick="navigator.clipboard.writeText(\`${(summary || '').replace(/`/g, '\\`')}\`); showToast('Clinical briefing copied!', 'success');">
-            📋 Copy Briefing for EMS Radio
-          </button>
-          <span class="latency-pill">⚡ Latency: 680ms</span>
-        </div>
-      </div>
-
-      <!-- 3. Recommended Trauma Center (Cyan Safe) -->
-      ${hospital ? `
-        <div class="glass-card triage-hospital-card">
-          <div class="triage-card-header">
-            <div class="hospital-brand-badge">
-              <span>🏥</span>
-              <strong>OPTIMAL TRAUMA FACILITY</strong>
-            </div>
-            <span class="match-score-badge">${hospital.MatchScore || 95}% MATCH</span>
-          </div>
-
-          <div class="hospital-info-body">
-            <h3>${hospital.Name}</h3>
-            <div class="hospital-specs-grid">
-              <div class="spec-cell">
-                <span class="spec-label">AVAILABLE BEDS</span>
-                <span class="spec-val">${hospital.Capacity || 'Open'}</span>
-              </div>
-              <div class="spec-cell">
-                <span class="spec-label">DISTANCE</span>
-                <span class="spec-val">${hospital.DistanceKm || '5.2'} km</span>
-              </div>
-              <div class="spec-cell">
-                <span class="spec-label">AMBULANCE DRIVE</span>
-                <span class="spec-val">~${hospital.EstimatedDriveMinutes || 8} min</span>
-              </div>
-            </div>
-
-            <div class="hospital-services-wrap">
-              <span class="services-label">DEPARTMENTS & CAPABILITIES:</span>
-              <div class="triage-tags-row">
-                ${services.map(s => `<span class="tag-badge service">${s}</span>`).join('')}
-              </div>
-            </div>
-
-            <div class="hospital-actions-row">
-              <a href="tel:${(hospital.ContactInfo || '911').replace(/[^\d+]/g, '')}" class="btn btn-primary btn-block">
-                📞 CALL TRAUMA ADMISSIONS (${hospital.ContactInfo || 'Direct'})
-              </a>
-            </div>
-          </div>
-        </div>
-      ` : ''}
-    </div>
-  `;
-}
-
-// -----------------------------------------------------------------------------
-// Setup Global Event Listeners & Modals
+// 9. Global Modal & Scroll Handlers
 // -----------------------------------------------------------------------------
 function setupGlobalListeners() {
-  // Language Modal Handlers
+  // Translucent Navbar Scroll Compression
+  window.addEventListener('scroll', () => {
+    const nav = document.querySelector('.editorial-nav-wrapper');
+    if (nav) {
+      nav.classList.toggle('scrolled', window.scrollY > 24);
+    }
+  }, { passive: true });
+
+  // Language Modal
   const langModal = document.getElementById('langModal');
   const closeLangBtn = document.getElementById('closeLangModalBtn');
   const langSearchInput = document.getElementById('langSearchInput');
@@ -525,12 +716,11 @@ function setupGlobalListeners() {
   if (closeLangBtn && langModal) {
     closeLangBtn.addEventListener('click', () => langModal.classList.add('hidden'));
   }
-
   if (langSearchInput) {
     langSearchInput.addEventListener('input', (e) => renderLanguageList(e.target.value));
   }
 
-  // Theme Modal Handlers
+  // Theme Modal & Controls
   const themeModal = document.getElementById('themeModal');
   const closeThemeBtn = document.getElementById('closeThemeModalBtn');
   const btnModeDark = document.getElementById('btnModeDark');
@@ -542,7 +732,6 @@ function setupGlobalListeners() {
   if (closeThemeBtn && themeModal) {
     closeThemeBtn.addEventListener('click', () => themeModal.classList.add('hidden'));
   }
-
   if (btnModeDark) btnModeDark.addEventListener('click', () => setDisplayMode('dark'));
   if (btnModeLight) btnModeLight.addEventListener('click', () => setDisplayMode('light'));
 
@@ -555,12 +744,11 @@ function setupGlobalListeners() {
   if (customColorInput) {
     customColorInput.addEventListener('input', (e) => setAccentColor(e.target.value));
   }
-
   if (applyCustomColorBtn && customColorHex) {
     applyCustomColorBtn.addEventListener('click', () => setAccentColor(customColorHex.value.trim()));
   }
 
-  // Close modals when clicking backdrop
+  // Close modals on backdrop click or Escape
   [langModal, themeModal].forEach(modal => {
     if (modal) {
       modal.addEventListener('click', (e) => {
@@ -569,7 +757,6 @@ function setupGlobalListeners() {
     }
   });
 
-  // Escape key closes modals
   document.addEventListener('keydown', (e) => {
     if (e.key === 'Escape') {
       if (langModal) langModal.classList.add('hidden');
@@ -579,30 +766,30 @@ function setupGlobalListeners() {
 }
 
 // -----------------------------------------------------------------------------
-// App Initialization
+// 10. Bootstrap Application
 // -----------------------------------------------------------------------------
 async function initApp() {
-  // Apply visual theme and custom color
-  applyCurrentTheme();
+  // 1. Initialize Ambient Canvas
+  new AmbientCanvasEngine('ambientCanvas');
 
-  // Populate and render language directory
+  // 2. Apply theme & language
+  applyCurrentTheme();
   renderLanguageList();
   applyCurrentLanguage();
 
-  // Setup global event listeners
+  // 3. Setup global listeners
   setupGlobalListeners();
 
-  // Fetch initial system health & hospital database
+  // 4. Check API health & hospital records
   await checkHealth();
   await fetchHospitals();
 
-  // Initialize router
+  // 5. Mount current route
   if (typeof appRouter !== 'undefined') {
     appRouter.handleRoute();
   }
 }
 
-// Bootstrap once DOM is ready
 if (document.readyState === 'loading') {
   document.addEventListener('DOMContentLoaded', initApp);
 } else {
