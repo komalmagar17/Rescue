@@ -64,16 +64,16 @@ const Views = {
                 allergies: ['Penicillin (Anaphylaxis)', 'Peanuts (Severe)'],
                 conditions: ['Asthma (Carry Inhaler)', 'Mild Hypertension'],
                 emergencyContacts: [
-                  { name: 'Mark Rostova', relationship: 'Spouse', phone: '+1 (555) 019-2834' },
-                  { name: 'Dr. Viktor Rostov', relationship: 'Father · Physician', phone: '+1 (555) 018-9921' }
+                  { name: 'Pooja Sharma', relationship: 'Spouse', phone: '+91 98101 23456' },
+                  { name: 'Dr. Rajesh Sharma', relationship: 'Father · Physician', phone: '+91 98111 87654' }
                 ],
                 lastVerified: '2026-09-22'
               }, {
-                name: 'Elena Rostova',
+                name: 'Aarav Sharma',
                 passportId: 'T-1001',
-                avatar: 'ER',
-                country: 'International Traveler',
-                language: 'English, Russian',
+                avatar: 'AS',
+                country: 'India',
+                language: 'English, Hindi',
                 dob: '1995-04-12'
               })}
             </div>
@@ -217,7 +217,7 @@ const Views = {
           <form id="loginForm" class="auth-form">
             <div class="editorial-field">
               <label for="loginEmail" class="editorial-label">Email Address or Username</label>
-              <input type="text" id="loginEmail" class="editorial-input" required placeholder="elena@rescue.io" value="elena@rescue.io" autocomplete="username" />
+              <input type="text" id="loginEmail" class="editorial-input" required placeholder="aarav@rescue.in" value="aarav@rescue.in" autocomplete="username" />
             </div>
 
             <div class="editorial-field">
@@ -293,12 +293,12 @@ const Views = {
           <form id="signupForm" class="auth-form">
             <div class="editorial-field">
               <label for="signupName" class="editorial-label">Full Name</label>
-              <input type="text" id="signupName" class="editorial-input" required placeholder="Elena Rostova" />
+              <input type="text" id="signupName" class="editorial-input" required placeholder="Aarav Sharma" />
             </div>
 
             <div class="editorial-field">
               <label for="signupEmail" class="editorial-label">Email Address</label>
-              <input type="email" id="signupEmail" class="editorial-input" required placeholder="elena@rescue.io" />
+              <input type="email" id="signupEmail" class="editorial-input" required placeholder="aarav@rescue.in" />
             </div>
 
             <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 14px;">
@@ -361,7 +361,7 @@ const Views = {
           <form id="forgotForm" class="auth-form">
             <div class="editorial-field">
               <label for="forgotEmail" class="editorial-label">Email Address</label>
-              <input type="email" id="forgotEmail" class="editorial-input" required placeholder="elena@rescue.io" value="elena@rescue.io" />
+              <input type="email" id="forgotEmail" class="editorial-input" required placeholder="aarav@rescue.in" value="aarav@rescue.in" />
             </div>
 
             <button type="submit" class="btn btn-primary btn-block btn-lg">
@@ -445,12 +445,12 @@ const Views = {
               <div class="auth-form" style="margin-top: 24px;">
                 <div class="editorial-field">
                   <label class="editorial-label">Full Name</label>
-                  <input type="text" id="obName" class="editorial-input" value="${user?.name || 'Elena Rostova'}" required />
+                  <input type="text" id="obName" class="editorial-input" value="${user?.name || 'Aarav Sharma'}" required />
                 </div>
                 <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 14px;">
                   <div class="editorial-field">
                     <label class="editorial-label">Nationality</label>
-                    <input type="text" id="obNationality" class="editorial-input" value="${user?.country || 'International Traveler'}" required />
+                    <input type="text" id="obNationality" class="editorial-input" value="${user?.country || 'India'}" required />
                   </div>
                   <div class="editorial-field">
                     <label class="editorial-label">Preferred Language</label>
@@ -596,7 +596,7 @@ const Views = {
         <header class="dashboard-hero-header">
           <div>
             <span class="story-eyebrow">PERSONAL EMERGENCY COMMAND CENTER</span>
-            <h1 class="dash-salutation">Good evening, ${(u.name || 'Elena').split(' ')[0]}.</h1>
+            <h1 class="dash-salutation">Good evening, ${(u.name || 'Aarav').split(' ')[0]}.</h1>
             <p class="dash-subtitle">Your Emergency Passport is verified and active across all global trauma networks.</p>
           </div>
 
@@ -718,7 +718,7 @@ const Views = {
                   <span class="timeline-bullet"></span>
                   <div class="activity-text-wrap">
                     <span class="activity-main-text">Regional trauma centers mapped</span>
-                    <span class="activity-time-stamp">4 Facilities • Tokyo Metro Area</span>
+                    <span class="activity-time-stamp">4 Facilities • Delhi NCR Sector</span>
                   </div>
                 </div>
               </div>
@@ -968,9 +968,10 @@ const Views = {
         <!-- Quick Demo Case Shortcuts -->
         <div style="display: flex; gap: 8px; align-items: center; margin-top: 14px; font-size: 0.8rem; color: var(--text-secondary); flex-wrap: wrap;">
           <span style="font-family: var(--font-mono); font-size: 0.72rem; letter-spacing: 0.05em; color: var(--gold);">VERIFIED DEMO CASES:</span>
-          <button class="btn btn-ghost btn-sm" onclick="fetchEmergencyTriage('T-1001')" style="padding: 3px 10px; font-size: 0.78rem; border-radius: var(--radius-pill); border: 1px solid var(--border);">Elena Rostova (O+)</button>
-          <button class="btn btn-ghost btn-sm" onclick="fetchEmergencyTriage('T-1002')" style="padding: 3px 10px; font-size: 0.78rem; border-radius: var(--radius-pill); border: 1px solid var(--border);">Kenji Sato (A-)</button>
-          <button class="btn btn-ghost btn-sm" onclick="fetchEmergencyTriage('T-1003')" style="padding: 3px 10px; font-size: 0.78rem; border-radius: var(--radius-pill); border: 1px solid var(--border);">Chloe Dupont (B+)</button>
+          <button class="btn btn-ghost btn-sm" onclick="fetchEmergencyTriage('T-1001')" style="padding: 3px 10px; font-size: 0.78rem; border-radius: var(--radius-pill); border: 1px solid var(--border);">Aarav Sharma (O+)</button>
+          <button class="btn btn-ghost btn-sm" onclick="fetchEmergencyTriage('T-1002')" style="padding: 3px 10px; font-size: 0.78rem; border-radius: var(--radius-pill); border: 1px solid var(--border);">Rohan Kulkarni (A-)</button>
+          <button class="btn btn-ghost btn-sm" onclick="fetchEmergencyTriage('T-1003')" style="padding: 3px 10px; font-size: 0.78rem; border-radius: var(--radius-pill); border: 1px solid var(--border);">Ananya Iyer (B+)</button>
+          <button class="btn btn-ghost btn-sm" onclick="fetchEmergencyTriage('T-1004')" style="padding: 3px 10px; font-size: 0.78rem; border-radius: var(--radius-pill); border: 1px solid var(--border);">Arjun Patel (O-)</button>
         </div>
 
         <!-- Active Triage Workspace Mount -->
@@ -1030,7 +1031,7 @@ const Views = {
           <div style="display: flex; justify-content: space-between; align-items: center; padding-bottom: 20px; border-bottom: 1px solid var(--border);">
             <div>
               <span class="story-eyebrow">NAME & IDENTIFIER</span>
-              <h3 style="font-size: 1.3rem;">${u.name || 'Elena Rostova'}</h3>
+              <h3 style="font-size: 1.3rem;">${u.name || 'Aarav Sharma'}</h3>
               <span style="font-family: var(--font-mono); font-size: 0.8rem; color: var(--gold);">${u.passportId || 'T-1001'} • ${u.email}</span>
             </div>
             <a href="#/passport/edit" class="btn btn-sm btn-outline" data-route="/passport/edit">Edit Details</a>
@@ -1112,7 +1113,7 @@ const Views = {
           <div style="display: flex; justify-content: space-between; align-items: center;">
             <div>
               <strong>Active Session</strong>
-              <p style="font-size: 0.82rem; color: var(--text-secondary);">Logged in as ${user?.email || 'elena@rescue.io'}</p>
+              <p style="font-size: 0.82rem; color: var(--text-secondary);">Logged in as ${user?.email || 'aarav@rescue.in'}</p>
             </div>
             <button class="btn btn-sm btn-outline" style="color: var(--emergency); border-color: var(--emergency);" id="settingsLogoutBtn">
               <span>Sign Out</span>
@@ -1134,7 +1135,7 @@ const Views = {
           <div>
             <span class="story-eyebrow">FIRST RESPONDER TERMINAL</span>
             <h1 style="font-size: 2rem;">Paramedic Dispatch HUD</h1>
-            <p style="font-size: 0.9rem; color: var(--text-secondary);">Unit: EMS Battalion 4 • First Responder: <strong>${user?.name || 'Marcus Vance'}</strong></p>
+            <p style="font-size: 0.9rem; color: var(--text-secondary);">Unit: Delhi EMS Battalion 108 • First Responder: <strong>${user?.name || 'Paramedic Vikram Rathore'}</strong></p>
           </div>
           <a href="#/triage" class="btn btn-primary btn-lg" data-route="/triage">
             <span class="btn-icon">${UI.icons.qrCode}</span>
@@ -1149,12 +1150,12 @@ const Views = {
               <span style="font-family: var(--font-mono); font-weight: 700; color: var(--gold);">CASE-8841</span>
               <span class="editorial-status-pill" style="color: var(--emergency); border-color: var(--emergency); background: var(--emergency-subtle);">CRITICAL</span>
             </div>
-            <h4 style="font-size: 1.1rem;">Elena Rostova (29 y/o, Blood: <strong class="text-gold">O+</strong>)</h4>
+            <h4 style="font-size: 1.1rem;">Aarav Sharma (29 y/o, Blood: <strong class="text-gold">O+</strong>)</h4>
             <div style="font-size: 0.82rem; color: var(--emergency); margin: 8px 0; font-weight: 600;">
               <span class="icon-inline">${UI.icons.alertCircle}</span> CONTRAINDICATION: <span class="text-gold">Penicillin, Peanuts</span>
             </div>
             <div style="font-size: 0.78rem; color: var(--text-secondary); margin-bottom: 16px;">
-              <span class="icon-inline">${UI.icons.mapPin}</span> Tokyo Shinjuku Terminal • <strong class="text-gold">ETA 6 mins</strong>
+              <span class="icon-inline">${UI.icons.mapPin}</span> Connaught Place Metro Hub • <strong class="text-gold">ETA 6 mins</strong>
             </div>
             <a href="#/triage?id=T-1001" class="btn btn-sm btn-primary">Open Clinical Brief</a>
           </div>
@@ -1164,12 +1165,12 @@ const Views = {
               <span style="font-family: var(--font-mono); font-weight: 700; color: var(--gold);">CASE-8842</span>
               <span class="editorial-status-pill verified">STABLE</span>
             </div>
-            <h4 style="font-size: 1.1rem;">Kenji Sato (34 y/o, Blood: <strong class="text-gold">A-</strong>)</h4>
+            <h4 style="font-size: 1.1rem;">Rohan Kulkarni (34 y/o, Blood: <strong class="text-gold">A-</strong>)</h4>
             <div style="font-size: 0.82rem; color: var(--emergency); margin: 8px 0; font-weight: 600;">
               <span class="icon-inline">${UI.icons.alertCircle}</span> CONTRAINDICATION: <span class="text-gold">Latex, Sulfa Drugs</span>
             </div>
             <div style="font-size: 0.78rem; color: var(--text-secondary); margin-bottom: 16px;">
-              <span class="icon-inline">${UI.icons.mapPin}</span> Roppongi Hills • <strong class="text-gold">ETA 11 mins</strong>
+              <span class="icon-inline">${UI.icons.mapPin}</span> Hauz Khas Enclave • <strong class="text-gold">ETA 11 mins</strong>
             </div>
             <a href="#/triage?id=T-1002" class="btn btn-sm btn-primary">Open Clinical Brief</a>
           </div>
@@ -1184,8 +1185,8 @@ const Views = {
         <header style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px;">
           <div>
             <span class="story-eyebrow">HOSPITAL ADMISSIONS COMMAND</span>
-            <h1 style="font-size: 2rem;">City General Trauma Center</h1>
-            <p style="font-size: 0.9rem; color: var(--text-secondary);">Chief of Emergency Medicine: <strong>${user?.name || 'Dr. Alistair Chen'}</strong></p>
+            <h1 style="font-size: 2rem;">AIIMS New Delhi — Apex Trauma Centre</h1>
+            <p style="font-size: 0.9rem; color: var(--text-secondary);">Chief of Emergency Medicine: <strong>${user?.name || 'Dr. Priya Nair'}</strong></p>
           </div>
           <button class="btn btn-outline btn-sm">Refresh Inventory</button>
         </header>

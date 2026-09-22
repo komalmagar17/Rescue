@@ -198,10 +198,10 @@ function initHeroMap() {
     state.leafletHeroMap = null;
   }
 
-  // Tokyo Shinjuku Center
-  const tokyoCenter = [35.6895, 139.6917];
+  // New Delhi Central Center
+  const delhiCenter = [28.6139, 77.2090];
   const map = L.map(container, {
-    center: tokyoCenter,
+    center: delhiCenter,
     zoom: 13,
     zoomControl: false,
     scrollWheelZoom: false,
@@ -219,13 +219,14 @@ function initHeroMap() {
     iconSize: [28, 28],
     iconAnchor: [14, 14],
   });
-  L.marker(tokyoCenter, { icon: userIcon }).addTo(map);
+  L.marker(delhiCenter, { icon: userIcon }).addTo(map);
 
-  // Surrounding Hospital Beacons
+  // Surrounding Hospital Beacons in Delhi NCR
   const hospitalPoints = [
-    { coords: [35.6980, 139.7000], name: 'St. Jude Emergency Center' },
-    { coords: [35.6750, 139.7120], name: 'City General ICU & Trauma' },
-    { coords: [35.6920, 139.6750], name: 'Metro Cardiology Pavilion' },
+    { coords: [28.5672, 77.2100], name: 'AIIMS New Delhi — Apex Trauma Centre' },
+    { coords: [28.5701, 77.2078], name: 'Safdarjung Hospital Emergency Block' },
+    { coords: [28.5282, 77.2131], name: 'Max Super Speciality Saket' },
+    { coords: [28.5412, 77.2831], name: 'Apollo Indraprastha Sarita Vihar' },
   ];
 
   const hospIcon = L.divIcon({
@@ -266,7 +267,7 @@ function initHospitalsMap(hospitals = []) {
     state.leafletHospitalsMap = null;
   }
 
-  const userCoords = [35.6895, 139.6917];
+  const userCoords = [28.6139, 77.2090];
   const map = L.map(container, {
     center: userCoords,
     zoom: 13,
@@ -285,7 +286,7 @@ function initHospitalsMap(hospitals = []) {
     iconAnchor: [14, 14],
   });
   L.marker(userCoords, { icon: userIcon })
-    .bindPopup('<strong>Your Current Position</strong><br>GPS: Tokyo Metro Core')
+    .bindPopup('<strong>Your Current Position</strong><br>GPS: New Delhi Central District / Connaught Place')
     .addTo(map);
 
   // Hospitals Markers
@@ -1039,7 +1040,7 @@ if (typeof window !== 'undefined') {
 // -----------------------------------------------------------------------------
 // 7. Emergency Triage Engine & Clinical AI Integration
 // -----------------------------------------------------------------------------
-async function fetchEmergencyTriage(touristId, location = 'Tokyo Central Station', lat = null, lon = null) {
+async function fetchEmergencyTriage(touristId, location = 'Connaught Place, New Delhi', lat = 28.6304, lon = 77.2177) {
   const displayContainer = document.getElementById('triageActiveDisplay');
   if (displayContainer) {
     displayContainer.innerHTML = `
@@ -1068,7 +1069,7 @@ async function fetchEmergencyTriage(touristId, location = 'Tokyo Central Station
         <div class="glass-card" style="padding: 40px; text-align: center;">
           <h3 style="color: var(--emergency);">Emergency Record Lookup Failed</h3>
           <p style="color: var(--text-secondary); margin: 8px 0 20px 0;">${err.message}</p>
-          <button class="btn btn-primary" onclick="fetchEmergencyTriage('T-1001')">Load Default (Elena Rostova)</button>
+          <button class="btn btn-primary" onclick="fetchEmergencyTriage('T-1001')">Load Default (Aarav Sharma)</button>
         </div>
       `;
     }
@@ -1494,7 +1495,7 @@ function initStitchCommandDock() {
   tabTraveler?.addEventListener('click', () => {
     if (typeof authService !== 'undefined') authService.switchRole(ROLES.TRAVELER);
     if (typeof appRouter !== 'undefined') appRouter.navigate('/dashboard');
-    showToast('Switched to Traveler Mode (Elena Rostova)', 'info');
+    showToast('Switched to Traveler Mode (Aarav Sharma)', 'info');
   });
 
   tabResponder?.addEventListener('click', () => {
@@ -1514,7 +1515,7 @@ function initStitchCommandDock() {
     if (typeof appRouter !== 'undefined') {
       appRouter.navigate('/triage');
       setTimeout(() => {
-        fetchEmergencyTriage('T-1001', 'Tokyo Central Station (Simulated Incident)', 35.6812, 139.7671);
+        fetchEmergencyTriage('T-1001', 'Connaught Place Metro Hub (Simulated Incident)', 28.6304, 77.2177);
       }, 250);
     }
   });
@@ -1531,24 +1532,34 @@ function initStitchCommandDock() {
 }
 
 // -----------------------------------------------------------------------------
-// 10.C Luxury Interactive Cursor & Spring Trailing Engine
+// 10.C Luxury Interactive Cursor & Spring Trailing Engine (Industry Grade)
 // -----------------------------------------------------------------------------
 class LuxuryCursorEngine {
   constructor() {
     this.dot = document.getElementById('cursorDot');
     this.ring = document.getElementById('cursorRing');
     this.trail = document.getElementById('cursorTrail');
+    this.glow = document.getElementById('cursorGlow');
     if (!this.dot || !this.ring) return;
 
     if (window.matchMedia('(hover: none) and (pointer: coarse)').matches) return;
     if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
 
     this.mouse = { x: -100, y: -100 };
+    this.lastMouse = { x: -100, y: -100 };
     this.ringPos = { x: -100, y: -100 };
+    this.glowPos = { x: -100, y: -100 };
+    this.speed = 0;
+    this.smoothSpeed = 0;
+    this.angle = 0;
+    this.scaleX = 1;
+    this.scaleY = 1;
     this.isHovering = false;
     this.isClicking = false;
     this.isVisible = false;
-    this.lerpFactor = 0.22;
+    this.magnetTarget = null;
+    this.lerpFactor = 0.24;
+    this.glowLerpFactor = 0.085;
 
     this._bindEvents();
     this._renderLoop();
@@ -1563,17 +1574,20 @@ class LuxuryCursorEngine {
         this.isVisible = true;
         this.dot.style.opacity = '1';
         this.ring.style.opacity = '1';
+        if (this.glow) this.glow.style.opacity = '1';
       }
 
-      const target = e.target.closest(
-        'a, button, input, select, textarea, .btn, .custom-dropdown-btn, .custom-dropdown-item, .stitch-role-tab, .stitch-action-btn, .stitch-dock-link, .stitch-smart-chip, .stitch-card, .relationship-contact-card, .editorial-hospital-card, [data-interactive], [role="button"]'
+      const interactive = e.target.closest(
+        'a, button, input, select, textarea, .btn, .custom-dropdown-btn, .custom-dropdown-item, .stitch-role-tab, .stitch-action-btn, .stitch-dock-link, .stitch-smart-chip, .stitch-card, .relationship-contact-card, .editorial-hospital-card, .scanner-preset-chip, .shelter-chip, [data-interactive], [role="button"]'
       );
 
-      if (target && !this.isHovering) {
+      if (interactive) {
         this.isHovering = true;
+        this.magnetTarget = interactive;
         document.body.classList.add('cursor-hovering');
-      } else if (!target && this.isHovering) {
+      } else {
         this.isHovering = false;
+        this.magnetTarget = null;
         document.body.classList.remove('cursor-hovering');
       }
     }, { passive: true });
@@ -1593,12 +1607,14 @@ class LuxuryCursorEngine {
       this.isVisible = false;
       this.dot.style.opacity = '0';
       this.ring.style.opacity = '0';
+      if (this.glow) this.glow.style.opacity = '0';
     });
 
     document.documentElement.addEventListener('mouseenter', () => {
       this.isVisible = true;
       this.dot.style.opacity = '1';
       this.ring.style.opacity = '1';
+      if (this.glow) this.glow.style.opacity = '1';
     });
   }
 
@@ -1612,12 +1628,53 @@ class LuxuryCursorEngine {
   }
 
   _renderLoop() {
-    this.ringPos.x += (this.mouse.x - this.ringPos.x) * this.lerpFactor;
-    this.ringPos.y += (this.mouse.y - this.ringPos.y) * this.lerpFactor;
+    // 1. Calculate instant mouse velocity and movement angle
+    const dx = this.mouse.x - this.lastMouse.x;
+    const dy = this.mouse.y - this.lastMouse.y;
+    this.speed = Math.hypot(dx, dy);
+    this.smoothSpeed += (this.speed - this.smoothSpeed) * 0.18;
 
+    if (this.speed > 0.8) {
+      this.angle = Math.atan2(dy, dx);
+    }
+
+    this.lastMouse.x = this.mouse.x;
+    this.lastMouse.y = this.mouse.y;
+
+    // 2. Velocity squish & stretch dynamic calculation
+    const squish = Math.min(this.smoothSpeed * 0.012, 0.48);
+    const targetScaleX = this.isHovering ? 1.3 : (this.isClicking ? 0.78 : (1 + squish));
+    const targetScaleY = this.isHovering ? 1.3 : (this.isClicking ? 0.78 : (1 / (1 + squish * 0.75)));
+    this.scaleX += (targetScaleX - this.scaleX) * 0.22;
+    this.scaleY += (targetScaleY - this.scaleY) * 0.22;
+
+    // 3. Magnetic pull calculation when hovering interactive controls
+    let targetX = this.mouse.x;
+    let targetY = this.mouse.y;
+
+    if (this.magnetTarget && this.isHovering) {
+      const rect = this.magnetTarget.getBoundingClientRect();
+      const centerX = rect.left + rect.width / 2;
+      const centerY = rect.top + rect.height / 2;
+      // 32% magnetic attraction towards the center of element
+      targetX = this.mouse.x + (centerX - this.mouse.x) * 0.32;
+      targetY = this.mouse.y + (centerY - this.mouse.y) * 0.32;
+    }
+
+    // 4. Spring position lerping
+    this.ringPos.x += (targetX - this.ringPos.x) * this.lerpFactor;
+    this.ringPos.y += (targetY - this.ringPos.y) * this.lerpFactor;
+
+    this.glowPos.x += (this.mouse.x - this.glowPos.x) * this.glowLerpFactor;
+    this.glowPos.y += (this.mouse.y - this.glowPos.y) * this.glowLerpFactor;
+
+    // 5. Update DOM transforms with GPU acceleration
     if (this.isVisible) {
       this.dot.style.transform = `translate3d(${this.mouse.x}px, ${this.mouse.y}px, 0)`;
-      this.ring.style.transform = `translate3d(${this.ringPos.x}px, ${this.ringPos.y}px, 0)`;
+      this.ring.style.transform = `translate3d(${this.ringPos.x}px, ${this.ringPos.y}px, 0) rotate(${this.angle}rad) scale(${this.scaleX}, ${this.scaleY})`;
+      if (this.glow) {
+        this.glow.style.transform = `translate3d(${this.glowPos.x}px, ${this.glowPos.y}px, 0)`;
+      }
     }
 
     requestAnimationFrame(() => this._renderLoop());

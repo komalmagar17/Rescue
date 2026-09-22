@@ -547,68 +547,75 @@ def handle_list_alerts(
     Returns active regional disaster early warnings with dynamic distance calculation,
     evacuation directives, and emergency hospital shelter routing.
     """
-    user_lat = latitude if latitude is not None else 35.6762  # Tokyo Central
-    user_lon = longitude if longitude is not None else 139.6503
+    user_lat = latitude if latitude is not None else 28.6139  # New Delhi Central
+    user_lon = longitude if longitude is not None else 77.2090
 
-    # Primary Critical Alert: Earthquake Early Warning
-    eq_lat = 35.6120
-    eq_lon = 139.8100
+    # Primary Critical Alert: Himalayan Foothill Seismic Tremor
+    eq_lat = 28.7200
+    eq_lon = 77.1500
     eq_dist = round(calculate_haversine_distance(user_lat, user_lon, eq_lat, eq_lon), 1)
 
-    # Secondary Warning: Flash Flood / Typhoon Surge Advisory
-    fl_lat = 35.6200
-    fl_lon = 139.7500
+    # Secondary Warning: Yamuna Flood Surge & Lowland Inundation
+    fl_lat = 28.6500
+    fl_lon = 77.2400
     fl_dist = round(calculate_haversine_distance(user_lat, user_lon, fl_lat, fl_lon), 1)
 
     alerts = [
         {
-            "id": "ALERT-2026-0922-01",
-            "disaster_type": "EARTHQUAKE",
+            "id": "ALERT-2026-IN-01",
+            "disaster_type": "SEISMIC_EARTHQUAKE",
             "severity": "CRITICAL",
-            "headline": "EARTHQUAKE EARLY WARNING — MAGNITUDE 5.8 DETECTED",
-            "location": "Tokyo Bay Seismic Fault (Sub-crustal)",
-            "depth_km": 28,
+            "headline": "HIMALAYAN FOOTHILL SEISMIC EARLY WARNING — MAGNITUDE 5.6 DETECTED",
+            "location": "NCR Northern Perimeter Seismic Fault (Sub-crustal)",
+            "depth_km": 18,
             "epicenter": {"latitude": eq_lat, "longitude": eq_lon},
             "distance_km": eq_dist,
-            "estimated_arrival_sec": max(5, int(eq_dist * 1.4)),
-            "instruction": "Drop, Cover, and Hold On. Move away from glass facades and power lines. Aftershocks imminent.",
+            "estimated_arrival_sec": max(5, int(eq_dist * 1.3)),
+            "instruction": "Drop, Cover, and Hold On. Keep clear of unreinforced brick masonry, metro pillars, and overhead electrical lines. Prepare for aftershocks.",
             "safe_shelters": [
                 {
-                    "name": "St. Luke's International Hospital Enclave",
-                    "type": "Level 1 Disaster Center",
-                    "distance_km": 1.4,
-                    "bed_status": "OPEN (24 Emergency Beds)",
-                    "phone": "+81-3-3541-5151",
+                    "name": "AIIMS Apex Trauma Evacuation Command",
+                    "type": "Level 1 National Disaster Trauma Centre",
+                    "distance_km": 3.2,
+                    "bed_status": "OPEN (42 Emergency Beds Available)",
+                    "phone": "+91-11-2659-3677",
                 },
                 {
-                    "name": "Tokyo Medical Center Emergency Command",
-                    "type": "Reinforced Evacuation Hub",
+                    "name": "Safdarjung Hospital Emergency & Burns Block",
+                    "type": "Reinforced National Disaster Hub",
                     "distance_km": 3.8,
-                    "bed_status": "OPEN (38 Emergency Beds)",
-                    "phone": "+81-3-3411-0111",
+                    "bed_status": "OPEN (54 Emergency Beds Available)",
+                    "phone": "+91-11-2616-5060",
                 },
             ],
             "issued_at": "2026-09-22T21:45:00Z",
             "expires_at": "2026-09-22T23:00:00Z",
         },
         {
-            "id": "ALERT-2026-0922-02",
-            "disaster_type": "FLOOD_SURGE",
+            "id": "ALERT-2026-IN-02",
+            "disaster_type": "FLOOD_INUNDATION",
             "severity": "WARNING",
-            "headline": "FLASH FLOOD & COASTAL WATER SURGE ADVISORY",
-            "location": "Minato & Shinagawa Coastal Lowlands",
+            "headline": "YAMUNA RIVER FLOOD SURGE & LOWLAND INUNDATION ADVISORY",
+            "location": "Yamuna Khadar Floodplain & Ring Road Lowlands",
             "depth_km": 0,
             "epicenter": {"latitude": fl_lat, "longitude": fl_lon},
             "distance_km": fl_dist,
-            "estimated_arrival_sec": 420,
-            "instruction": "Avoid underground transit stations and riverbanks. Move to third floor or higher.",
+            "estimated_arrival_sec": 380,
+            "instruction": "Avoid low-lying underpasses, riverbanks, and flooded subway corridors. Move to elevated arterial roads or 3rd floor shelters immediately.",
             "safe_shelters": [
                 {
-                    "name": "Toranomon Hospital High-Ground Shelter",
-                    "type": "Elevated Medical Complex",
-                    "distance_km": 2.1,
-                    "bed_status": "OPEN",
-                    "phone": "+81-3-3588-1111",
+                    "name": "Max Super Speciality Hospital (Saket Emergency Hub)",
+                    "type": "Elevated Critical Care Complex",
+                    "distance_km": 4.5,
+                    "bed_status": "OPEN (19 Beds Available)",
+                    "phone": "+91-11-2651-5050",
+                },
+                {
+                    "name": "Apollo Hospital Speciality (Sarita Vihar)",
+                    "type": "Tertiary Care Center",
+                    "distance_km": 6.2,
+                    "bed_status": "OPEN (28 Beds Available)",
+                    "phone": "+91-11-2692-5858",
                 },
             ],
             "issued_at": "2026-09-22T21:30:00Z",

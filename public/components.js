@@ -164,7 +164,7 @@ const UI = {
                     <span class="item-icon-box">${UI.icons.user}</span>
                     <div class="item-text-group">
                       <div class="item-title">Traveler</div>
-                      <div class="item-sub">Elena Rostova • Passport</div>
+                      <div class="item-sub">Aarav Sharma • Passport</div>
                     </div>
                     <span class="item-check-gold">${UI.icons.check}</span>
                   </button>
@@ -172,7 +172,7 @@ const UI = {
                     <span class="item-icon-box">${UI.icons.heartPulse}</span>
                     <div class="item-text-group">
                       <div class="item-title">Paramedic</div>
-                      <div class="item-sub">Marcus Vance • Field Triage</div>
+                      <div class="item-sub">Vikram Rathore • Field Triage</div>
                     </div>
                     <span class="item-check-gold">${UI.icons.check}</span>
                   </button>
@@ -180,7 +180,7 @@ const UI = {
                     <span class="item-icon-box">${UI.icons.hospital}</span>
                     <div class="item-text-group">
                       <div class="item-title">Hospital Admin</div>
-                      <div class="item-sub">Dr. Chen • ICU Admissions</div>
+                      <div class="item-sub">Dr. Priya Nair • ICU Admissions</div>
                     </div>
                     <span class="item-check-gold">${UI.icons.check}</span>
                   </button>
@@ -190,7 +190,7 @@ const UI = {
               <!-- Profile Avatar & Compact Dropdown Menu -->
               <div class="user-profile-menu-wrap">
                 <button class="avatar-pill-btn" id="userMenuBtn" aria-haspopup="true" aria-expanded="false">
-                  <span class="avatar-monogram">${user.avatar || 'ER'}</span>
+                  <span class="avatar-monogram">${user.avatar || 'AS'}</span>
                   <span class="avatar-name-label">${(user.name || '').split(' ')[0]}</span>
                   <span class="icon-wrap dropdown-caret">${UI.icons.chevronDown}</span>
                 </button>
@@ -495,7 +495,7 @@ const UI = {
           <!-- Right: Critical Clinical Fields -->
           <div class="passport-clinical-col">
             <div class="traveler-name-row">
-              <h2 class="traveler-full-name">${u.name || 'Elena Rostova'}</h2>
+              <h2 class="traveler-full-name">${u.name || 'Aarav Sharma'}</h2>
               <div class="blood-type-display-badge" data-parallax-depth="20">
                 <span class="blood-caption">BLOOD GROUP</span>
                 <span class="blood-value text-gold-glow">${p.bloodGroup || 'O+'}</span>

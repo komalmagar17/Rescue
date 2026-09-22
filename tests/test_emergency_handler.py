@@ -74,7 +74,7 @@ class TestEmergencyHandler(unittest.TestCase):
     def test_emergency_endpoint_success(self, mock_hospitals, mock_profile):
         mock_profile.return_value = {
             "TouristID": "T-1001",
-            "Name": "Elena Rostova",
+            "Name": "Aarav Sharma",
             "Age": 29,
             "BloodType": "O+",
             "Conditions": ["Asthma"],
@@ -217,7 +217,7 @@ class TestEmergencyHandler(unittest.TestCase):
         mock_response = io.BytesIO(json.dumps({
             "choices": [{
                 "message": {
-                    "content": "• Elena Rostova (29 y/o, Blood: O+)\n• CONTRAINDICATION: Penicillin, Peanuts\n• Chronic: Asthma, Hypertension\n• Lang: English, Russian\n• Contact: Mark Rostova (+1-555-0199)"
+                    "content": "• Aarav Sharma (29 y/o, Blood: O+)\n• CONTRAINDICATION: Penicillin, Peanuts\n• Chronic: Asthma, Hypertension\n• Lang: Hindi, English\n• Contact: Priya Sharma (+91 98201 44521)"
                 }
             }]
         }).encode("utf-8"))
@@ -233,7 +233,7 @@ class TestEmergencyHandler(unittest.TestCase):
             self.assertEqual(response["statusCode"], 200)
             body = json.loads(response["body"])
             self.assertEqual(body["ai_provider"], "groq")
-            self.assertIn("Elena Rostova", body["ai_summary"])
+            self.assertIn("Aarav Sharma", body["ai_summary"])
             self.assertIn("Penicillin", body["ai_summary"])
 
     @patch("src.emergency_handler.app.urllib.request.urlopen")

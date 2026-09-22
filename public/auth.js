@@ -16,7 +16,7 @@ class AuthService {
       if (storedUser) {
         this._currentUser = JSON.parse(storedUser);
       } else {
-        // Default to Elena Rostova (Traveler) for instant evaluator demo
+        // Default to Aarav Sharma (Traveler) for instant evaluator demo
         this._currentUser = Object.assign({}, DEFAULT_USERS[0]);
         this._persistUser();
       }
@@ -155,7 +155,7 @@ class AuthService {
 
   async loginWithGoogle() {
     await new Promise(r => setTimeout(r, 500));
-    return this.login('elena@rescue.io', 'google-auth');
+    return this.login('aarav@rescue.in', 'google-auth');
   }
 
   async signup(formData) {
@@ -242,19 +242,19 @@ class AuthService {
     this._currentUser.role = role;
 
     if (role === ROLES.RESPONDER) {
-      this._currentUser.name = 'Paramedic Marcus Vance';
-      this._currentUser.email = 'responder@rescue.io';
-      this._currentUser.avatar = 'MV';
-      this._currentUser.badgeNumber = 'EMS-NY-8842';
+      this._currentUser.name = 'Paramedic Vikram Rathore';
+      this._currentUser.email = 'responder@rescue.in';
+      this._currentUser.avatar = 'VR';
+      this._currentUser.badgeNumber = 'DL-EMS-108-442';
     } else if (role === ROLES.ADMIN) {
-      this._currentUser.name = 'Dr. Alistair Chen (Chief ER)';
-      this._currentUser.email = 'admin@hospital.org';
-      this._currentUser.avatar = 'AC';
-      this._currentUser.hospitalName = 'City General ICU & Cardiology Center';
+      this._currentUser.name = 'Dr. Priya Nair (Chief ER)';
+      this._currentUser.email = 'admin@aiims.delhi.in';
+      this._currentUser.avatar = 'PN';
+      this._currentUser.hospitalName = 'AIIMS New Delhi — Apex Trauma Centre';
     } else {
-      this._currentUser.name = 'Elena Rostova';
-      this._currentUser.email = 'elena@rescue.io';
-      this._currentUser.avatar = 'ER';
+      this._currentUser.name = 'Aarav Sharma';
+      this._currentUser.email = 'aarav@rescue.in';
+      this._currentUser.avatar = 'AS';
       this._currentUser.passportId = 'T-1001';
       this._loadPassportForUser();
     }
