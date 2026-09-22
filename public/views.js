@@ -1132,25 +1132,33 @@ const Views = {
 
         <h3 style="font-size: 1.1rem; margin-bottom: 16px;">Active Trauma Cases</h3>
         <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
-          <div class="glass-card" style="padding: 24px;">
+          <div class="glass-card stitch-card" style="padding: 24px;">
             <div style="display: flex; justify-content: space-between; margin-bottom: 10px;">
               <span style="font-family: var(--font-mono); font-weight: 700; color: var(--gold);">CASE-8841</span>
               <span class="editorial-status-pill" style="color: var(--emergency); border-color: var(--emergency); background: var(--emergency-subtle);">CRITICAL</span>
             </div>
-            <h4 style="font-size: 1.1rem;">Elena Rostova (29 y/o, Blood: O+)</h4>
-            <div style="font-size: 0.82rem; color: var(--emergency); margin: 8px 0; font-weight: 600;">⛔ ALLERGY: Penicillin, Peanuts</div>
-            <div style="font-size: 0.78rem; color: var(--text-secondary); margin-bottom: 16px;">📍 Tokyo Shinjuku Terminal • ETA 6 mins</div>
+            <h4 style="font-size: 1.1rem;">Elena Rostova (29 y/o, Blood: <strong class="text-gold">O+</strong>)</h4>
+            <div style="font-size: 0.82rem; color: var(--emergency); margin: 8px 0; font-weight: 600;">
+              <span class="icon-inline">${UI.icons.alertCircle}</span> CONTRAINDICATION: <span class="text-gold">Penicillin, Peanuts</span>
+            </div>
+            <div style="font-size: 0.78rem; color: var(--text-secondary); margin-bottom: 16px;">
+              <span class="icon-inline">${UI.icons.mapPin}</span> Tokyo Shinjuku Terminal • <strong class="text-gold">ETA 6 mins</strong>
+            </div>
             <a href="#/triage?id=T-1001" class="btn btn-sm btn-primary">Open Clinical Brief</a>
           </div>
 
-          <div class="glass-card" style="padding: 24px;">
+          <div class="glass-card stitch-card" style="padding: 24px;">
             <div style="display: flex; justify-content: space-between; margin-bottom: 10px;">
               <span style="font-family: var(--font-mono); font-weight: 700; color: var(--gold);">CASE-8842</span>
               <span class="editorial-status-pill verified">STABLE</span>
             </div>
-            <h4 style="font-size: 1.1rem;">Kenji Sato (34 y/o, Blood: A-)</h4>
-            <div style="font-size: 0.82rem; color: var(--emergency); margin: 8px 0; font-weight: 600;">⛔ ALLERGY: Latex, Sulfa Drugs</div>
-            <div style="font-size: 0.78rem; color: var(--text-secondary); margin-bottom: 16px;">📍 Roppongi Hills • ETA 11 mins</div>
+            <h4 style="font-size: 1.1rem;">Kenji Sato (34 y/o, Blood: <strong class="text-gold">A-</strong>)</h4>
+            <div style="font-size: 0.82rem; color: var(--emergency); margin: 8px 0; font-weight: 600;">
+              <span class="icon-inline">${UI.icons.alertCircle}</span> CONTRAINDICATION: <span class="text-gold">Latex, Sulfa Drugs</span>
+            </div>
+            <div style="font-size: 0.78rem; color: var(--text-secondary); margin-bottom: 16px;">
+              <span class="icon-inline">${UI.icons.mapPin}</span> Roppongi Hills • <strong class="text-gold">ETA 11 mins</strong>
+            </div>
             <a href="#/triage?id=T-1002" class="btn btn-sm btn-primary">Open Clinical Brief</a>
           </div>
         </div>

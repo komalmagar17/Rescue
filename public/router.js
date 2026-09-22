@@ -117,27 +117,73 @@ class Router {
     if (userMenuBtn && userDropdownMenu) {
       userMenuBtn.addEventListener('click', (e) => {
         e.stopPropagation();
-        userDropdownMenu.classList.toggle('hidden');
+        const willOpen = !userDropdownMenu.classList.contains('is-open');
+        userDropdownMenu.classList.toggle('is-open', willOpen);
+        userDropdownMenu.classList.toggle('hidden', !willOpen);
+        userMenuBtn.setAttribute('aria-expanded', willOpen ? 'true' : 'false');
       });
 
-      document.addEventListener('click', () => {
-        userDropdownMenu.classList.add('hidden');
+      document.addEventListener('click', (e) => {
+        if (!userMenuBtn.contains(e.target) && !userDropdownMenu.contains(e.target)) {
+          userDropdownMenu.classList.remove('is-open');
+          userDropdownMenu.classList.add('hidden');
+          userMenuBtn.setAttribute('aria-expanded', 'false');
+        }
       });
     }
 
-    const roleSelect = document.getElementById('roleSwitchSelect');
-    if (roleSelect) {
-      roleSelect.addEventListener('change', (e) => {
-        const newRole = e.target.value;
-        authService.switchRole(newRole);
-        if (newRole === ROLES.RESPONDER) {
-          this.navigate('/responder');
-        } else if (newRole === ROLES.ADMIN) {
-          this.navigate('/hospital-admin');
-        } else {
-          this.navigate('/dashboard');
+    const roleDropdownBtn = document.getElementById('roleDropdownBtn');
+    const roleDropdownMenu = document.getElementById('roleDropdownMenu');
+    if (roleDropdownBtn && roleDropdownMenu) {
+      roleDropdownBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        if (userDropdownMenu) {
+          userDropdownMenu.classList.remove('is-open');
+          userDropdownMenu.classList.add('hidden');
+          userMenuBtn?.setAttribute('aria-expanded', 'false');
         }
-        showToast(`Switched active role to ${newRole.toUpperCase()}`, 'info');
+        const willOpen = !roleDropdownMenu.classList.contains('is-open');
+        roleDropdownMenu.classList.toggle('is-open', willOpen);
+        roleDropdownMenu.classList.toggle('hidden', !willOpen);
+        roleDropdownBtn.setAttribute('aria-expanded', willOpen ? 'true' : 'false');
+      });
+
+      const roleItems = roleDropdownMenu.querySelectorAll('.custom-dropdown-item');
+      roleItems.forEach(item => {
+        item.addEventListener('click', (e) => {
+          e.stopPropagation();
+          const newRole = item.dataset.role;
+          if (!newRole) return;
+
+          roleItems.forEach(i => i.classList.remove('selected'));
+          item.classList.add('selected');
+
+          roleDropdownMenu.classList.remove('is-open');
+          roleDropdownMenu.classList.add('hidden');
+          roleDropdownBtn.setAttribute('aria-expanded', 'false');
+
+          authService.switchRole(newRole);
+          const roleLabel = document.getElementById('roleCurrentLabel');
+          if (roleLabel) {
+            roleLabel.textContent = newRole === ROLES.RESPONDER ? 'Paramedic' : newRole === ROLES.ADMIN ? 'Hospital Admin' : 'Traveler';
+          }
+          if (newRole === ROLES.RESPONDER) {
+            this.navigate('/responder');
+          } else if (newRole === ROLES.ADMIN) {
+            this.navigate('/hospital-admin');
+          } else {
+            this.navigate('/dashboard');
+          }
+          showToast(`Switched active persona to ${newRole.toUpperCase()}`, 'info');
+        });
+      });
+
+      document.addEventListener('click', (e) => {
+        if (!roleDropdownBtn.contains(e.target) && !roleDropdownMenu.contains(e.target)) {
+          roleDropdownMenu.classList.remove('is-open');
+          roleDropdownMenu.classList.add('hidden');
+          roleDropdownBtn.setAttribute('aria-expanded', 'false');
+        }
       });
     }
 

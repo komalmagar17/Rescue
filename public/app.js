@@ -230,7 +230,7 @@ function initHeroMap() {
 
   const hospIcon = L.divIcon({
     className: 'custom-map-beacon beacon-hospital',
-    html: `<span class="beacon-radar-ring"></span><span>✚</span>`,
+    html: `<span class="beacon-radar-ring"></span><span>+</span>`,
     iconSize: [26, 26],
     iconAnchor: [13, 13],
   });
@@ -291,7 +291,7 @@ function initHospitalsMap(hospitals = []) {
   // Hospitals Markers
   const hospIcon = L.divIcon({
     className: 'custom-map-beacon beacon-hospital',
-    html: `<span class="beacon-radar-ring"></span><span>✚</span>`,
+    html: `<span class="beacon-radar-ring"></span><span>+</span>`,
     iconSize: [28, 28],
     iconAnchor: [14, 14],
   });
@@ -603,7 +603,7 @@ function startSiren() {
 
     const sirenBtn = document.getElementById('navSirenBtn');
     if (sirenBtn) sirenBtn.classList.add('active');
-    showToast('🚨 Emergency alert chime activated', 'emergency');
+    showToast('Emergency alert chime activated', 'emergency');
   } catch (e) {
     console.warn('Audio note:', e);
   }
@@ -1021,12 +1021,84 @@ function initStitchParallax() {
 }
 
 // -----------------------------------------------------------------------------
+// 10.B Stitch Persistent Command Dock & Tactile Role Switcher Controller
+// -----------------------------------------------------------------------------
+function initStitchCommandDock() {
+  const tabTraveler = document.getElementById('stitchTabTraveler');
+  const tabResponder = document.getElementById('stitchTabResponder');
+  const tabAdmin = document.getElementById('stitchTabAdmin');
+  const simulateBtn = document.getElementById('stitchSimulateEmergencyBtn');
+
+  function syncTabs(role) {
+    [tabTraveler, tabResponder, tabAdmin].forEach(t => t?.classList.remove('active'));
+    if (role === ROLES.RESPONDER) {
+      tabResponder?.classList.add('active');
+    } else if (role === ROLES.ADMIN) {
+      tabAdmin?.classList.add('active');
+    } else {
+      tabTraveler?.classList.add('active');
+    }
+  }
+
+  // Initial sync & listener
+  if (typeof authService !== 'undefined') {
+    syncTabs(authService.getRole());
+    authService.onAuthStateChanged((user) => {
+      syncTabs(user?.role);
+      const roleLabel = document.getElementById('roleCurrentLabel');
+      if (roleLabel) {
+        roleLabel.textContent = user?.role === ROLES.RESPONDER ? 'Paramedic' : user?.role === ROLES.ADMIN ? 'Hospital Admin' : 'Traveler';
+      }
+    });
+  }
+
+  tabTraveler?.addEventListener('click', () => {
+    if (typeof authService !== 'undefined') authService.switchRole(ROLES.TRAVELER);
+    if (typeof appRouter !== 'undefined') appRouter.navigate('/dashboard');
+    showToast('Switched to Traveler Mode (Elena Rostova)', 'info');
+  });
+
+  tabResponder?.addEventListener('click', () => {
+    if (typeof authService !== 'undefined') authService.switchRole(ROLES.RESPONDER);
+    if (typeof appRouter !== 'undefined') appRouter.navigate('/responder');
+    showToast('Switched to Paramedic First Responder HUD', 'emergency');
+  });
+
+  tabAdmin?.addEventListener('click', () => {
+    if (typeof authService !== 'undefined') authService.switchRole(ROLES.ADMIN);
+    if (typeof appRouter !== 'undefined') appRouter.navigate('/hospital-admin');
+    showToast('Switched to Hospital ER Admissions Console', 'medical');
+  });
+
+  simulateBtn?.addEventListener('click', () => {
+    showToast('Initiating Golden Hour Bedrock AI Triage Simulation...', 'emergency');
+    if (typeof appRouter !== 'undefined') {
+      appRouter.navigate('/triage');
+      setTimeout(() => {
+        fetchEmergencyTriage('T-1001', 'Tokyo Central Station (Simulated Incident)', 35.6812, 139.7671);
+      }, 250);
+    }
+  });
+
+  // Interactive NFC Smart Chip Click Effect
+  document.addEventListener('click', (e) => {
+    const chip = e.target.closest('.stitch-smart-chip');
+    if (chip) {
+      chip.style.transform = 'scale(0.95)';
+      setTimeout(() => { chip.style.transform = ''; }, 150);
+      showToast('NFC Lifeline Scanned: AWS 256-Bit Encrypted Record Read in 42ms', 'medical');
+    }
+  });
+}
+
+// -----------------------------------------------------------------------------
 // 11. Bootstrap Application
 // -----------------------------------------------------------------------------
 async function initApp() {
   // 1. Initialize Ambient Canvas & Parallax
   new AmbientCanvasEngine('ambientCanvas');
   initStitchParallax();
+  initStitchCommandDock();
 
   // 2. Apply theme & language
   applyCurrentTheme();

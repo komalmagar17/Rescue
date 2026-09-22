@@ -147,13 +147,44 @@ const UI = {
             </button>
 
             ${isAuth ? `
-              <!-- Evaluator Role Switcher Pill -->
-              <div class="role-switch-badge" title="Switch Demo Role">
-                <select id="roleSwitchSelect" class="role-select-input">
-                  <option value="${ROLES.TRAVELER}" ${role === ROLES.TRAVELER ? 'selected' : ''}>Traveler</option>
-                  <option value="${ROLES.RESPONDER}" ${role === ROLES.RESPONDER ? 'selected' : ''}>Paramedic</option>
-                  <option value="${ROLES.ADMIN}" ${role === ROLES.ADMIN ? 'selected' : ''}>Hospital Admin</option>
-                </select>
+              <!-- Evaluator Role Switcher Custom Animated Dropdown -->
+              <div class="custom-dropdown-wrap" id="roleDropdownWrap">
+                <button class="custom-dropdown-btn" id="roleDropdownBtn" aria-haspopup="true" aria-expanded="false" title="Switch Demo Persona">
+                  <span class="role-indicator-dot"></span>
+                  <span class="role-current-label" id="roleCurrentLabel">${role === ROLES.RESPONDER ? 'Paramedic' : role === ROLES.ADMIN ? 'Hospital Admin' : 'Traveler'}</span>
+                  <span class="icon-wrap dropdown-caret">${UI.icons.chevronDown}</span>
+                </button>
+                <div class="custom-dropdown-menu" id="roleDropdownMenu" role="listbox" aria-label="Select Demo Persona">
+                  <div class="dropdown-menu-header">
+                    <span class="dropdown-header-eyebrow">DEMO PERSONA</span>
+                    <span class="dropdown-header-sub">Switch active perspective</span>
+                  </div>
+                  <div class="dropdown-divider"></div>
+                  <button class="custom-dropdown-item ${role === ROLES.TRAVELER ? 'selected' : ''}" data-role="${ROLES.TRAVELER}" role="option">
+                    <span class="item-icon-box">${UI.icons.user}</span>
+                    <div class="item-text-group">
+                      <div class="item-title">Traveler</div>
+                      <div class="item-sub">Elena Rostova • Passport</div>
+                    </div>
+                    <span class="item-check-gold">${UI.icons.check}</span>
+                  </button>
+                  <button class="custom-dropdown-item ${role === ROLES.RESPONDER ? 'selected' : ''}" data-role="${ROLES.RESPONDER}" role="option">
+                    <span class="item-icon-box">${UI.icons.heartPulse}</span>
+                    <div class="item-text-group">
+                      <div class="item-title">Paramedic</div>
+                      <div class="item-sub">Marcus Vance • Field Triage</div>
+                    </div>
+                    <span class="item-check-gold">${UI.icons.check}</span>
+                  </button>
+                  <button class="custom-dropdown-item ${role === ROLES.ADMIN ? 'selected' : ''}" data-role="${ROLES.ADMIN}" role="option">
+                    <span class="item-icon-box">${UI.icons.hospital}</span>
+                    <div class="item-text-group">
+                      <div class="item-title">Hospital Admin</div>
+                      <div class="item-sub">Dr. Chen • ICU Admissions</div>
+                    </div>
+                    <span class="item-check-gold">${UI.icons.check}</span>
+                  </button>
+                </div>
               </div>
 
               <!-- Profile Avatar & Compact Dropdown Menu -->
@@ -164,34 +195,34 @@ const UI = {
                   <span class="icon-wrap dropdown-caret">${UI.icons.chevronDown}</span>
                 </button>
 
-                <div class="user-dropdown-sheet hidden" id="userDropdownMenu">
+                <div class="user-dropdown-sheet" id="userDropdownMenu" role="menu" aria-label="User profile options">
                   <div class="sheet-user-summary">
                     <div class="summary-name">${user.name}</div>
                     <div class="summary-meta">${user.email}</div>
                     <div class="summary-role-tag">
                       <span class="tag-gold-dot">✦</span>
-                      <span>${user.passportId || 'T-1001'} • ${role.toUpperCase()}</span>
+                      <span class="text-gold">${user.passportId || 'T-1001'}</span> • <span>${role.toUpperCase()}</span>
                     </div>
                   </div>
                   <div class="sheet-divider"></div>
-                  <a href="#/profile" class="sheet-menu-link" data-route="/profile">
+                  <a href="#/profile" class="sheet-menu-link" data-route="/profile" role="menuitem">
                     <span class="icon-wrap">${UI.icons.user}</span>
                     <span>My Profile</span>
                   </a>
-                  <a href="#/passport" class="sheet-menu-link" data-route="/passport">
+                  <a href="#/passport" class="sheet-menu-link" data-route="/passport" role="menuitem">
                     <span class="icon-wrap">${UI.icons.fileText}</span>
                     <span>Emergency Passport</span>
                   </a>
-                  <a href="#/qr" class="sheet-menu-link" data-route="/qr">
+                  <a href="#/qr" class="sheet-menu-link" data-route="/qr" role="menuitem">
                     <span class="icon-wrap">${UI.icons.qrCode}</span>
                     <span>Emergency QR</span>
                   </a>
-                  <a href="#/settings" class="sheet-menu-link" data-route="/settings">
+                  <a href="#/settings" class="sheet-menu-link" data-route="/settings" role="menuitem">
                     <span class="icon-wrap">${UI.icons.settings}</span>
                     <span>Privacy & Settings</span>
                   </a>
                   <div class="sheet-divider"></div>
-                  <button class="sheet-menu-link text-emergency" id="logoutBtn">
+                  <button class="sheet-menu-link text-emergency" id="logoutBtn" role="menuitem">
                     <span class="icon-wrap">${UI.icons.logOut}</span>
                     <span>Sign Out</span>
                   </button>
@@ -405,7 +436,15 @@ const UI = {
     const contacts = Array.isArray(p.emergencyContacts) ? p.emergencyContacts : [];
 
     return `
-      <div class="luxury-passport-document" id="passportDocumentSheet" data-parallax-card>
+      <div class="luxury-passport-document stitch-card" id="passportDocumentSheet" data-parallax-card>
+        <!-- Stitch Crosshair Corner Pins -->
+        <span class="stitch-pin stitch-pin-tl" aria-hidden="true">✦</span>
+        <span class="stitch-pin stitch-pin-tr" aria-hidden="true">✦</span>
+        <span class="stitch-pin stitch-pin-bl" aria-hidden="true">✦</span>
+        <span class="stitch-pin stitch-pin-br" aria-hidden="true">✦</span>
+
+        <!-- Stitched Tailored Inner Seam -->
+        <div class="stitch-inner-seam" aria-hidden="true"></div>
         
         <!-- Document Guilloché Security Border & Gold Crest -->
         <div class="passport-security-header">
@@ -418,17 +457,23 @@ const UI = {
           </div>
           <div class="passport-id-box" data-parallax-depth="16">
             <span class="id-label">DOCUMENT NO.</span>
-            <span class="id-mono">${u.passportId || 'T-1001'}</span>
+            <span class="id-mono text-gold-glow">${u.passportId || 'T-1001'}</span>
           </div>
         </div>
 
         <div class="passport-body-grid">
           <!-- Left: Identity & Photo Block -->
           <div class="passport-photo-col">
+            <!-- Stitch Metallic NFC Smart Chip -->
+            <div class="stitch-smart-chip" title="Encrypted Health Record NFC Chip (Sub-800ms Read)" data-parallax-depth="28">
+              <div class="chip-circuit-lines"></div>
+              <span class="chip-nfc-glyph">NFC</span>
+            </div>
+
             <div class="traveler-portrait-frame" data-parallax-depth="24">
               <div class="portrait-placeholder">${u.avatar || 'ER'}</div>
               <div class="security-watermark-seal">
-                <span>VERIFIED</span>
+                <span class="text-gold">VERIFIED</span>
               </div>
             </div>
             <div class="passport-doc-metadata">
@@ -453,11 +498,11 @@ const UI = {
               <h2 class="traveler-full-name">${u.name || 'Elena Rostova'}</h2>
               <div class="blood-type-display-badge" data-parallax-depth="20">
                 <span class="blood-caption">BLOOD GROUP</span>
-                <span class="blood-value">${p.bloodGroup || 'O+'}</span>
+                <span class="blood-value text-gold-glow">${p.bloodGroup || 'O+'}</span>
               </div>
             </div>
 
-            <!-- Critical Drug Allergies (Emergency Red) -->
+            <!-- Critical Drug Allergies (Emergency Crimson Highlight) -->
             <div class="clinical-section-block alert-block">
               <span class="section-label-mono">
                 <span class="icon-inline">${UI.icons.alertCircle}</span>
@@ -466,7 +511,7 @@ const UI = {
               <div class="pills-row">
                 ${allergies.length > 0 && allergies[0] !== 'None'
                   ? allergies.map(a => UI.renderAllergyBadge(a)).join('')
-                  : '<span class="safe-tag">✓ No Known Fatal Drug Allergies</span>'}
+                  : '<span class="safe-tag"><span class="safe-star text-gold">✦</span> No Known Fatal Drug Allergies</span>'}
               </div>
             </div>
 
@@ -489,7 +534,7 @@ const UI = {
                     <span class="contact-label"><strong>${c.name}</strong> (${c.relationship})</span>
                     <a href="tel:${(c.phone || '').replace(/[^\d+]/g, '')}" class="btn-tel-link">
                       <span class="icon-inline">${UI.icons.phone}</span>
-                      <span>${c.phone}</span>
+                      <span class="text-gold">${c.phone}</span>
                     </a>
                   </div>
                 `).join('')}
@@ -498,8 +543,8 @@ const UI = {
 
             <!-- Clinical Security Footer Stamp -->
             <div class="passport-security-footer">
-              <span class="footer-timestamp">LAST VERIFIED: ${p.lastVerified || 'TODAY'} • AWS KMS 256-BIT ENCRYPTED</span>
-              <span class="footer-seal-symbol">SECURE MEDICAL SPEC 4.2</span>
+              <span class="footer-timestamp">LAST VERIFIED: <strong class="text-gold">${p.lastVerified || 'TODAY'}</strong> • AWS KMS 256-BIT ENCRYPTED</span>
+              <span class="footer-seal-symbol text-gold">✦ SECURE SPEC 4.2</span>
             </div>
           </div>
         </div>

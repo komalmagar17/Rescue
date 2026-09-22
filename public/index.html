@@ -49,6 +49,58 @@
   <div id="toastContainer" class="toast-stack" aria-live="polite"></div>
 
   <!-- ================================================================= -->
+  <!-- STITCH CREATIVE FLOATING COMMAND DOCK (TACTILE MULTI-ROLE HUD) -->
+  <!-- ================================================================= -->
+  <aside id="stitchCommandDock" class="stitch-command-dock" role="toolbar" aria-label="Emergency Passport Stitch Command HUD">
+    <div class="stitch-dock-inner glass-pill">
+      <!-- Role Switcher Segmented Control -->
+      <div class="stitch-role-tabs" id="stitchRoleTabs">
+        <button class="stitch-role-tab active" data-stitch-role="traveler" id="stitchTabTraveler" title="Traveler Mode (Elena Rostova)">
+          <span class="tab-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" class="dock-svg"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></span>
+          <span class="tab-label">Traveler</span>
+        </button>
+        <button class="stitch-role-tab" data-stitch-role="responder" id="stitchTabResponder" title="Paramedic Responder HUD (Marcus Vance)">
+          <span class="tab-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" class="dock-svg"><path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"/><path d="M3.22 12H9.5l1.5-3 2 6 1.5-3h6.28"/></svg></span>
+          <span class="tab-label">Paramedic</span>
+        </button>
+        <button class="stitch-role-tab" data-stitch-role="admin" id="stitchTabAdmin" title="Hospital ER Command Center (Dr. Chen)">
+          <span class="tab-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" class="dock-svg"><path d="M12 6v4"/><path d="M14 14h-4"/><path d="M14 18h-4"/><path d="M14 8h-4"/><path d="M18 12h-4"/><path d="M6 12h4"/><path d="M3 21h18"/><path d="M5 21V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v16"/></svg></span>
+          <span class="tab-label">ER Chief</span>
+        </button>
+      </div>
+
+      <div class="stitch-dock-divider"></div>
+
+      <!-- Quick Action: Golden Hour AI Simulation -->
+      <button class="stitch-action-btn btn-golden-hour" id="stitchSimulateEmergencyBtn" title="Simulate Golden Hour Emergency Triage (Amazon Bedrock Claude 3)">
+        <span class="stitch-pulse-ring" aria-hidden="true"></span>
+        <span class="btn-sigil"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="dock-svg"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg></span>
+        <span class="btn-text">Test AI Triage</span>
+      </button>
+
+      <!-- Quick Action: Hospital Radar Map -->
+      <a href="#/hospitals" class="stitch-dock-link" id="stitchHospitalRadarBtn" title="Live Emergency Trauma Radar">
+        <span class="link-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" class="dock-svg"><circle cx="12" cy="12" r="10"/><polygon points="16.24 7.76 14.12 14.12 7.76 16.24 9.88 9.88 16.24 7.76"/></svg></span>
+        <span class="link-label">Radar</span>
+      </a>
+
+      <!-- Quick Action: QR Badge -->
+      <a href="#/qr" class="stitch-dock-link" id="stitchQrBtn" title="Instant QR Medical Beacon">
+        <span class="link-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" class="dock-svg"><rect width="5" height="5" x="3" y="3" rx="1"/><rect width="5" height="5" x="16" y="3" rx="1"/><rect width="5" height="5" x="3" y="16" rx="1"/><path d="M21 16h-3a2 2 0 0 0-2 2v3"/><path d="M21 21v.01"/><path d="M12 7v3a2 2 0 0 1-2 2H7"/><path d="M3 12h.01"/><path d="M12 3h.01"/><path d="M12 16v.01"/><path d="M16 12h1"/><path d="M21 12v.01"/><path d="M12 21v-1"/></svg></span>
+        <span class="link-label">QR Card</span>
+      </a>
+
+      <div class="stitch-dock-divider"></div>
+
+      <!-- Live AWS Status Indicator -->
+      <div class="stitch-status-badge" id="stitchAwsStatusBadge" title="AWS Serverless Engine Active">
+        <span class="stitch-status-dot"></span>
+        <span class="stitch-status-text">AWS READY</span>
+      </div>
+    </div>
+  </aside>
+
+  <!-- ================================================================= -->
   <!-- GLOBAL SHARED MODALS (THEME & LANGUAGE) -->
   <!-- ================================================================= -->
 
@@ -91,14 +143,14 @@
         <label class="option-group-label">Surface Atmosphere</label>
         <div class="mode-toggles">
           <button class="mode-toggle-card active" id="btnModeDark">
-            <span class="mode-glyph">🌙</span>
+            <span class="mode-glyph"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" class="mode-svg"><path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"/></svg></span>
             <div class="mode-text">
               <strong>Quiet Obsidian</strong>
               <span>Deep charcoal medical night command</span>
             </div>
           </button>
           <button class="mode-toggle-card" id="btnModeLight">
-            <span class="mode-glyph">☀️</span>
+            <span class="mode-glyph"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" class="mode-svg"><circle cx="12" cy="12" r="4"/><path d="M12 2v2"/><path d="M12 20v2"/><path d="m4.93 4.93 1.41 1.41"/><path d="m17.66 17.66 1.41 1.41"/><path d="M2 12h2"/><path d="M20 12h2"/><path d="m6.34 17.66-1.41 1.41"/><path d="m19.07 4.93-1.41 1.41"/></svg></span>
             <div class="mode-text">
               <strong>Warm Ivory</strong>
               <span>Porcelain daylight & editorial stationary</span>
